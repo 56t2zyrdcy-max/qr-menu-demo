@@ -524,6 +524,8 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
 .order.closed.new{box-shadow:none}
 .histtog{width:100%;margin-top:18px;padding:12px;border:1px solid var(--rule-2);font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ash)}
 .histtog:hover{border-color:var(--ink);color:var(--ink)}
+.histtog.on{border-color:var(--ink);color:var(--ink)}
+.cl-btn.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .daysum{margin-top:12px;padding:11px;border:1px solid var(--rule);font-family:var(--mono);font-size:12px;text-align:center;color:var(--ash)}
 .daysum b{color:var(--ink);font-size:13.5px}
 
@@ -636,6 +638,7 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
     <div class="wctrl" id="waiterSel"></div>
     <div class="wnote" id="waiterNote"></div>
     <div id="orderRoot"></div>
+    <div class="closerow" id="dayRow"></div>
     <div class="closerow" id="closeRow"></div>
     <div class="foot"><a href="?view=service" style="color:var(--ash)">Servicelink</a> · <a href="./" style="color:var(--ash)">Gastansicht</a><br>Jede Station sieht nur ihre Tische. Ein Ruf löst Ton und Vibration aus und wiederholt sich alle 45 Sekunden, bis er quittiert ist.</div>
   </div>
@@ -1173,6 +1176,23 @@ const STATIONS=[
 ];
 const zoneOf = n => STATIONS.find(w => n>=w.from && n<=w.to) || null;
 let activeWaiter='all', soundOn=false, audioCtx=null, showHist=false;
+
+/* Servicetag: läuft von 04:00 bis 04:00 am Folgetag.
+   Eine Spätschicht nach Mitternacht gehört damit noch zum selben Tag. */
+const DAY_START_HOUR = 4;
+function serviceDay(ts){
+  const d = new Date(ts);
+  if(d.getHours() < DAY_START_HOUR) d.setDate(d.getDate()-1);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function dayLabel(key){
+  const today = serviceDay(Date.now());
+  if(key===today) return 'Heute';
+  if(key===serviceDay(Date.now()-864e5)) return 'Gestern';
+  const [Y,M,D] = key.split('-');
+  return D+'.'+M+'.'+Y;
+}
+let viewDay = null;   // null = laufender Servicetag
 const isClosed = o => o.status==='served' || o.status==='done';
 
 const $  = s => document.querySelector(s);
@@ -1482,7 +1502,7 @@ function pushOrder(type){
 /* eingehende Daten -> Oberfläche */
 let seenIds = new Set();
 function onSync(map){
-  const cutoff = Date.now() - 12*3600*1000;
+  const cutoff = Date.now() - 7*24*3600*1000;      // sieben Servicetage aufbewahren
   const list = Object.values(map||{}).filter(o=>o && o.ts>cutoff).sort((a,b)=>b.ts-a.ts);
   const fresh = list.filter(o=>!seenIds.has(o.id) && o.status==='new'
                  && (activeWaiter==='all'||o.waiter===activeWaiter));
@@ -1545,21 +1565,29 @@ function orderCard(o){
 }
 function renderOrders(){
   renderWaiterSel();
-  const openTables = [...new Set(orders.filter(o=>mine(o) && !isClosed(o)).map(o=>o.table))].sort((a,b)=>a-b);
+  const today = serviceDay(Date.now());
+  const day   = viewDay || today;
+  const days  = [...new Set(orders.map(o=>serviceDay(o.ts)))].sort().reverse().slice(0,7);
+  const dr = $('#dayRow');
+  if(dr) dr.innerHTML = days.length>1
+    ? `<span class="cl-lbl">Servicetag:</span>` + days.map(k=>
+        `<button class="cl-btn${k===day?' on':''}" data-day="${k}">${dayLabel(k)}</button>`).join('')
+    : '';
+  const openTables = [...new Set(orders.filter(o=>mine(o) && !isClosed(o) && serviceDay(o.ts)===today).map(o=>o.table))].sort((a,b)=>a-b);
   const cr=$('#closeRow');
-  if(cr) cr.innerHTML = openTables.length
+  if(cr) cr.innerHTML = (openTables.length && day===today)
     ? `<span class="cl-lbl">Tisch abschließen:</span>` +
       openTables.map(t=>`<button class="cl-btn" data-closetable="${t}">Tisch ${t}</button>`).join('')
     : '';
-  const all = orders.filter(mine);
-  const active = all.filter(o=>!isClosed(o));
-  const hist   = all.filter(isClosed);
-  const sum    = hist.filter(o=>o.type==='order').reduce((a,o)=>a+o.total,0)
-               + active.filter(o=>o.type==='order').reduce((a,o)=>a+o.total,0);
+  const all    = orders.filter(o=>mine(o) && serviceDay(o.ts)===day);
+  const active = all.filter(o=>!isClosed(o) && day===today);
+  const hist   = all.filter(o=>isClosed(o) || day!==today);
+  const ords   = all.filter(o=>o.type==='order');
+  const sum    = ords.reduce((a,o)=>a+o.total,0);
   const histBlock = hist.length ? `
-    <button class="histtog" data-toghist>${showHist?'Verlauf ausblenden':'Verlauf anzeigen'} (${hist.length})</button>
+    <button class="histtog${showHist?' on':''}" data-toghist>${showHist?'Verlauf ausblenden':'Verlauf anzeigen'} (${hist.length})</button>
     ${showHist ? hist.map(orderCard).join('') : ''}
-    <div class="daysum">Umsatz an diesen Tischen: <b>${eur(sum)}</b></div>` : '';
+    <div class="daysum">${dayLabel(day)} · ${ords.length} Bestellungen · Umsatz <b>${eur(sum)}</b></div>` : '';
   $('#orderRoot').innerHTML =
     (active.length ? active.map(orderCard).join('')
       : `<div class="empty">Keine offenen Bestellungen.<br><span style="font-size:11px">In der Gastansicht bestellen oder den Serviceruf auslösen.</span></div>`)
@@ -1600,7 +1628,7 @@ function genQR(){
 
 /* ---------------- Ereignisse ---------------- */
 document.addEventListener('click', e=>{
-  const el = e.target.closest('[data-star],[data-prenote],[data-closetable],[data-lang],[data-cat],[data-add],[data-view],[data-close],[data-send],[data-inc],[data-dec],[data-next],[data-done],[data-w],[data-cook],[data-note],[data-chip],[data-notesave]');
+  const el = e.target.closest('[data-toghist],[data-hist],[data-day],[data-star],[data-prenote],[data-closetable],[data-lang],[data-cat],[data-add],[data-view],[data-close],[data-send],[data-inc],[data-dec],[data-next],[data-done],[data-w],[data-cook],[data-note],[data-chip],[data-notesave]');
   if(!el) return;
   if(el.dataset.note){ noteSheet(el.dataset.note); return; }
   if(el.dataset.chip){
@@ -1651,6 +1679,11 @@ document.addEventListener('click', e=>{
   else if(el.dataset.done){ const o=orders.find(x=>x.id===el.dataset.done); o.status='done'; o.closed=Date.now(); SYNC.save(o); }
   else if(el.hasAttribute('data-hist')){ historySheet(); }
   else if(el.hasAttribute('data-toghist')){ showHist=!showHist; renderOrders(); }
+  else if(el.dataset.day){
+    viewDay  = (el.dataset.day===serviceDay(Date.now())) ? null : el.dataset.day;
+    showHist = viewDay!==null;         // vergangener Tag: Verlauf direkt offen
+    renderOrders();
+  }
 });
 document.addEventListener('click', e=>{
   if(!e.target.closest('#soundBtn')) return;
