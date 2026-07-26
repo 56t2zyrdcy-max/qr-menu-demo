@@ -439,6 +439,20 @@ body.has-bar .cartbar{bottom:50px}
 textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-2);color:var(--ink);font-family:var(--body);font-size:13px;padding:11px;resize:vertical;min-height:62px}
 .primary{width:100%;margin-top:13px;background:var(--ember);color:#fff;padding:15px;font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
 .ghost{width:100%;margin-top:8px;padding:12px;border:1px solid var(--rule-2);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ash)}
+/* Notizen pro Gericht */
+.itemnote{display:block;font-size:11.5px;color:var(--ember);margin-top:4px;line-height:1.45}
+.notebtn{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ash);border-bottom:1px solid var(--rule-2);padding:2px 0}
+.notebtn:hover{color:var(--ink);border-color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 4px}
+.chips .chip{font-size:12.5px;padding:9px 12px;border:1px solid var(--rule-2);color:var(--ink);transition:.14s;background:#fff}
+.chips .chip:hover{border-color:var(--ember)}
+.chips .chip.on{background:var(--ember);color:#fff;border-color:var(--ember);font-weight:700}
+.onlbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ash);margin-top:16px}
+.oi{padding:2px 0}
+.oi .pos{font-family:var(--mono);color:var(--ash);margin-right:4px;font-weight:400}
+.inote{font-size:12px;color:var(--ember);font-weight:700;margin:3px 0 5px 22px;padding-left:8px;border-left:2px solid var(--ember)}
+
 /* Garstufen */
 .cookbtn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:14px 14px;border:1px solid var(--rule-2);margin-top:9px;transition:.14s}
 .cookbtn:hover{border-color:var(--ember);background:var(--ember-soft)}
@@ -660,7 +674,7 @@ const ART = {
 
 /* ---------------- UI-Texte ---------------- */
 const T = {
-de:{sub:'Brasilianisches Grillhaus an Bord', cookTitle:'Garstufe wählen', cookNote:'Ihre Auswahl geht direkt an den Grill.', index:'Inhalt', pickTable:'Tisch wählen', myOrders:'Ihre Bestellungen', histEmpty:'Noch keine Bestellung an diesem Tisch.', grandTotal:'Summe bisher', stNew:'Eingegangen', stAcc:'Angenommen', stRdy:'Fertig', stSrv:'Serviert', table:'Tisch',
+de:{sub:'Brasilianisches Grillhaus an Bord', cookTitle:'Garstufe wählen', cookNote:'Ihre Auswahl geht direkt an den Grill.', index:'Inhalt', pickTable:'Tisch wählen', myOrders:'Ihre Bestellungen', histEmpty:'Noch keine Bestellung an diesem Tisch.', grandTotal:'Summe bisher', stNew:'Eingegangen', stAcc:'Angenommen', stRdy:'Fertig', stSrv:'Serviert', noteBtn:'Anmerkung', noteEdit:'Anmerkung ändern', noteTitle:'Anmerkung zu diesem Gericht', noteFree:'Eigener Text (optional)', noteSave:'Übernehmen', noteOne:'Gilt für eine Portion. Wählen Sie für weitere Portionen erneut.', orderNote:'Anmerkung für die ganze Bestellung', table:'Tisch',
   add:'Hinzufügen', cart:'Bestellung ansehen', order:'Bestellung senden',
   yourOrder:'Ihre Bestellung', tableIs:'Tisch', empty:'Noch nichts ausgewählt.',
   notes:'Allergien, Garstufe oder Wünsche? Hier eintragen – die Küche sieht Ihre Notiz.',
@@ -680,7 +694,7 @@ de:{sub:'Brasilianisches Grillhaus an Bord', cookTitle:'Garstufe wählen', cookN
   langNote:'<b>Fünf Sprachen sind aktiv: Deutsch, Englisch, Spanisch, Niederländisch, Türkisch.</b> Weitere Sprachen werden als einzelner Datenblock ergänzt – ohne neues Design. Naheliegend an Bord: Italienisch, Französisch, Portugiesisch, Russisch.',
   vegan:'vegan', alc:'enthält Alkohol', star:'Hinweis *'},
 
-en:{sub:'Brazilian grill house on board', cookTitle:'Choose your doneness', cookNote:'Your choice goes straight to the grill.', index:'Contents', pickTable:'Choose your table', myOrders:'Your orders', histEmpty:'No orders at this table yet.', grandTotal:'Total so far', stNew:'Received', stAcc:'Accepted', stRdy:'Ready', stSrv:'Served', table:'Table',
+en:{sub:'Brazilian grill house on board', cookTitle:'Choose your doneness', cookNote:'Your choice goes straight to the grill.', index:'Contents', pickTable:'Choose your table', myOrders:'Your orders', histEmpty:'No orders at this table yet.', grandTotal:'Total so far', stNew:'Received', stAcc:'Accepted', stRdy:'Ready', stSrv:'Served', noteBtn:'Note', noteEdit:'Change note', noteTitle:'Note for this dish', noteFree:'Your own words (optional)', noteSave:'Apply', noteOne:'Applies to one portion. Repeat for further portions.', orderNote:'Note for the whole order', table:'Table',
   add:'Select', cart:'View order', order:'Send order',
   yourOrder:'Your order', tableIs:'Table', empty:'Nothing selected yet.',
   notes:'Allergies, cooking preference or requests? Write here – the kitchen sees your note.',
@@ -700,7 +714,7 @@ en:{sub:'Brazilian grill house on board', cookTitle:'Choose your doneness', cook
   langNote:'<b>Five languages are live: German, English, Spanish, Dutch, Turkish.</b> Further languages are added as a single data block – no redesign needed. Obvious next steps on board: Italian, French, Portuguese, Russian.',
   vegan:'vegan', alc:'contains alcohol', star:'note *'},
 
-es:{sub:'Parrilla brasileña a bordo', cookTitle:'Elija el punto de cocción', cookNote:'Su elección va directamente a la parrilla.', index:'Contenido', pickTable:'Elija su mesa', myOrders:'Sus pedidos', histEmpty:'Aún no hay pedidos en esta mesa.', grandTotal:'Total hasta ahora', stNew:'Recibido', stAcc:'Aceptado', stRdy:'Listo', stSrv:'Servido', table:'Mesa',
+es:{sub:'Parrilla brasileña a bordo', cookTitle:'Elija el punto de cocción', cookNote:'Su elección va directamente a la parrilla.', index:'Contenido', pickTable:'Elija su mesa', myOrders:'Sus pedidos', histEmpty:'Aún no hay pedidos en esta mesa.', grandTotal:'Total hasta ahora', stNew:'Recibido', stAcc:'Aceptado', stRdy:'Listo', stSrv:'Servido', noteBtn:'Nota', noteEdit:'Cambiar nota', noteTitle:'Nota para este plato', noteFree:'Sus propias palabras (opcional)', noteSave:'Aplicar', noteOne:'Se aplica a una ración. Repita para más raciones.', orderNote:'Nota para todo el pedido', table:'Mesa',
   add:'Elegir', cart:'Ver pedido', order:'Enviar pedido',
   yourOrder:'Su pedido', tableIs:'Mesa', empty:'Aún no ha elegido nada.',
   notes:'¿Alergias, punto de cocción o peticiones? Escríbalo aquí: la cocina verá su nota.',
@@ -720,7 +734,7 @@ es:{sub:'Parrilla brasileña a bordo', cookTitle:'Elija el punto de cocción', c
   langNote:'<b>Cinco idiomas activos: alemán, inglés, español, neerlandés y turco.</b> Cada idioma nuevo se añade como un único bloque de datos, sin rediseñar nada. Siguientes candidatos a bordo: italiano, francés, portugués y ruso.',
   vegan:'vegano', alc:'contiene alcohol', star:'aviso *'},
 
-nl:{sub:'Braziliaans grillhuis aan boord', cookTitle:'Kies de gaarheid', cookNote:'Uw keuze gaat rechtstreeks naar de grill.', index:'Inhoud', pickTable:'Kies uw tafel', myOrders:'Uw bestellingen', histEmpty:'Nog geen bestelling aan deze tafel.', grandTotal:'Totaal tot nu toe', stNew:'Ontvangen', stAcc:'Aangenomen', stRdy:'Klaar', stSrv:'Geserveerd', table:'Tafel',
+nl:{sub:'Braziliaans grillhuis aan boord', cookTitle:'Kies de gaarheid', cookNote:'Uw keuze gaat rechtstreeks naar de grill.', index:'Inhoud', pickTable:'Kies uw tafel', myOrders:'Uw bestellingen', histEmpty:'Nog geen bestelling aan deze tafel.', grandTotal:'Totaal tot nu toe', stNew:'Ontvangen', stAcc:'Aangenomen', stRdy:'Klaar', stSrv:'Geserveerd', noteBtn:'Notitie', noteEdit:'Notitie wijzigen', noteTitle:'Notitie bij dit gerecht', noteFree:'Eigen tekst (optioneel)', noteSave:'Toepassen', noteOne:'Geldt voor één portie. Herhaal voor meer porties.', orderNote:'Notitie voor de hele bestelling', table:'Tafel',
   add:'Kiezen', cart:'Bestelling bekijken', order:'Bestelling versturen',
   yourOrder:'Uw bestelling', tableIs:'Tafel', empty:'Nog niets gekozen.',
   notes:'Allergieën, gaarheid of wensen? Schrijf het hier – de keuken ziet uw notitie.',
@@ -740,7 +754,7 @@ nl:{sub:'Braziliaans grillhuis aan boord', cookTitle:'Kies de gaarheid', cookNot
   langNote:'<b>Vijf talen zijn actief: Duits, Engels, Spaans, Nederlands en Turks.</b> Elke nieuwe taal wordt als één datablok toegevoegd – zonder nieuw ontwerp. Voor de hand liggend aan boord: Italiaans, Frans, Portugees, Russisch.',
   vegan:'vegan', alc:'bevat alcohol', star:'let op *'},
 
-tr:{sub:'Gemide Brezilya usulü ızgara evi', cookTitle:'Pişirme derecesini seçin', cookNote:'Seçiminiz doğrudan ızgaraya iletilir.', index:'İçindekiler', pickTable:'Masanızı seçin', myOrders:'Siparişleriniz', histEmpty:'Bu masada henüz sipariş yok.', grandTotal:'Şu ana kadar toplam', stNew:'Alındı', stAcc:'Onaylandı', stRdy:'Hazır', stSrv:'Servis edildi', table:'Masa',
+tr:{sub:'Gemide Brezilya usulü ızgara evi', cookTitle:'Pişirme derecesini seçin', cookNote:'Seçiminiz doğrudan ızgaraya iletilir.', index:'İçindekiler', pickTable:'Masanızı seçin', myOrders:'Siparişleriniz', histEmpty:'Bu masada henüz sipariş yok.', grandTotal:'Şu ana kadar toplam', stNew:'Alındı', stAcc:'Onaylandı', stRdy:'Hazır', stSrv:'Servis edildi', noteBtn:'Not', noteEdit:'Notu değiştir', noteTitle:'Bu yemek için not', noteFree:'Kendi cümlenizle (isteğe bağlı)', noteSave:'Uygula', noteOne:'Tek porsiyon için geçerlidir. Diğer porsiyonlar için tekrarlayın.', orderNote:'Siparişin tamamı için not', table:'Masa',
   add:'Sepete ekle', cart:'Sepeti gör', order:'Siparişi gönder',
   yourOrder:'Siparişiniz', tableIs:'Masa', empty:'Henüz seçim yapılmadı.',
   notes:'Alerji, pişirme derecesi veya özel isteğiniz? Buraya yazın – mutfak notunuzu görür.',
@@ -1222,15 +1236,38 @@ function renderStatic(){
 }
 function renderAll(){ renderStatic(); renderIndex(); renderMenu(); renderCart(); renderMyOrdersBtn(); }
 
+
+/* Häufige Wünsche als Chips. Der Gast tippt in seiner Sprache,
+   die Küche liest immer die deutsche Fassung. */
+const CHIPS = [
+ {id:'onion', de:'ohne Zwiebeln',  en:'no onions',      es:'sin cebolla',      nl:'zonder ui',        tr:'soğansız'},
+ {id:'garlic',de:'ohne Knoblauch', en:'no garlic',      es:'sin ajo',          nl:'zonder knoflook',  tr:'sarımsaksız'},
+ {id:'lact',  de:'laktosefrei',    en:'lactose-free',   es:'sin lactosa',      nl:'lactosevrij',      tr:'laktozsuz'},
+ {id:'glut',  de:'glutenfrei',     en:'gluten-free',    es:'sin gluten',       nl:'glutenvrij',       tr:'glutensiz'},
+ {id:'nuts',  de:'Nussallergie',   en:'nut allergy',    es:'alergia a frutos secos', nl:'notenallergie', tr:'fındık/fıstık alerjisi'},
+ {id:'pork',  de:'kein Schweinefleisch', en:'no pork',  es:'sin cerdo',        nl:'geen varkensvlees', tr:'domuz eti olmasın'},
+ {id:'salt',  de:'wenig Salz',     en:'less salt',      es:'poca sal',         nl:'weinig zout',      tr:'az tuzlu'},
+ {id:'hot',   de:'sehr scharf',    en:'extra spicy',    es:'muy picante',      nl:'extra pittig',     tr:'çok acı'},
+ {id:'mild',  de:'nicht scharf',   en:'not spicy',      es:'no picante',       nl:'niet pittig',      tr:'acısız'},
+ {id:'sep',   de:'Beilage separat',en:'sides on the side', es:'guarnición aparte', nl:'bijgerecht apart', tr:'garnitür ayrı'}
+];
+const chipTxt = (id, l) => { const c=CHIPS.find(x=>x.id===id); return c ? (c[l]||c.de) : ''; };
+const noteFor = (it, l) => [...(it.chips||[]).map(c=>chipTxt(c,l)), it.free||''].filter(Boolean).join(' · ');
+
 /* ---------------- Warenkorb ---------------- */
-function addItem(id,si,ci){
+function keyOf(id,si,cookId,chips,free){
+  return id + (si!==undefined&&si!==null?'#'+si:'') + (cookId?'@'+cookId:'')
+       + ((chips&&chips.length)||free ? '~'+(chips||[]).join(',')+'|'+(free||'') : '');
+}
+function addItem(id,si,ci,chips,free){
   const d = MENU.find(x=>x.id===id);
   const size = (si!==undefined && si!==null && d.sizes) ? d.sizes[si] : null;
   const cook = (ci!==undefined && ci!==null) ? COOK[ci] : null;
-  const key = id + (size?'#'+si:'') + (cook?'@'+cook.id:'');
+  const key = keyOf(id,si,cook?cook.id:null,chips,free);
   const f = cart.find(c=>c.key===key);
   if(f) f.qty++;
-  else cart.push({key,id,size:size?size.lbl:null,cook:cook?cook.n:null,
+  else cart.push({key,id,si,ci,size:size?size.lbl:null,cook:cook?cook.n:null,
+                  chips:chips||[], free:free||'',
                   price:size?size.p:d.price,qty:1,name:d.name});
   renderCart();
 }
@@ -1270,7 +1307,7 @@ function historySheet(){
           <span class="h-st ${o.status==='new'?'live':(o.status==='served'||o.status==='done')?'ok':''}">${GST(o)}</span>
           <span class="h-time">${o.time}</span>
         </div>
-        <div class="h-items">${o.items.map(i=>`<div><span>${i.q}×</span>${i.n}${i.s?` <em>(${i.s})</em>`:''}</div>`).join('')}</div>
+        <div class="h-items">${o.items.map((i,k)=>`<div><span>${k+1}. ${i.q}×</span>${i.n}${i.s?` <em>(${i.s})</em>`:''}${i.note?`<div class="inote">${i.note.replace(/</g,'&lt;')}</div>`:''}</div>`).join('')}</div>
         ${o.note?`<div class="o-note">${o.note.replace(/</g,'&lt;')}</div>`:''}
         <div class="h-sum">${eur(o.total)}</div>
       </div>`).join('') : `<div class="empty">${t('histEmpty')}</div>`}
@@ -1281,15 +1318,55 @@ function openSheet(h){ $('#sheetBox').innerHTML=h; $('#sheet').classList.add('on
 function closeSheet(){ $('#sheet').classList.remove('on'); }
 $('#sheetBg').onclick = closeSheet;
 
+let NOTE_KEY=null, NOTE_SEL=[];
+function noteSheet(key){
+  const it = cart.find(c=>c.key===key); if(!it) return;
+  NOTE_KEY = key; NOTE_SEL = [...(it.chips||[])];
+  drawNoteSheet(it);
+}
+function drawNoteSheet(it){
+  openSheet(`<div class="sheet-h"><h3>${t('noteTitle')}</h3><button class="x" data-close>×</button></div>
+    <div class="sheet-sub">${L(it.name)}${it.size?' · '+it.size:''}</div>
+    <div class="chips">${CHIPS.map(c=>
+      `<button class="chip${NOTE_SEL.includes(c.id)?' on':''}" data-chip="${c.id}">${chipTxt(c.id,lang)}</button>`).join('')}</div>
+    <div class="onlbl">${t('noteFree')}</div>
+    <textarea id="freeNote" placeholder="">${it.free||''}</textarea>
+    ${it.qty>1?`<p class="cooknote">${t('noteOne')}</p>`:''}
+    <button class="primary" data-notesave>${t('noteSave')}</button>
+    <button class="ghost" data-close>${t('close')}</button>`);
+}
+function saveNote(){
+  const it = cart.find(c=>c.key===NOTE_KEY); if(!it) return;
+  const free = ($('#freeNote')?.value||'').trim();
+  const chips = [...NOTE_SEL];
+  const newKey = keyOf(it.id, it.si, it.cook?COOK.find(c=>L(c.n)===L(it.cook))?.id:null, chips, free);
+  if(it.qty>1){                       // eine Portion abspalten
+    it.qty--;
+    const twin = cart.find(c=>c.key===newKey);
+    if(twin) twin.qty++;
+    else cart.push({...it, key:newKey, qty:1, chips, free});
+  } else {
+    const twin = cart.find(c=>c.key===newKey && c!==it);
+    if(twin){ twin.qty += it.qty; cart.splice(cart.indexOf(it),1); }
+    else { it.key=newKey; it.chips=chips; it.free=free; }
+  }
+  renderCart(); cartSheet();
+}
 function cartSheet(){
   const sum = cart.reduce((a,c)=>a+c.qty*c.price,0);
   openSheet(`<div class="sheet-h"><h3>${t('yourOrder')}</h3><button class="x" data-close>×</button></div>
     <div class="sheet-sub">${t('tableIs')} ${table}</div>
-    ${cart.length ? cart.map(c=>`<div class="line">
+    ${cart.length ? cart.map(c=>{
+      const nt = noteFor(c, lang);
+      return `<div class="line">
         <div class="qty"><button data-dec="${c.key}">−</button><span>${c.qty}</span><button data-inc="${c.key}">+</button></div>
-        <div class="nm">${L(c.name)}${(c.size||c.cook)?`<small>${[c.size, c.cook?L(c.cook):''].filter(Boolean).join(' · ')}</small>`:''}</div>
-        <div class="pr">${eur(c.qty*c.price)}</div></div>`).join('') : `<div class="empty">${t('empty')}</div>`}
+        <div class="nm">${L(c.name)}${(c.size||c.cook)?`<small>${[c.size, c.cook?L(c.cook):''].filter(Boolean).join(' · ')}</small>`:''}
+          ${nt?`<span class="itemnote">${nt}</span>`:''}
+          <button class="notebtn" data-note="${c.key}">${nt?t('noteEdit'):'+ '+t('noteBtn')}</button>
+        </div>
+        <div class="pr">${eur(c.qty*c.price)}</div></div>`;}).join('') : `<div class="empty">${t('empty')}</div>`}
     <div class="totrow"><span class="t1">${t('total')}</span><span class="t2">${eur(sum)}</span></div>
+    <div class="onlbl">${t('orderNote')}</div>
     <textarea id="orderNote" placeholder="${t('notes')}"></textarea>
     <button class="primary" data-send ${cart.length?'':'disabled style="opacity:.4"'}>${t('order')}</button>
     <button class="ghost" data-close>${t('close')}</button>`);
@@ -1316,7 +1393,12 @@ function pushOrder(type){
   const o = {id: stamp.toString(36)+Math.random().toString(36).slice(2,6),
     no: String(stamp).slice(-4), table, type, waiter:w?w.id:null, wname:w?w.name:'—',
     ts:stamp, rang:stamp,
-    items: type==='order' ? cart.map(c=>({n:L(c.name), s:[c.size, c.cook?L(c.cook):''].filter(Boolean).join(' · '), q:c.qty})) : [],
+    items: type==='order' ? cart.map(c=>({
+        n: c.name.de || L(c.name),
+        s: [c.size, c.cook?c.cook.de:''].filter(Boolean).join(' · '),
+        q: c.qty,
+        note: noteFor(c,'de')                       // Küche liest deutsch
+      })) : [],
     total: type==='order' ? cart.reduce((a,c)=>a+c.qty*c.price,0) : 0,
     note: type==='order' ? ($('#orderNote')?.value||'') : '',
     status:'new', time:new Date().toTimeString().slice(0,5)};
@@ -1374,7 +1456,10 @@ function orderCard(o){
     return `<div class="order${o.status==='new'?' new':''}${isClosed(o)?' closed':''}"><div class="o-top">
       <span class="o-table">Tisch ${o.table}</span><span class="o-id">${o.wname} · #${o.no}</span>
       <span class="status ${STCLS[o.status]}">${STLBL[o.status]||'ABGESCHLOSSEN'}</span><span class="o-time">${o.time}</span></div>
-      <div class="o-items">${o.items.map(i=>`<div><span>${i.q}×</span>${i.n}${i.s?` <em style="font-style:normal;color:var(--ash)">(${i.s})</em>`:''}</div>`).join('')}</div>
+      <div class="o-items">${o.items.map((i,k)=>`<div class="oi">
+          <span class="pos">${k+1}.</span><span>${i.q}×</span>${i.n}${i.s?` <em style="font-style:normal;color:var(--ash)">(${i.s})</em>`:''}
+          ${i.note?`<div class="inote">${i.note.replace(/</g,'&lt;')}</div>`:''}
+        </div>`).join('')}</div>
       ${o.note?`<div class="o-note">${o.note.replace(/</g,'&lt;')}</div>`:''}
       <div class="o-foot"><span class="o-total">${eur(o.total)}</span>
         ${next?`<button class="sbtn act" data-next="${o.id}">${lbl}</button>`:''}</div></div>`;
@@ -1430,8 +1515,17 @@ function genQR(){
 
 /* ---------------- Ereignisse ---------------- */
 document.addEventListener('click', e=>{
-  const el = e.target.closest('[data-lang],[data-cat],[data-add],[data-view],[data-close],[data-send],[data-inc],[data-dec],[data-next],[data-done],[data-w],[data-cook]');
+  const el = e.target.closest('[data-lang],[data-cat],[data-add],[data-view],[data-close],[data-send],[data-inc],[data-dec],[data-next],[data-done],[data-w],[data-cook],[data-note],[data-chip],[data-notesave]');
   if(!el) return;
+  if(el.dataset.note){ noteSheet(el.dataset.note); return; }
+  if(el.dataset.chip){
+    const i=NOTE_SEL.indexOf(el.dataset.chip);
+    if(i<0) NOTE_SEL.push(el.dataset.chip); else NOTE_SEL.splice(i,1);
+    const it=cart.find(c=>c.key===NOTE_KEY);
+    const keep=$('#freeNote')?.value||''; if(it) it.free=keep;
+    drawNoteSheet(it); return;
+  }
+  if(el.hasAttribute('data-notesave')){ saveNote(); return; }
   if(el.dataset.cook){
     const [id,si,ci] = el.dataset.cook.split('|');
     addItem(id, si===''?undefined:+si, +ci); closeSheet(); return;
