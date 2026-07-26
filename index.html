@@ -18,7 +18,226 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rye&family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+/* Minimaler QR-Encoder (Byte-Modus, Fehlerkorrektur M, Version 1–10)
+   Ohne externe Bibliothek. Gibt eine boolesche Matrix zurück. */
+const QRC = (function(){
+  const EXP = new Array(512), LOG = new Array(256);
+  (function(){ let x = 1;
+    for(let i=0;i<255;i++){ EXP[i]=x; LOG[x]=i; x<<=1; if(x & 0x100) x ^= 0x11d; }
+    for(let i=255;i<512;i++) EXP[i]=EXP[i-255];
+  })();
+  const mul = (a,b) => (a===0||b===0) ? 0 : EXP[LOG[a]+LOG[b]];
+
+  function genPoly(n){
+    let g=[1];
+    for(let i=0;i<n;i++){
+      const ng = new Array(g.length+1).fill(0);
+      for(let j=0;j<g.length;j++){ ng[j] ^= g[j]; ng[j+1] ^= mul(g[j], EXP[i]); }
+      g = ng;
+    }
+    return g;
+  }
+  function rsEC(data, n){
+    const g = genPoly(n);
+    const res = data.concat(new Array(n).fill(0));
+    for(let i=0;i<data.length;i++){
+      const c = res[i];
+      if(c) for(let j=0;j<g.length;j++) res[i+j] ^= mul(g[j], c);
+    }
+    return res.slice(data.length);
+  }
+
+  /* Blockaufteilung für Fehlerkorrekturstufe M */
+  const M = {
+    1:{ec:10,g:[[1,16]]},   2:{ec:16,g:[[1,28]]},   3:{ec:26,g:[[1,44]]},
+    4:{ec:18,g:[[2,32]]},   5:{ec:24,g:[[2,43]]},   6:{ec:16,g:[[4,27]]},
+    7:{ec:18,g:[[4,31]]},   8:{ec:22,g:[[2,38],[2,39]]},
+    9:{ec:22,g:[[3,36],[2,37]]}, 10:{ec:26,g:[[4,43],[1,44]]}
+  };
+  const ALIGN = {1:[],2:[6,18],3:[6,22],4:[6,26],5:[6,30],6:[6,34],
+                 7:[6,22,38],8:[6,24,42],9:[6,26,46],10:[6,28,50]};
+  const remainderBits = v => (v===1 ? 0 : (v<=6 ? 7 : 0));
+  const dataCount = v => M[v].g.reduce((a,[n,c])=>a+n*c,0);
+
+  function bch(value, poly, len){
+    let v = value;
+    const bit = n => { let b=0; while(n){b++;n>>=1;} return b; };
+    const pl = bit(poly);
+    while(bit(v) >= pl) v ^= poly << (bit(v) - pl);
+    return v;
+  }
+
+  function encode(text){
+    const bytes = [];
+    for(const ch of unescape(encodeURIComponent(text))) bytes.push(ch.charCodeAt(0));
+
+    let ver = 0;
+    for(let v=1;v<=10;v++){
+      const cci = v<=9 ? 8 : 16;
+      if(dataCount(v)*8 >= 4 + cci + bytes.length*8){ ver = v; break; }
+    }
+    if(!ver) throw new Error('Text zu lang');
+
+    const cci = ver<=9 ? 8 : 16;
+    const bits = [];
+    const put = (val, len) => { for(let i=len-1;i>=0;i--) bits.push((val>>i)&1); };
+    put(4, 4); put(bytes.length, cci);
+    bytes.forEach(b => put(b, 8));
+
+    const cap = dataCount(ver)*8;
+    for(let i=0;i<4 && bits.length<cap;i++) bits.push(0);
+    while(bits.length % 8) bits.push(0);
+    const pads = [0xEC, 0x11];
+    for(let i=0; bits.length<cap; i++) put(pads[i%2], 8);
+
+    const dcw = [];
+    for(let i=0;i<bits.length;i+=8){
+      let b=0; for(let j=0;j<8;j++) b=(b<<1)|bits[i+j];
+      dcw.push(b);
+    }
+
+    /* Blöcke bilden und verschachteln */
+    const blocks=[], ecs=[]; let pos=0;
+    M[ver].g.forEach(([count, len])=>{
+      for(let i=0;i<count;i++){
+        const blk = dcw.slice(pos, pos+len); pos += len;
+        blocks.push(blk); ecs.push(rsEC(blk, M[ver].ec));
+      }
+    });
+    const finalCW = [];
+    const maxD = Math.max(...blocks.map(b=>b.length));
+    for(let i=0;i<maxD;i++) blocks.forEach(b => { if(i<b.length) finalCW.push(b[i]); });
+    for(let i=0;i<M[ver].ec;i++) ecs.forEach(e => finalCW.push(e[i]));
+
+    const stream = [];
+    finalCW.forEach(b => { for(let i=7;i>=0;i--) stream.push((b>>i)&1); });
+    for(let i=0;i<remainderBits(ver);i++) stream.push(0);
+
+    /* Matrix aufbauen */
+    const size = 17 + ver*4;
+    const m  = Array.from({length:size},()=>new Array(size).fill(null));
+    const rs = Array.from({length:size},()=>new Array(size).fill(false)); // reserviert
+
+    const setF = (r,c,v) => { m[r][c]=v; rs[r][c]=true; };
+    const finder = (r,c) => {
+      for(let i=-1;i<=7;i++) for(let j=-1;j<=7;j++){
+        const rr=r+i, cc=c+j;
+        if(rr<0||cc<0||rr>=size||cc>=size) continue;
+        const on = (i>=0&&i<=6&&(j===0||j===6)) || (j>=0&&j<=6&&(i===0||i===6)) ||
+                   (i>=2&&i<=4&&j>=2&&j<=4);
+        setF(rr,cc,on);
+      }
+    };
+    finder(0,0); finder(0,size-7); finder(size-7,0);
+
+    ALIGN[ver].forEach(r => ALIGN[ver].forEach(c => {
+      if((r<=8&&c<=8)||(r<=8&&c>=size-9)||(r>=size-9&&c<=8)) return;
+      for(let i=-2;i<=2;i++) for(let j=-2;j<=2;j++)
+        setF(r+i, c+j, Math.max(Math.abs(i),Math.abs(j))!==1);
+    }));
+
+    for(let i=8;i<size-8;i++){ setF(6,i,i%2===0); setF(i,6,i%2===0); }
+    setF(size-8, 8, true);
+
+    for(let i=0;i<9;i++){ if(!rs[8][i]) setF(8,i,false); if(!rs[i][8]) setF(i,8,false); }
+    for(let i=0;i<8;i++){ if(!rs[8][size-1-i]) setF(8,size-1-i,false);
+                          if(!rs[size-1-i][8]) setF(size-1-i,8,false); }
+    if(ver>=7){
+      for(let i=0;i<6;i++) for(let j=0;j<3;j++){
+        setF(size-11+j, i, false); setF(i, size-11+j, false);
+      }
+    }
+
+    let idx=0, up=true;
+    for(let col=size-1; col>0; col-=2){
+      if(col===6) col--;
+      for(let k=0;k<size;k++){
+        const row = up ? size-1-k : k;
+        for(let c of [col, col-1]){
+          if(m[row][c]===null){
+            m[row][c] = idx < stream.length ? stream[idx++]===1 : false;
+          }
+        }
+      }
+      up = !up;
+    }
+
+    const maskFn = [
+      (r,c)=>(r+c)%2===0, (r,c)=>r%2===0, (r,c)=>c%3===0, (r,c)=>(r+c)%3===0,
+      (r,c)=>(Math.floor(r/2)+Math.floor(c/3))%2===0, (r,c)=>(r*c)%2+(r*c)%3===0,
+      (r,c)=>((r*c)%2+(r*c)%3)%2===0, (r,c)=>((r+c)%2+(r*c)%3)%2===0
+    ];
+    function penalty(g){
+      let p=0;
+      for(let i=0;i<size;i++){
+        for(const line of [g[i], g.map(r=>r[i])]){
+          let run=1;
+          for(let j=1;j<size;j++){
+            if(line[j]===line[j-1]) run++;
+            else { if(run>=5) p += 3 + (run-5); run=1; }
+          }
+          if(run>=5) p += 3 + (run-5);
+        }
+      }
+      for(let r=0;r<size-1;r++) for(let c=0;c<size-1;c++)
+        if(g[r][c]===g[r][c+1] && g[r][c]===g[r+1][c] && g[r][c]===g[r+1][c+1]) p+=3;
+      const pat=[true,false,true,true,true,false,true,false,false,false,false];
+      const has=(line,s)=>{ for(let i=0;i<11;i++) if(line[s+i]!==pat[i]) return false; return true; };
+      for(let i=0;i<size;i++){
+        const row=g[i], col=g.map(r=>r[i]);
+        for(let s=0;s+11<=size;s++){
+          if(has(row,s)) p+=40; if(has(col,s)) p+=40;
+          const rr=row.slice(s,s+11).reverse(), cc=col.slice(s,s+11).reverse();
+          if(has(rr,0)) p+=40; if(has(cc,0)) p+=40;
+        }
+      }
+      let dark=0; g.forEach(r=>r.forEach(v=>{ if(v) dark++; }));
+      p += Math.floor(Math.abs(dark*100/(size*size) - 50)/5)*10;
+      return p;
+    }
+
+    let best=null, bestP=Infinity, bestMask=0;
+    for(let msk=0; msk<8; msk++){
+      const g = m.map((row,r)=>row.map((v,c)=> rs[r][c] ? v : (maskFn[msk](r,c) ? !v : v)));
+      const fmt = ((0<<3)|msk);                        // Stufe M = 00
+      const bchv = bch(fmt<<10, 0x537, 15);
+      const info = ((fmt<<10)|bchv) ^ 0x5412;
+      for(let i=0;i<15;i++){
+        const bit = ((info>>i)&1)===1;
+        if(i<6) g[8][i]=bit; else if(i<8) g[8][i+1]=bit;
+        else g[8+7-i][8]=bit;                          // i=8..14 -> Zeile 7..1
+        if(i<8) g[size-1-i][8]=bit; else g[8][size-15+i]=bit;
+      }
+      g[size-8][8]=true;
+      if(ver>=7){
+        const vinfo = (ver<<12) | bch(ver<<12, 0x1F25, 18);
+        for(let i=0;i<18;i++){
+          const bit = ((vinfo>>i)&1)===1;
+          g[Math.floor(i/3)][size-11+(i%3)] = bit;
+          g[size-11+(i%3)][Math.floor(i/3)] = bit;
+        }
+      }
+      const p = penalty(g);
+      if(p<bestP){ bestP=p; best=g; bestMask=msk; }
+    }
+    return {size, matrix:best, version:ver, mask:bestMask};
+  }
+
+  function svg(text, px){
+    const {size, matrix} = encode(text);
+    const q = 4, total = size + q*2;
+    let d = '';
+    for(let r=0;r<size;r++) for(let c=0;c<size;c++)
+      if(matrix[r][c]) d += `M${c+q} ${r+q}h1v1h-1z`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${total} ${total}" `+
+           `width="${px||160}" height="${px||160}" shape-rendering="crispEdges">`+
+           `<rect width="${total}" height="${total}" fill="#fff"/>`+
+           `<path d="${d}" fill="#000"/></svg>`;
+  }
+  return {encode, svg};
+})();
+</script>
 <style>
 :root{
   --paper:#F5F1E8;
@@ -274,7 +493,7 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
 .qrgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;margin-top:18px}
 .qrcard{background:#fff;border:1px solid var(--rule);padding:13px 10px;text-align:center}
 .qrcard .qbox{display:flex;justify-content:center;margin-bottom:9px}
-.qrcard .qbox img,.qrcard .qbox canvas{width:104px !important;height:104px !important}
+.qrcard .qbox img,.qrcard .qbox canvas,.qrcard .qbox svg{width:104px !important;height:104px !important;display:block}
 .qrcard .qn{font-family:var(--mono);font-weight:600;font-size:30px;line-height:1}
 .qrcard .qt{font-size:8px;line-height:1.5;color:var(--ash);margin-top:6px}
 .warn{margin-top:14px;padding:11px;border:1px dashed var(--ember);font-size:12px;color:var(--ember)}
@@ -1106,16 +1325,15 @@ function genQR(){
   if(!base){ $('#qrGrid').innerHTML=''; return; }
   const count = Math.min(parseInt($('#tableCount').value,10)||30, 60);
   const grid = $('#qrGrid'); grid.innerHTML='';
-  $('#qrWarn').innerHTML = (typeof QRCode==='undefined')
-    ? `<div class="warn">Die QR-Bibliothek konnte hier nicht geladen werden. Die Links unten stimmen – jeder QR-Generator erzeugt daraus denselben Code.</div>` : '';
+  $('#qrWarn').innerHTML = '';
   for(let i=1;i<=count;i++){
     const url = `${base}?table=${i}`;
     const card = document.createElement('div'); card.className='qrcard';
     card.innerHTML = `<div class="qbox"></div><div class="qn">${String(i).padStart(2,'0')}</div>
       <div class="qt">Karte &amp; Bestellung · Menu &amp; order<br>Carta · Kaart · Menü</div>`;
     grid.appendChild(card);
-    if(typeof QRCode!=='undefined') new QRCode(card.querySelector('.qbox'),{text:url,width:208,height:208,correctLevel:QRCode.CorrectLevel.M});
-    else card.querySelector('.qbox').innerHTML = `<code style="font-size:8px;word-break:break-all">${url}</code>`;
+    try{ card.querySelector('.qbox').innerHTML = QRC.svg(url, 208); }
+    catch(err){ card.querySelector('.qbox').innerHTML = `<code style="font-size:8px;word-break:break-all">${url}</code>`; }
   }
 }
 
