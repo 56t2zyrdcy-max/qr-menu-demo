@@ -3,7 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Churrascaria Steakhouse · Menükarte</title>
+<title>Churrascaria Steakhouse · Menükarte / Menu</title>
+<meta name="description" content="Digitale Menükarte des Churrascaria Steakhouse – in fünf Sprachen, mit Bestellung direkt vom Tisch.">
+<meta name="theme-color" content="#F5F1E8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Churrascaria">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Churrascaria Steakhouse · Menükarte">
+<meta property="og:description" content="Karte in fünf Sprachen · Bestellung und Service direkt vom Tisch.">
+<meta property="og:locale" content="de_DE">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2317130F'/%3E%3Crect x='5' y='5' width='54' height='54' fill='none' stroke='%23F5F1E8' stroke-width='1.5'/%3E%3Cline x1='14' y1='47' x2='50' y2='17' stroke='%23A8321C' stroke-width='3' stroke-linecap='round'/%3E%3Cellipse cx='23' cy='40' rx='7.5' ry='6' fill='%23F5F1E8' transform='rotate(-40 23 40)'/%3E%3Cellipse cx='34' cy='31' rx='7.5' ry='6' fill='%23F5F1E8' transform='rotate(-40 34 31)'/%3E%3Cellipse cx='45' cy='22' rx='7.5' ry='6' fill='%23F5F1E8' transform='rotate(-40 45 22)'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2317130F'/%3E%3Crect x='5' y='5' width='54' height='54' fill='none' stroke='%23F5F1E8' stroke-width='1.5'/%3E%3Cline x1='14' y1='47' x2='50' y2='17' stroke='%23A8321C' stroke-width='3' stroke-linecap='round'/%3E%3Cellipse cx='23' cy='40' rx='7.5' ry='6' fill='%23F5F1E8' transform='rotate(-40 23 40)'/%3E%3Cellipse cx='34' cy='31' rx='7.5' ry='6' fill='%23F5F1E8' transform='rotate(-40 34 31)'/%3E%3Cellipse cx='45' cy='22' rx='7.5' ry='6' fill='%23F5F1E8' transform='rotate(-40 45 22)'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rye&family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -29,8 +40,9 @@
 html,body{margin:0;padding:0}
 body{
   background:var(--paper);color:var(--ink);font-family:var(--body);font-weight:400;
-  line-height:1.55;-webkit-font-smoothing:antialiased;padding-bottom:126px;
+  line-height:1.55;-webkit-font-smoothing:antialiased;padding-bottom:34px;
 }
+body.has-bar{padding-bottom:126px}
 img{max-width:100%;display:block}
 button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none}
 :focus-visible{outline:2px solid var(--ember);outline-offset:3px}
@@ -145,10 +157,29 @@ button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:n
 .svc{width:100%;padding:14px 12px;border:1px solid var(--rule-2);text-align:center;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;transition:.15s}
 .svc:hover{border-color:var(--ink)}
 .svc small{display:block;font-family:var(--mono);font-size:9px;font-weight:400;letter-spacing:.16em;color:var(--ash);margin-top:5px}
+.svc.hist{margin-bottom:8px;border-color:var(--ink)}
+.hcard{border:1px solid var(--rule);padding:12px 13px;margin-top:11px;background:#fff}
+.hcard.done{opacity:.72}
+.h-top{display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap}
+.h-no{font-family:var(--mono);font-size:11px;color:var(--ash)}
+.h-time{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ash)}
+.h-st{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 7px;border:1px solid var(--rule-2);color:var(--ash)}
+.h-st.live{border-color:var(--ember);color:var(--ember)}
+.h-st.ok{border-color:var(--ok);color:var(--ok)}
+.h-items{font-size:13px;line-height:1.7}
+.h-items span{font-family:var(--mono);color:var(--ember);margin-right:6px;font-weight:600}
+.h-items em{font-style:normal;color:var(--ash);font-size:12px}
+.h-sum{font-family:var(--mono);font-size:12.5px;font-weight:600;text-align:right;margin-top:8px}
 
 /* ---------- cart ---------- */
-.cartbar{position:fixed;left:0;right:0;bottom:50px;z-index:60;transform:translateY(150%);transition:transform .3s cubic-bezier(.2,.8,.3,1)}
+.cartbar{position:fixed;left:0;right:0;bottom:8px;z-index:60;transform:translateY(150%);transition:transform .3s cubic-bezier(.2,.8,.3,1)}
 .cartbar.on{transform:translateY(0)}
+body.has-bar .cartbar{bottom:50px}
+
+/* Tischauswahl im Kopf (nur ohne Tischnummer im QR-Code) */
+.tablepick{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:16px}
+.tablepick label{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ash)}
+.tablepick select{background:#fff;border:1px solid var(--rule-2);color:var(--ink);font-family:var(--mono);font-size:13px;padding:7px 9px}
 .cartbar-in{max-width:560px;margin:0 auto;padding:0 var(--pad) 10px}
 .cartbtn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--ink);color:var(--paper);padding:15px 18px;box-shadow:0 12px 34px rgba(23,19,15,.3)}
 .cartbtn .l{font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
@@ -227,11 +258,19 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
 .status{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:3px 7px;border:1px solid var(--rule-2);color:var(--ash)}
 .st-new{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .empty{padding:40px 12px;text-align:center;color:var(--ash);font-size:13px;border:1px dashed var(--rule-2);margin-top:14px}
+.order.closed{opacity:.6;border-color:var(--rule)}
+.order.closed.new{box-shadow:none}
+.histtog{width:100%;margin-top:18px;padding:12px;border:1px solid var(--rule-2);font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ash)}
+.histtog:hover{border-color:var(--ink);color:var(--ink)}
+.daysum{margin-top:12px;padding:11px;border:1px solid var(--rule);font-family:var(--mono);font-size:12px;text-align:center;color:var(--ash)}
+.daysum b{color:var(--ink);font-size:13.5px}
 
 /* ---------- QR ---------- */
 .field{margin-top:13px}
 .field label{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ash);margin-bottom:5px}
 .field input{width:100%;background:#fff;border:1px solid var(--rule-2);color:var(--ink);font-family:var(--mono);font-size:12px;padding:11px}
+.hint{font-family:var(--mono);font-size:10.5px;line-height:1.6;color:var(--ash);margin-top:6px;word-break:break-all}
+.hint b{color:var(--ink)}
 .qrgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;margin-top:18px}
 .qrcard{background:#fff;border:1px solid var(--rule);padding:13px 10px;text-align:center}
 .qrcard .qbox{display:flex;justify-content:center;margin-bottom:9px}
@@ -282,6 +321,11 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
         </span>
       </div>
 
+      <div class="tablepick" id="tablePickWrap">
+        <label id="tablePickLbl"></label>
+        <select id="tablePick" aria-label="Tisch"></select>
+      </div>
+
       <div class="langbar">
         <button class="lang on" data-lang="de">DEUTSCH</button>
         <button class="lang" data-lang="en">ENGLISH</button>
@@ -296,7 +340,10 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
     </div>
   </header>
 
-  <div class="servicetop"><button class="svc" id="svcBill"></button></div>
+  <div class="servicetop">
+    <button class="svc hist" id="myOrdersBtn" hidden></button>
+    <button class="svc" id="svcBill"></button>
+  </div>
 
   <main class="wrap">
     <div id="menuRoot"></div>
@@ -320,7 +367,7 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
     <div class="wctrl" id="waiterSel"></div>
     <div class="wnote" id="waiterNote"></div>
     <div id="orderRoot"></div>
-    <div class="foot">Jede Station sieht nur ihre Tische. Ein Ruf löst Ton und Vibration aus und wiederholt sich alle 45 Sekunden, bis er quittiert ist.</div>
+    <div class="foot"><a href="?view=service" style="color:var(--ash)">Servicelink</a> · <a href="./" style="color:var(--ash)">Gastansicht</a><br>Jede Station sieht nur ihre Tische. Ein Ruf löst Ton und Vibration aus und wiederholt sich alle 45 Sekunden, bis er quittiert ist.</div>
   </div>
 </div>
 
@@ -331,7 +378,8 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
       <h2>QR-Codes</h2>
       <p>Jeder Code öffnet die Karte mit seiner eigenen Tischnummer.</p>
     </div>
-    <div class="field noprint"><label>Basis-URL</label><input id="baseUrl" value="https://churrascaria.aida/menu" spellcheck="false"></div>
+    <div class="field noprint"><label>Basis-URL</label><input id="baseUrl" spellcheck="false">
+      <div class="hint" id="urlHint"></div></div>
     <div class="field noprint"><label>Anzahl Tische</label><input id="tableCount" value="30" inputmode="numeric"></div>
     <button class="primary noprint" id="genQr">QR-Codes erzeugen</button>
     <button class="ghost noprint" onclick="window.print()">Bogen drucken</button>
@@ -351,13 +399,13 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
 
 <div class="sheet" id="sheet"><div class="sheet-bg" id="sheetBg"></div><div class="sheet-box" id="sheetBox"></div></div>
 
-<div class="demobar">
+<div class="demobar" id="demobar" hidden>
   <div class="demobar-in">
-    <span class="dtag">DEMO</span>
+    <span class="dtag">ANSICHT</span>
     <button class="dbtn on" data-view="guest">Gast</button>
     <button class="dbtn" data-view="waiter">Service<span class="badge" id="ordBadge" style="display:none">0</span></button>
     <button class="dbtn" data-view="qr">QR</button>
-    <select class="tsel" id="tablePick" aria-label="Tisch"></select>
+    <span style="flex:0 0 auto"></span>
   </div>
 </div>
 
@@ -377,7 +425,7 @@ const ART = {
 
 /* ---------------- UI-Texte ---------------- */
 const T = {
-de:{sub:'Brasilianisches Grillhaus an Bord', cookTitle:'Garstufe wählen', cookNote:'Ihre Auswahl geht direkt an den Grill.', index:'Inhalt', table:'Tisch',
+de:{sub:'Brasilianisches Grillhaus an Bord', cookTitle:'Garstufe wählen', cookNote:'Ihre Auswahl geht direkt an den Grill.', index:'Inhalt', pickTable:'Tisch wählen', myOrders:'Ihre Bestellungen', histEmpty:'Noch keine Bestellung an diesem Tisch.', grandTotal:'Summe bisher', stNew:'Eingegangen', stAcc:'Angenommen', stRdy:'Fertig', stSrv:'Serviert', table:'Tisch',
   add:'Hinzufügen', cart:'Bestellung ansehen', order:'Bestellung senden',
   yourOrder:'Ihre Bestellung', tableIs:'Tisch', empty:'Noch nichts ausgewählt.',
   notes:'Allergien, Garstufe oder Wünsche? Hier eintragen – die Küche sieht Ihre Notiz.',
@@ -397,7 +445,7 @@ de:{sub:'Brasilianisches Grillhaus an Bord', cookTitle:'Garstufe wählen', cookN
   langNote:'<b>Fünf Sprachen sind aktiv: Deutsch, Englisch, Spanisch, Niederländisch, Türkisch.</b> Weitere Sprachen werden als einzelner Datenblock ergänzt – ohne neues Design. Naheliegend an Bord: Italienisch, Französisch, Portugiesisch, Russisch.',
   vegan:'vegan', alc:'enthält Alkohol', star:'Hinweis *'},
 
-en:{sub:'Brazilian grill house on board', cookTitle:'Choose your doneness', cookNote:'Your choice goes straight to the grill.', index:'Contents', table:'Table',
+en:{sub:'Brazilian grill house on board', cookTitle:'Choose your doneness', cookNote:'Your choice goes straight to the grill.', index:'Contents', pickTable:'Choose your table', myOrders:'Your orders', histEmpty:'No orders at this table yet.', grandTotal:'Total so far', stNew:'Received', stAcc:'Accepted', stRdy:'Ready', stSrv:'Served', table:'Table',
   add:'Select', cart:'View order', order:'Send order',
   yourOrder:'Your order', tableIs:'Table', empty:'Nothing selected yet.',
   notes:'Allergies, cooking preference or requests? Write here – the kitchen sees your note.',
@@ -417,7 +465,7 @@ en:{sub:'Brazilian grill house on board', cookTitle:'Choose your doneness', cook
   langNote:'<b>Five languages are live: German, English, Spanish, Dutch, Turkish.</b> Further languages are added as a single data block – no redesign needed. Obvious next steps on board: Italian, French, Portuguese, Russian.',
   vegan:'vegan', alc:'contains alcohol', star:'note *'},
 
-es:{sub:'Parrilla brasileña a bordo', cookTitle:'Elija el punto de cocción', cookNote:'Su elección va directamente a la parrilla.', index:'Contenido', table:'Mesa',
+es:{sub:'Parrilla brasileña a bordo', cookTitle:'Elija el punto de cocción', cookNote:'Su elección va directamente a la parrilla.', index:'Contenido', pickTable:'Elija su mesa', myOrders:'Sus pedidos', histEmpty:'Aún no hay pedidos en esta mesa.', grandTotal:'Total hasta ahora', stNew:'Recibido', stAcc:'Aceptado', stRdy:'Listo', stSrv:'Servido', table:'Mesa',
   add:'Elegir', cart:'Ver pedido', order:'Enviar pedido',
   yourOrder:'Su pedido', tableIs:'Mesa', empty:'Aún no ha elegido nada.',
   notes:'¿Alergias, punto de cocción o peticiones? Escríbalo aquí: la cocina verá su nota.',
@@ -437,7 +485,7 @@ es:{sub:'Parrilla brasileña a bordo', cookTitle:'Elija el punto de cocción', c
   langNote:'<b>Cinco idiomas activos: alemán, inglés, español, neerlandés y turco.</b> Cada idioma nuevo se añade como un único bloque de datos, sin rediseñar nada. Siguientes candidatos a bordo: italiano, francés, portugués y ruso.',
   vegan:'vegano', alc:'contiene alcohol', star:'aviso *'},
 
-nl:{sub:'Braziliaans grillhuis aan boord', cookTitle:'Kies de gaarheid', cookNote:'Uw keuze gaat rechtstreeks naar de grill.', index:'Inhoud', table:'Tafel',
+nl:{sub:'Braziliaans grillhuis aan boord', cookTitle:'Kies de gaarheid', cookNote:'Uw keuze gaat rechtstreeks naar de grill.', index:'Inhoud', pickTable:'Kies uw tafel', myOrders:'Uw bestellingen', histEmpty:'Nog geen bestelling aan deze tafel.', grandTotal:'Totaal tot nu toe', stNew:'Ontvangen', stAcc:'Aangenomen', stRdy:'Klaar', stSrv:'Geserveerd', table:'Tafel',
   add:'Kiezen', cart:'Bestelling bekijken', order:'Bestelling versturen',
   yourOrder:'Uw bestelling', tableIs:'Tafel', empty:'Nog niets gekozen.',
   notes:'Allergieën, gaarheid of wensen? Schrijf het hier – de keuken ziet uw notitie.',
@@ -457,7 +505,7 @@ nl:{sub:'Braziliaans grillhuis aan boord', cookTitle:'Kies de gaarheid', cookNot
   langNote:'<b>Vijf talen zijn actief: Duits, Engels, Spaans, Nederlands en Turks.</b> Elke nieuwe taal wordt als één datablok toegevoegd – zonder nieuw ontwerp. Voor de hand liggend aan boord: Italiaans, Frans, Portugees, Russisch.',
   vegan:'vegan', alc:'bevat alcohol', star:'let op *'},
 
-tr:{sub:'Gemide Brezilya usulü ızgara evi', cookTitle:'Pişirme derecesini seçin', cookNote:'Seçiminiz doğrudan ızgaraya iletilir.', index:'İçindekiler', table:'Masa',
+tr:{sub:'Gemide Brezilya usulü ızgara evi', cookTitle:'Pişirme derecesini seçin', cookNote:'Seçiminiz doğrudan ızgaraya iletilir.', index:'İçindekiler', pickTable:'Masanızı seçin', myOrders:'Siparişleriniz', histEmpty:'Bu masada henüz sipariş yok.', grandTotal:'Şu ana kadar toplam', stNew:'Alındı', stAcc:'Onaylandı', stRdy:'Hazır', stSrv:'Servis edildi', table:'Masa',
   add:'Sepete ekle', cart:'Sepeti gör', order:'Siparişi gönder',
   yourOrder:'Siparişiniz', tableIs:'Masa', empty:'Henüz seçim yapılmadı.',
   notes:'Alerji, pişirme derecesi veya özel isteğiniz? Buraya yazın – mutfak notunuzu görür.',
@@ -760,17 +808,22 @@ const COOK = [
 ];
 
 /* ---------------- Zustand ---------------- */
+const PARAMS = new URLSearchParams(location.search);
+const TABLE_FIXED = /^\d{1,2}$/.test(PARAMS.get('table')||PARAMS.get('tisch')||PARAMS.get('masa')||'');
+const DEMO_MODE = PARAMS.get('demo') === '1';
+const START_VIEW = ['service','qr'].includes(PARAMS.get('view')) ? PARAMS.get('view') : 'guest';
 let lang='de', table=11, cat='rodizio';
 const cart=[], orders=[];
 let ticketSeq=2040;
 
 const STATIONS=[
- {id:'a',name:'Marco', from:1,  to:10},
- {id:'b',name:'Lena',  from:11, to:20},
- {id:'c',name:'Tiago', from:21, to:30}
+ {id:'a',name:'Posta 1', from:1,  to:10},
+ {id:'b',name:'Posta 2', from:11, to:20},
+ {id:'c',name:'Posta 3', from:21, to:30}
 ];
 const zoneOf = n => STATIONS.find(w => n>=w.from && n<=w.to) || null;
-let activeWaiter='all', soundOn=false, audioCtx=null;
+let activeWaiter='all', soundOn=false, audioCtx=null, showHist=false;
+const isClosed = o => o.status==='served' || o.status==='done';
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -778,8 +831,7 @@ const eur = n => n.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFracti
 const t = k => T[lang][k];
 const L = o => (typeof o === 'string') ? o : (o[lang] || o.de);
 
-try{ const p=new URLSearchParams(location.search);
-  const v=parseInt(p.get('table')||p.get('tisch')||p.get('masa'),10);
+try{ const v=parseInt(PARAMS.get('table')||PARAMS.get('tisch')||PARAMS.get('masa'),10);
   if(v>0&&v<=99) table=v; }catch(e){}
 
 /* ---------------- Ton ---------------- */
@@ -859,6 +911,7 @@ function renderStatic(){
   document.documentElement.lang = lang;
   $('#heroSub').textContent = t('sub');
   $('#tableLbl').textContent = t('table');
+  $('#tablePickLbl').textContent = t('pickTable');
   $('#tableNum').textContent = table;
   $('#legTitle').textContent = t('legTitle');
   $('#legStar').textContent  = t('legStar');
@@ -874,7 +927,7 @@ function renderStatic(){
   $('#ringText').textContent = Array(reps).fill(ring).join('  ·  ') + '  ·  ';
   $$('.lang').forEach(b=>b.classList.toggle('on', b.dataset.lang===lang));
 }
-function renderAll(){ renderStatic(); renderIndex(); renderMenu(); renderCart(); }
+function renderAll(){ renderStatic(); renderIndex(); renderMenu(); renderCart(); renderMyOrdersBtn(); }
 
 /* ---------------- Warenkorb ---------------- */
 function addItem(id,si,ci){
@@ -905,6 +958,32 @@ function renderCart(){
   $('#cartSum').textContent = `${n} · ${eur(sum)}`;
   $('#cartLabel').textContent = t('cart');
 }
+const GST = o => ({new:t('stNew'),accepted:t('stAcc'),ready:t('stRdy'),served:t('stSrv'),done:t('stSrv')}[o.status]);
+const myOrders = () => orders.filter(o=>o.table===table && o.type==='order');
+function renderMyOrdersBtn(){
+  const list = myOrders(), b = $('#myOrdersBtn');
+  b.hidden = list.length===0;
+  if(list.length) b.innerHTML = `${t('myOrders')} (${list.length})<small>${eur(list.reduce((a,o)=>a+o.total,0))}</small>`;
+}
+function historySheet(){
+  const list = myOrders();
+  const sum = list.reduce((a,o)=>a+o.total,0);
+  openSheet(`<div class="sheet-h"><h3>${t('myOrders')}</h3><button class="x" data-close>×</button></div>
+    <div class="sheet-sub">${t('tableIs')} ${table}</div>
+    ${list.length ? list.map(o=>`
+      <div class="hcard${(o.status==='served'||o.status==='done')?' done':''}">
+        <div class="h-top">
+          <span class="h-no">${t('ticketNo')} #${o.no}</span>
+          <span class="h-st ${o.status==='new'?'live':(o.status==='served'||o.status==='done')?'ok':''}">${GST(o)}</span>
+          <span class="h-time">${o.time}</span>
+        </div>
+        <div class="h-items">${o.items.map(i=>`<div><span>${i.q}×</span>${i.n}${i.s?` <em>(${i.s})</em>`:''}</div>`).join('')}</div>
+        ${o.note?`<div class="o-note">${o.note.replace(/</g,'&lt;')}</div>`:''}
+        <div class="h-sum">${eur(o.total)}</div>
+      </div>`).join('') : `<div class="empty">${t('histEmpty')}</div>`}
+    ${list.length?`<div class="totrow"><span class="t1">${t('grandTotal')}</span><span class="t2">${eur(sum)}</span></div>`:''}
+    <button class="ghost" data-close>${t('close')}</button>`);
+}
 function openSheet(h){ $('#sheetBox').innerHTML=h; $('#sheet').classList.add('on'); }
 function closeSheet(){ $('#sheet').classList.remove('on'); }
 $('#sheetBg').onclick = closeSheet;
@@ -927,7 +1006,8 @@ function sentSheet(no){
     <div class="sheet-sub" style="margin-bottom:4px">${t('ticketNo')}</div>
     <div class="big">#${no}</div>
     <div class="sm">${t('tableIs')} ${table}<br>${t('sentBody')}</div></div>
-    <button class="primary" data-close>${t('ok')}</button>`);
+    <button class="primary" data-close>${t('ok')}</button>
+    <button class="ghost" data-hist>${t('myOrders')}</button>`);
 }
 function msgSheet(title,body){
   openSheet(`<div class="ticket"><div class="tick">✓</div>
@@ -946,6 +1026,7 @@ function pushOrder(type){
     note: type==='order' ? ($('#orderNote')?.value||'') : '',
     status:'new', time:new Date().toTimeString().slice(0,5)};
   orders.unshift(o);
+  renderMyOrdersBtn();
   if(activeWaiter==='all'||activeWaiter===o.waiter)
     chime(type==='order'?'order':type==='bill'?'bill':'waiter');
   renderOrders(); badge();
@@ -960,7 +1041,7 @@ const STLBL={new:'NEU',accepted:'ANGENOMMEN',ready:'FERTIG',served:'SERVIERT'};
 const STCLS={new:'st-new',accepted:'',ready:'',served:''};
 function renderWaiterSel(){
   const cnt = id => orders.filter(o=>o.status==='new'&&(id==='all'||o.waiter===id)).length;
-  const items = [{id:'all',name:'Alle Tische',from:1,to:30}].concat(STATIONS);
+  const items = [{id:'all',name:'Alle Postas',from:1,to:30}].concat(STATIONS);
   $('#waiterSel').innerHTML = items.map(w=>{
     const n=cnt(w.id);
     return `<button class="wchip${activeWaiter===w.id?' on':''}" data-w="${w.id}">${w.name}<b>${w.from}–${w.to}</b>${n?` <span style="color:var(--ember)">●${n}</span>`:''}</button>`;
@@ -970,36 +1051,59 @@ function renderWaiterSel(){
     ? `Angemeldet als <b>${w.name}</b> – Sie werden nur für die Tische ${w.from}–${w.to} benachrichtigt.`
     : `Ansicht für Restaurantleitung und Küche: alle 30 Tische. Im Betrieb meldet sich jede Station separat an.`;
 }
-function renderOrders(){
-  renderWaiterSel();
-  const list = orders.filter(mine);
-  if(!list.length){ $('#orderRoot').innerHTML =
-    `<div class="empty">Keine offenen Bestellungen.<br><span style="font-size:11px">In der Gastansicht bestellen oder den Serviceruf auslösen.</span></div>`; return; }
-  $('#orderRoot').innerHTML = list.map(o=>{
+function orderCard(o){
     if(o.type!=='order'){
       const txt = o.type==='waiter' ? 'Ruft den Service' : 'Bittet um die Rechnung';
-      return `<div class="order call"><div class="o-top">
+      return `<div class="order call${isClosed(o)?' closed':''}"><div class="o-top">
         <span class="o-table alert">Tisch ${o.table}</span><span class="o-id">${o.wname}</span>
         <span class="elapsed" data-ts="${o.ts}"></span><span class="o-time">${o.time}</span></div>
         <div class="o-items" style="color:var(--ember);font-weight:700">${txt}</div>
-        <div class="o-foot"><span class="o-total"></span><button class="sbtn act" data-done="${o.no}">Erledigt</button></div></div>`;
+        <div class="o-foot"><span class="o-total"></span>
+          ${isClosed(o)?'<span class="h-st ok">Erledigt</span>':`<button class="sbtn act" data-done="${o.no}">Erledigt</button>`}</div></div>`;
     }
     const next = {new:'accepted',accepted:'ready',ready:'served'}[o.status];
     const lbl  = {accepted:'Annehmen',ready:'Küche fertig',served:'Serviert'}[next];
-    return `<div class="order${o.status==='new'?' new':''}"><div class="o-top">
+    return `<div class="order${o.status==='new'?' new':''}${isClosed(o)?' closed':''}"><div class="o-top">
       <span class="o-table">Tisch ${o.table}</span><span class="o-id">${o.wname} · #${o.no}</span>
-      <span class="status ${STCLS[o.status]}">${STLBL[o.status]}</span><span class="o-time">${o.time}</span></div>
+      <span class="status ${STCLS[o.status]}">${STLBL[o.status]||'ABGESCHLOSSEN'}</span><span class="o-time">${o.time}</span></div>
       <div class="o-items">${o.items.map(i=>`<div><span>${i.q}×</span>${i.n}${i.s?` <em style="font-style:normal;color:var(--ash)">(${i.s})</em>`:''}</div>`).join('')}</div>
       ${o.note?`<div class="o-note">${o.note.replace(/</g,'&lt;')}</div>`:''}
       <div class="o-foot"><span class="o-total">${eur(o.total)}</span>
-        ${next?`<button class="sbtn act" data-next="${o.no}">${lbl}</button>`:''}
-        <button class="sbtn" data-done="${o.no}">Entfernen</button></div></div>`;
-  }).join('');
+        ${next?`<button class="sbtn act" data-next="${o.no}">${lbl}</button>`:''}</div></div>`;
+}
+function renderOrders(){
+  renderWaiterSel();
+  const all = orders.filter(mine);
+  const active = all.filter(o=>!isClosed(o));
+  const hist   = all.filter(isClosed);
+  const sum    = hist.filter(o=>o.type==='order').reduce((a,o)=>a+o.total,0)
+               + active.filter(o=>o.type==='order').reduce((a,o)=>a+o.total,0);
+  const histBlock = hist.length ? `
+    <button class="histtog" data-toghist>${showHist?'Verlauf ausblenden':'Verlauf anzeigen'} (${hist.length})</button>
+    ${showHist ? hist.map(orderCard).join('') : ''}
+    <div class="daysum">Umsatz an diesen Tischen: <b>${eur(sum)}</b></div>` : '';
+  $('#orderRoot').innerHTML =
+    (active.length ? active.map(orderCard).join('')
+      : `<div class="empty">Keine offenen Bestellungen.<br><span style="font-size:11px">In der Gastansicht bestellen oder den Serviceruf auslösen.</span></div>`)
+    + histBlock;
 }
 
 /* ---------------- QR ---------------- */
+function selfURL(){
+  let u = location.origin + location.pathname;
+  if(location.protocol === 'file:') u = '';       // lokal geöffnet: keine gültige Adresse
+  return u;
+}
+function urlHint(){
+  const b = $('#baseUrl').value.trim();
+  $('#urlHint').innerHTML = b
+    ? `Tisch 1 öffnet: <b>${b}?table=1</b>`
+    : `<span style="color:var(--ember)">Bitte die Web-Adresse eintragen, unter der diese Karte online liegt. Ohne gültige Adresse führen die QR-Codes ins Leere.</span>`;
+}
 function genQR(){
-  const base = $('#baseUrl').value.trim() || 'https://churrascaria.aida/menu';
+  const base = $('#baseUrl').value.trim();
+  urlHint();
+  if(!base){ $('#qrGrid').innerHTML=''; return; }
   const count = Math.min(parseInt($('#tableCount').value,10)||30, 60);
   const grid = $('#qrGrid'); grid.innerHTML='';
   $('#qrWarn').innerHTML = (typeof QRCode==='undefined')
@@ -1042,7 +1146,9 @@ document.addEventListener('click', e=>{
   }
   else if(el.dataset.next){ const o=orders.find(x=>x.no==el.dataset.next);
     o.status={new:'accepted',accepted:'ready',ready:'served'}[o.status]; renderOrders(); badge(); }
-  else if(el.dataset.done){ orders.splice(orders.findIndex(x=>x.no==el.dataset.done),1); renderOrders(); badge(); }
+  else if(el.dataset.done){ const o=orders.find(x=>x.no==el.dataset.done); o.status='done'; o.closed=Date.now(); renderOrders(); badge(); }
+  else if(el.hasAttribute('data-hist')){ historySheet(); }
+  else if(el.hasAttribute('data-toghist')){ showHist=!showHist; renderOrders(); }
 });
 document.addEventListener('click', e=>{
   if(!e.target.closest('#soundBtn')) return;
@@ -1053,10 +1159,11 @@ $('#openCart').onclick = cartSheet;
 $('#svcBill').onclick  = ()=>{ pushOrder('bill'); msgSheet(t('billed'), t('billedBody')); };
 $('#bellBig').onclick  = e=>{
   const b=e.currentTarget; b.classList.add('ping'); setTimeout(()=>b.classList.remove('ping'),500);
-  const w=zoneOf(table); pushOrder('waiter');
-  msgSheet(t('called'), (w?`<b>${w.name}</b> · `:'') + t('calledBody'));
+  pushOrder('waiter');
+  msgSheet(t('called'), t('calledBody'));
 };
 $('#genQr').onclick = genQR;
+$('#baseUrl').addEventListener('input', urlHint);
 
 function switchView(v){
   $$('.view').forEach(x=>x.classList.remove('on'));
@@ -1064,12 +1171,25 @@ function switchView(v){
   $$('.dbtn').forEach(b=>b.classList.toggle('on', b.dataset.view===v));
   $('#cartBar').style.display = v==='guest'?'':'none';
   window.scrollTo({top:0});
-  if(v==='qr' && !$('#qrGrid').children.length) genQR();
+  if(v==='qr'){
+    if(!$('#baseUrl').value) $('#baseUrl').value = selfURL();
+    urlHint();
+    if(!$('#qrGrid').children.length) genQR();
+  }
 }
-(function(){ const sel=$('#tablePick');
-  for(let i=1;i<=30;i++){ const o=document.createElement('option'); o.value=i; o.textContent='Tisch '+i;
+(function(){
+  const sel=$('#tablePick');
+  for(let i=1;i<=30;i++){ const o=document.createElement('option'); o.value=i; o.textContent=String(i);
     if(i===table) o.selected=true; sel.appendChild(o); }
   sel.onchange=()=>{ table=+sel.value; $('#tableNum').textContent=table; };
+
+  /* Gast sieht die Tischauswahl nur, wenn der QR-Code keine Tischnummer mitgebracht hat */
+  const showPick = !TABLE_FIXED || DEMO_MODE;
+  $('#tablePickWrap').style.display = showPick ? '' : 'none';
+
+  /* Rollen: Gast (Standard) · ?view=service · ?view=qr · ?demo=1 zeigt den Umschalter */
+  if(DEMO_MODE){ $('#demobar').hidden = false; document.body.classList.add('has-bar'); }
+  if(START_VIEW!=='guest') switchView(START_VIEW==='service'?'waiter':'qr');
 })();
 setInterval(()=>{ $('#waiterClock').textContent=new Date().toTimeString().slice(0,5); },1000);
 setInterval(()=>{
