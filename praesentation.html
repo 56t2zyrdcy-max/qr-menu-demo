@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR-meny &amp; bestilling · Präsentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --ink:#141414;
+  --paper:#FFFFFF;
+  --soft:#F4F2ED;
+  --ash:#6A6A6A;
+  --line:#DFDCD5;
+  --ember:#A8321C;
+  --body:'Lato',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#EAE7E1;color:var(--ink);font-family:var(--body);line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none}
+
+/* toolbar */
+.bar{position:sticky;top:0;z-index:10;background:var(--ink);color:#fff}
+.bar-in{max-width:840px;margin:0 auto;padding:9px 16px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.bar .lg{font-size:10.5px;font-weight:700;letter-spacing:.14em;padding:7px 11px;border:1px solid rgba(255,255,255,.3);color:rgba(255,255,255,.72)}
+.bar .lg.on{background:#fff;color:var(--ink);border-color:#fff}
+.bar .pr{margin-left:auto;font-size:10.5px;font-weight:700;letter-spacing:.14em;padding:7px 12px;border:1px solid rgba(255,255,255,.3)}
+
+/* sheet */
+.page{max-width:840px;margin:18px auto 40px;background:var(--paper);box-shadow:0 10px 40px rgba(0,0,0,.14)}
+.head{background:var(--ink);color:#fff;padding:34px 40px 30px}
+.eyebrow{font-family:var(--mono);font-size:9.5px;letter-spacing:.32em;text-transform:uppercase;color:#C9A98F}
+h1{font-size:clamp(25px,4.4vw,36px);line-height:1.15;font-weight:900;margin:14px 0 12px;letter-spacing:-.015em}
+.lede{font-size:14.5px;line-height:1.65;color:rgba(255,255,255,.8);max-width:60ch;font-weight:300}
+.head .langs{margin-top:20px;font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:#C9A98F}
+
+.body{padding:34px 40px 40px}
+section{margin-bottom:30px}
+h2{font-size:11px;font-weight:900;letter-spacing:.22em;text-transform:uppercase;margin:0 0 14px;padding-bottom:8px;border-bottom:2px solid var(--ink)}
+ul{margin:0;padding:0;list-style:none}
+li{position:relative;padding:0 0 11px 22px;font-size:14px;line-height:1.6}
+li::before{content:'';position:absolute;left:0;top:9px;width:9px;height:2px;background:var(--ember)}
+li b{font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.note{background:var(--soft);padding:16px 18px;border-left:3px solid var(--ash)}
+.note li::before{background:var(--ash)}
+.note li{font-size:13.5px;padding-bottom:9px}
+.steps{counter-reset:st}
+.steps li{padding-left:38px;padding-bottom:14px}
+.steps li::before{counter-increment:st;content:counter(st);left:0;top:0;width:24px;height:24px;background:var(--ink);color:#fff;
+  font-family:var(--mono);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.time{font-family:var(--mono);font-size:12px;color:var(--ash);margin-top:4px}
+
+.price{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line)}
+.price div{padding:16px 18px}
+.price div + div{border-left:1px solid var(--line)}
+.price .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ash)}
+.price .v{font-size:20px;font-weight:900;margin-top:5px}
+
+.demo{display:flex;gap:24px;align-items:center;background:var(--soft);padding:22px 24px;margin-top:6px}
+.demo .qr{flex:0 0 auto;background:#fff;padding:9px;border:1px solid var(--line)}
+.demo .qr img,.demo .qr canvas{width:112px !important;height:112px !important;display:block}
+.demo .tx{flex:1;min-width:0}
+.demo .tx b{display:block;font-size:13px;letter-spacing:.02em}
+.demo .tx a{font-family:var(--mono);font-size:11.5px;color:var(--ember);word-break:break-all;text-decoration:none}
+.demo .tx p{font-size:12.5px;color:var(--ash);margin:7px 0 0;line-height:1.55}
+
+.foot{border-top:2px solid var(--ink);margin-top:6px;padding-top:18px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.foot .who b{display:block;font-size:15px;font-weight:900}
+.foot .who span{font-size:12.5px;color:var(--ash)}
+.foot .ct{font-family:var(--mono);font-size:11.5px;color:var(--ash);text-align:right;line-height:1.9}
+.edit{outline:none}
+.edit:focus{background:#FFF6D8}
+
+.urlrow{max-width:840px;margin:0 auto 10px;padding:0 16px;display:flex;gap:8px}
+.urlrow input{flex:1;font-family:var(--mono);font-size:11.5px;padding:9px;border:1px solid var(--line);background:#fff}
+.urlrow button{padding:9px 14px;background:var(--ink);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.12em}
+
+@media (max-width:640px){
+  .head,.body{padding:24px 20px}
+  .two{grid-template-columns:1fr;gap:22px}
+  .price{grid-template-columns:1fr}
+  .price div + div{border-left:none;border-top:1px solid var(--line)}
+  .demo{flex-direction:column;align-items:flex-start;gap:16px}
+}
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff}
+  .bar,.urlrow,.noprint{display:none !important}
+  .page{max-width:none;margin:0;box-shadow:none}
+  .head{padding:0 0 18px;background:#fff;color:var(--ink);border-bottom:3px solid var(--ink)}
+  .lede{color:#333}
+  .eyebrow,.head .langs{color:var(--ash)}
+  .body{padding:20px 0 0}
+  section{margin-bottom:18px;break-inside:avoid}
+  li{padding-bottom:7px;font-size:11.5px}
+  h1{font-size:26px}
+  .lede{font-size:12.5px}
+  h2{font-size:10px;margin-bottom:10px}
+  .demo{background:#fff;border:1px solid var(--line)}
+}
+</style>
+</head>
+<body>
+
+<div class="bar noprint">
+  <div class="bar-in">
+    <button class="lg on" data-l="no">NORSK</button>
+    <button class="lg" data-l="de">DEUTSCH</button>
+    <button class="lg" data-l="en">ENGLISH</button>
+    <button class="lg" data-l="tr">TÜRKÇE</button>
+    <button class="pr" onclick="window.print()">PDF / PRINT</button>
+  </div>
+</div>
+
+<div class="urlrow noprint">
+  <input id="demoUrl" value="https://56t2zyrdcy-max.github.io/qr-menu-demo/?table=11" spellcheck="false">
+  <button id="mkqr">QR</button>
+</div>
+
+<div class="page">
+  <div class="head">
+    <div class="eyebrow" id="c-eyebrow"></div>
+    <h1 id="c-h1"></h1>
+    <p class="lede" id="c-lede"></p>
+    <div class="langs" id="c-langs"></div>
+  </div>
+
+  <div class="body">
+    <div class="two">
+      <section>
+        <h2 id="t-problem"></h2>
+        <ul id="c-problem"></ul>
+      </section>
+      <section>
+        <h2 id="t-solution"></h2>
+        <ul id="c-solution"></ul>
+      </section>
+    </div>
+
+    <section>
+      <h2 id="t-not"></h2>
+      <div class="note"><ul id="c-not"></ul></div>
+    </section>
+
+    <div class="two">
+      <section>
+        <h2 id="t-start"></h2>
+        <ul class="steps" id="c-start"></ul>
+        <div class="time" id="c-time"></div>
+      </section>
+      <section>
+        <h2 id="t-price"></h2>
+        <div class="price">
+          <div><div class="k" id="k-setup"></div><div class="v edit" contenteditable id="v-setup"></div></div>
+          <div><div class="k" id="k-month"></div><div class="v edit" contenteditable id="v-month"></div></div>
+        </div>
+        <div class="time" id="c-pricenote"></div>
+      </section>
+    </div>
+
+    <section>
+      <h2 id="t-demo"></h2>
+      <div class="demo">
+        <div class="qr" id="qrBox"></div>
+        <div class="tx">
+          <b id="c-demotitle"></b>
+          <a id="c-demolink" href="#"></a>
+          <p id="c-demotext"></p>
+        </div>
+      </div>
+    </section>
+
+    <div class="foot">
+      <div class="who">
+        <b>Özkan Özmen</b>
+        <span id="c-role"></span>
+      </div>
+      <div class="ct edit" contenteditable id="c-contact"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const C = {
+no:{
+ eyebrow:'Digital meny og bestilling fra bordet',
+ h1:'Gjesten leser menyen på sitt eget språk – og bestiller selv',
+ lede:'Gjesten skanner QR-koden på bordet. Menyen åpnes på gjestens eget språk, med beskrivelser, allergener og priser. Bestillingen går rett til servitøren som har akkurat det bordet – med bordnummer, klokkeslett og gjestens notat.',
+ langs:'NORSK · ENGLISH · DEUTSCH · ESPAÑOL · NEDERLANDS · TÜRKÇE · 中文',
+ tProblem:'Utfordringen',
+ problem:[
+  'Cruisegjester og turister leser ikke norsk. En meny på ett eller to språk koster både salg og tid.',
+  'Servitøren bruker minutter på å forklare retter, stekegrad og allergener – ofte på et språk ingen av partene behersker helt.',
+  'Gjester som ikke får kontakt med servitøren, bestiller mindre. Det gjelder særlig dessert, kaffe og vin.'],
+ tSolution:'Løsningen',
+ solution:[
+  '<b>Menyen på flere språk</b> – rettnavn, beskrivelser, allergener og priser, alt oversatt.',
+  '<b>QR-koden kjenner bordet.</b> Skanner gjesten på bord 11, vet systemet at det er bord 11.',
+  '<b>Stekegrad velges før bestilling</b> – blodig, rosa eller gjennomstekt, uten misforståelser.',
+  '<b>«Tilkall servitør»</b> gir lyd og vibrasjon til den posten som har bordet, og gjentas til den er kvittert ut.',
+  '<b>Bestillingshistorikk</b> – gjesten ser hva som er bestilt og hva det koster så langt.',
+  '<b>Ferdige QR-koder</b> til alle bord, klare til utskrift.'],
+ tNot:'Hva dette ikke er',
+ not:[
+  'Ikke et kassesystem. Betaling og kvittering går som før, i deres eget system.',
+  'Ikke nytt utstyr. Det kjører på telefonene og nettbrettene dere allerede har.',
+  'Ingen app for gjesten. Menyen åpnes rett i nettleseren.'],
+ tStart:'Slik kommer dere i gang',
+ start:[
+  'Dere sender menyen. Vi legger inn retter, priser og oversettelser.',
+  'Vi leverer QR-koder til alle bord, ferdig til utskrift.',
+  'Servitørene logger inn på sin post. Opplæringen tar et kvarter.'],
+ time:'Tid fra menyen er mottatt: omtrent én uke.',
+ tPrice:'Pris', kSetup:'Oppsett, engangs', kMonth:'Per måned',
+ vSetup:'på forespørsel', vMonth:'på forespørsel',
+ priceNote:'Ingen avgift per gjest eller per bestilling.',
+ tDemo:'Prøv den selv',
+ demoTitle:'Skann koden eller åpne lenken',
+ demoText:'Dette er en fungerende demo av en menykarte. Bytt språk øverst, legg inn en bestilling og se hvordan den kommer inn hos servitøren.',
+ role:'DJ, produsent og resident om bord på cruiseskip',
+ contact:'E-post: …<br>Telefon: …'},
+
+de:{
+ eyebrow:'Digitale Karte und Bestellung direkt vom Tisch',
+ h1:'Der Gast liest die Karte in seiner Sprache – und bestellt selbst',
+ lede:'Der Gast scannt den QR-Code am Tisch. Die Karte öffnet sich in seiner eigenen Sprache, mit Beschreibungen, Allergenen und Preisen. Die Bestellung geht direkt an die Station, die diesen Tisch betreut – mit Tischnummer, Uhrzeit und der Notiz des Gastes.',
+ langs:'DEUTSCH · ENGLISH · ESPAÑOL · NEDERLANDS · TÜRKÇE · NORSK · 中文',
+ tProblem:'Die Ausgangslage',
+ problem:[
+  'Kreuzfahrt- und Feriengäste lesen die Landessprache nicht. Eine Karte in ein oder zwei Sprachen kostet Umsatz und Zeit.',
+  'Der Service erklärt Gerichte, Garstufen und Allergene minutenlang – oft in einer Sprache, die beide Seiten nur halb beherrschen.',
+  'Gäste, die den Service nicht erreichen, bestellen weniger. Das trifft vor allem Dessert, Kaffee und Wein.'],
+ tSolution:'Die Lösung',
+ solution:[
+  '<b>Die Karte in mehreren Sprachen</b> – Gerichtnamen, Beschreibungen, Allergene und Preise, vollständig übersetzt.',
+  '<b>Der QR-Code kennt den Tisch.</b> Scannt der Gast an Tisch 11, weiß das System, dass es Tisch 11 ist.',
+  '<b>Die Garstufe wird vor der Bestellung gewählt</b> – blutig, rosa oder durch, ohne Missverständnisse.',
+  '<b>„Service rufen“</b> löst Ton und Vibration bei der zuständigen Station aus und wiederholt sich, bis quittiert wurde.',
+  '<b>Bestellverlauf</b> – der Gast sieht, was bestellt wurde und was bisher aufgelaufen ist.',
+  '<b>Fertige QR-Codes</b> für alle Tische, druckfertig geliefert.'],
+ tNot:'Was es nicht ist',
+ not:[
+  'Kein Kassensystem. Zahlung und Beleg laufen wie bisher über Ihr eigenes System.',
+  'Keine neue Hardware. Es läuft auf den Telefonen und Tablets, die Sie bereits haben.',
+  'Keine App für den Gast. Die Karte öffnet sich direkt im Browser.'],
+ tStart:'So starten Sie',
+ start:[
+  'Sie schicken uns die Karte. Wir pflegen Gerichte, Preise und Übersetzungen ein.',
+  'Wir liefern die QR-Codes für alle Tische, druckfertig.',
+  'Der Service meldet sich an seiner Station an. Die Einweisung dauert eine Viertelstunde.'],
+ time:'Dauer ab Erhalt der Karte: etwa eine Woche.',
+ tPrice:'Preis', kSetup:'Einrichtung, einmalig', kMonth:'Pro Monat',
+ vSetup:'auf Anfrage', vMonth:'auf Anfrage',
+ priceNote:'Keine Gebühr pro Gast oder pro Bestellung.',
+ tDemo:'Selbst ausprobieren',
+ demoTitle:'Code scannen oder Link öffnen',
+ demoText:'Das ist eine funktionierende Demo einer Speisekarte. Oben die Sprache wechseln, eine Bestellung aufgeben und sehen, wie sie beim Service ankommt.',
+ role:'DJ, Produzent und Resident an Bord von Kreuzfahrtschiffen',
+ contact:'E-Mail: …<br>Telefon: …'},
+
+en:{
+ eyebrow:'Digital menu and ordering from the table',
+ h1:'Guests read the menu in their own language – and order themselves',
+ lede:'The guest scans the QR code on the table. The menu opens in their own language, with descriptions, allergens and prices. The order goes straight to the station responsible for that table – with the table number, the time and the guest\'s note.',
+ langs:'ENGLISH · DEUTSCH · ESPAÑOL · NEDERLANDS · TÜRKÇE · NORSK · 中文',
+ tProblem:'The situation',
+ problem:[
+  'Cruise passengers and tourists do not read the local language. A menu in one or two languages costs both revenue and time.',
+  'Waiters spend minutes explaining dishes, doneness and allergens – often in a language neither side fully commands.',
+  'Guests who cannot get the waiter\'s attention order less. Dessert, coffee and wine suffer most.'],
+ tSolution:'The solution',
+ solution:[
+  '<b>The menu in several languages</b> – dish names, descriptions, allergens and prices, fully translated.',
+  '<b>The QR code knows the table.</b> If the guest scans at table 11, the system knows it is table 11.',
+  '<b>Doneness is chosen before ordering</b> – rare, medium or well done, with no misunderstanding.',
+  '<b>"Call the waiter"</b> triggers sound and vibration on the station that covers the table, repeating until acknowledged.',
+  '<b>Order history</b> – the guest sees what has been ordered and what it comes to so far.',
+  '<b>Ready-made QR codes</b> for every table, delivered print-ready.'],
+ tNot:'What this is not',
+ not:[
+  'Not a till system. Payment and receipts stay in your own system, exactly as today.',
+  'No new hardware. It runs on the phones and tablets you already have.',
+  'No app for the guest. The menu opens straight in the browser.'],
+ tStart:'How you get started',
+ start:[
+  'You send us the menu. We enter dishes, prices and translations.',
+  'We deliver QR codes for every table, ready to print.',
+  'Waiters sign in to their station. Training takes fifteen minutes.'],
+ time:'Time from receiving the menu: roughly one week.',
+ tPrice:'Price', kSetup:'Setup, one-off', kMonth:'Per month',
+ vSetup:'on request', vMonth:'on request',
+ priceNote:'No fee per guest and no fee per order.',
+ tDemo:'Try it yourself',
+ demoTitle:'Scan the code or open the link',
+ demoText:'This is a working demo of a menu. Switch language at the top, place an order and watch it arrive on the waiter\'s screen.',
+ role:'DJ, producer and resident aboard cruise ships',
+ contact:'E-mail: …<br>Phone: …'},
+
+tr:{
+ eyebrow:'Dijital menü ve masadan sipariş',
+ h1:'Misafir menüyü kendi dilinde okur – ve siparişini kendi verir',
+ lede:'Misafir masadaki QR kodu okutur. Menü kendi dilinde açılır; açıklamalar, alerjenler ve fiyatlar dahil. Sipariş, o masaya bakan postaya doğrudan düşer – masa numarası, saati ve misafirin notuyla birlikte.',
+ langs:'TÜRKÇE · DEUTSCH · ENGLISH · ESPAÑOL · NEDERLANDS · NORSK · 中文',
+ tProblem:'Mevcut durum',
+ problem:[
+  'Cruise ve tatil misafirleri yerel dili okuyamıyor. Bir veya iki dilde menü hem ciro hem zaman kaybettiriyor.',
+  'Garson yemekleri, pişirme derecesini ve alerjenleri dakikalarca anlatıyor – çoğu zaman iki tarafın da tam bilmediği bir dilde.',
+  'Garsona ulaşamayan misafir daha az sipariş veriyor. En çok tatlı, kahve ve şarap etkileniyor.'],
+ tSolution:'Çözüm',
+ solution:[
+  '<b>Menü birden fazla dilde</b> – yemek adları, açıklamalar, alerjenler ve fiyatlar eksiksiz çevrilmiş.',
+  '<b>QR kod masayı tanıyor.</b> Misafir 11 numaralı masada okuttuysa sistem bunu bilir.',
+  '<b>Pişirme derecesi sipariş öncesi seçiliyor</b> – az, orta veya iyi pişmiş; yanlış anlaşılma yok.',
+  '<b>„Garson çağır“</b> o masaya bakan postada ses ve titreşim başlatır, kapatılana kadar tekrarlar.',
+  '<b>Sipariş geçmişi</b> – misafir ne sipariş ettiğini ve şu ana kadarki tutarı görür.',
+  '<b>Hazır QR kodlar</b> tüm masalar için, baskıya hazır teslim.'],
+ tNot:'Bu ne değildir',
+ not:[
+  'Kasa sistemi değildir. Ödeme ve fiş bugünkü gibi kendi sisteminizde kalır.',
+  'Yeni donanım gerektirmez. Elinizdeki telefon ve tabletlerde çalışır.',
+  'Misafir için uygulama yoktur. Menü doğrudan tarayıcıda açılır.'],
+ tStart:'Nasıl başlıyoruz',
+ start:[
+  'Menünüzü gönderiyorsunuz. Yemekleri, fiyatları ve çevirileri biz giriyoruz.',
+  'Tüm masalar için QR kodları baskıya hazır teslim ediyoruz.',
+  'Garsonlar kendi postasına giriş yapıyor. Eğitim çeyrek saat sürüyor.'],
+ time:'Menü elimize geçtikten sonra süre: yaklaşık bir hafta.',
+ tPrice:'Fiyat', kSetup:'Kurulum, tek seferlik', kMonth:'Aylık',
+ vSetup:'talep üzerine', vMonth:'talep üzerine',
+ priceNote:'Misafir başına veya sipariş başına ücret yoktur.',
+ tDemo:'Kendiniz deneyin',
+ demoTitle:'Kodu okutun veya bağlantıyı açın',
+ demoText:'Bu, çalışan bir menü demosudur. Üstten dili değiştirin, bir sipariş verin ve garson ekranına nasıl düştüğünü görün.',
+ role:'DJ, prodüktör ve cruise gemilerinde resident',
+ contact:'E-posta: …<br>Telefon: …'}
+};
+
+let L='no';
+const $=s=>document.querySelector(s);
+const li=(arr,cls)=>arr.map(x=>`<li>${x}</li>`).join('');
+
+function render(){
+  const c=C[L];
+  document.documentElement.lang = L==='no'?'no':L;
+  $('#c-eyebrow').textContent=c.eyebrow;
+  $('#c-h1').textContent=c.h1;
+  $('#c-lede').textContent=c.lede;
+  $('#c-langs').textContent=c.langs;
+  $('#t-problem').textContent=c.tProblem;  $('#c-problem').innerHTML=li(c.problem);
+  $('#t-solution').textContent=c.tSolution;$('#c-solution').innerHTML=li(c.solution);
+  $('#t-not').textContent=c.tNot;          $('#c-not').innerHTML=li(c.not);
+  $('#t-start').textContent=c.tStart;      $('#c-start').innerHTML=li(c.start);
+  $('#c-time').textContent=c.time;
+  $('#t-price').textContent=c.tPrice;
+  $('#k-setup').textContent=c.kSetup; $('#v-setup').textContent=c.vSetup;
+  $('#k-month').textContent=c.kMonth; $('#v-month').textContent=c.vMonth;
+  $('#c-pricenote').textContent=c.priceNote;
+  $('#t-demo').textContent=c.tDemo;
+  $('#c-demotitle').textContent=c.demoTitle;
+  $('#c-demotext').textContent=c.demoText;
+  $('#c-role').textContent=c.role;
+  $('#c-contact').innerHTML=c.contact;
+  document.querySelectorAll('.lg').forEach(b=>b.classList.toggle('on', b.dataset.l===L));
+  makeQR();
+}
+function makeQR(){
+  const url=$('#demoUrl').value.trim();
+  $('#c-demolink').textContent=url;
+  $('#c-demolink').href=url;
+  const box=$('#qrBox'); box.innerHTML='';
+  if(typeof QRCode!=='undefined') new QRCode(box,{text:url,width:224,height:224,correctLevel:QRCode.CorrectLevel.M});
+  else box.innerHTML='<code style="font-size:8px;word-break:break-all">'+url+'</code>';
+}
+document.querySelectorAll('.lg').forEach(b=>b.onclick=()=>{L=b.dataset.l;render();});
+$('#mkqr').onclick=makeQR;
+$('#demoUrl').addEventListener('change',makeQR);
+render();
+</script>
+</body>
+</html>
