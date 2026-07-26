@@ -1029,6 +1029,65 @@ const COOK = [
   d:{de:'komplett durchgegart',en:'cooked all the way through',es:'hecho del todo',nl:'helemaal gaar',tr:'tamamen pişmiş'}}
 ];
 
+
+/* ============================================================
+   SYNCHRONISATION
+   Ohne CLOUD.url: nur dieses Gerät (Tabs synchron, Neustart-fest).
+   Mit CLOUD.url: alle Geräte in Echtzeit über Firebase Realtime DB.
+   ============================================================ */
+const CLOUD = { url:'https://djozmen-53d67-default-rtdb.europe-west1.firebasedatabase.app', node:'qrmenu/churrascaria' };
+
+const SYNC = (function(){
+  const KEY='chs_orders_v1';
+  const on  = CLOUD.url && /^https?:\/\//.test(CLOUD.url);
+  let MAP={}, bc=null, notify=()=>{}, poll=null, live=false;
+
+  const load=()=>{ try{ return JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ return {}; } };
+  const stash=m=>{ try{ localStorage.setItem(KEY, JSON.stringify(m)); }catch(e){} };
+
+  function apply(m){ MAP=m||{}; notify(MAP); }
+
+  const path = ()=> CLOUD.url.replace(/\/$/,'') + '/' + (CLOUD.node||'qrmenu') + '/orders.json';
+
+  function push(one){
+    stash(MAP);
+    if(bc) try{ bc.postMessage(MAP); }catch(e){}
+    if(on && one) fetch(path(), {method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({[one.id]: one})}).catch(()=>{});   // nur diesen Datensatz, nichts überschreiben
+    notify(MAP);
+  }
+  function pull(){
+    if(!on) return;
+    fetch(path()).then(r=>r.json())
+      .then(d=>{ live=true; apply(Object.assign({}, d||{}, MAP)); })
+      .catch(()=>{ live=false; notify(MAP); });
+  }
+  function startPoll(){ if(poll) return; poll=setInterval(pull, 4000); pull(); }
+
+  function init(cb){
+    notify=cb;
+    MAP = load();
+    try{ bc=new BroadcastChannel('chs_orders'); bc.onmessage=e=>apply(e.data); }catch(e){}
+    window.addEventListener('storage', e=>{ if(e.key===KEY) apply(load()); });
+    if(on){
+      try{
+        const es=new EventSource(path());
+        es.addEventListener('put', e=>{ live=true;
+          try{ const d=JSON.parse(e.data); if(d.path==='/') apply(d.data||{}); else pull(); }catch(err){ pull(); } });
+        es.addEventListener('patch', ()=>pull());
+        es.onerror = ()=>{ live=false; startPoll(); };
+      }catch(e){ startPoll(); }
+    }
+    notify(MAP);
+  }
+  return {
+    init, all:()=>MAP,
+    save(o){ MAP[o.id]=o; push(o); },
+    state(){ return on ? (live?'cloud':'cloud-offline') : 'local'; }
+  };
+})();
+
 /* ---------------- Zustand ---------------- */
 const PARAMS = new URLSearchParams(location.search);
 const TABLE_FIXED = /^\d{1,2}$/.test(PARAMS.get('table')||PARAMS.get('tisch')||PARAMS.get('masa')||'');
@@ -1036,7 +1095,6 @@ const DEMO_MODE = PARAMS.get('demo') === '1';
 const START_VIEW = ['service','qr'].includes(PARAMS.get('view')) ? PARAMS.get('view') : 'guest';
 let lang='de', table=11, cat='rodizio';
 const cart=[], orders=[];
-let ticketSeq=2040;
 
 const STATIONS=[
  {id:'a',name:'Posta 1', from:1,  to:10},
@@ -1241,18 +1299,29 @@ function msgSheet(title,body){
 /* ---------------- Bestellungen ---------------- */
 function pushOrder(type){
   const w = zoneOf(table);
-  const o = {no:++ticketSeq, table, type, waiter:w?w.id:null, wname:w?w.name:'—',
-    ts:Date.now(), rang:Date.now(),
+  const stamp = Date.now();
+  const o = {id: stamp.toString(36)+Math.random().toString(36).slice(2,6),
+    no: String(stamp).slice(-4), table, type, waiter:w?w.id:null, wname:w?w.name:'—',
+    ts:stamp, rang:stamp,
     items: type==='order' ? cart.map(c=>({n:L(c.name), s:[c.size, c.cook?L(c.cook):''].filter(Boolean).join(' · '), q:c.qty})) : [],
     total: type==='order' ? cart.reduce((a,c)=>a+c.qty*c.price,0) : 0,
     note: type==='order' ? ($('#orderNote')?.value||'') : '',
     status:'new', time:new Date().toTimeString().slice(0,5)};
-  orders.unshift(o);
-  renderMyOrdersBtn();
-  if(activeWaiter==='all'||activeWaiter===o.waiter)
-    chime(type==='order'?'order':type==='bill'?'bill':'waiter');
-  renderOrders(); badge();
+  SYNC.save(o);
   return o.no;
+}
+
+/* eingehende Daten -> Oberfläche */
+let seenIds = new Set();
+function onSync(map){
+  const cutoff = Date.now() - 12*3600*1000;
+  const list = Object.values(map||{}).filter(o=>o && o.ts>cutoff).sort((a,b)=>b.ts-a.ts);
+  const fresh = list.filter(o=>!seenIds.has(o.id) && o.status==='new'
+                 && (activeWaiter==='all'||o.waiter===activeWaiter));
+  orders.length = 0; list.forEach(o=>orders.push(o));
+  if(seenIds.size){ fresh.forEach(o=>chime(o.type==='order'?'order':o.type==='bill'?'bill':'waiter')); }
+  list.forEach(o=>seenIds.add(o.id));
+  renderOrders(); badge(); renderMyOrdersBtn();
 }
 const mine = o => activeWaiter==='all' || o.waiter===activeWaiter;
 function badge(){
@@ -1269,9 +1338,13 @@ function renderWaiterSel(){
     return `<button class="wchip${activeWaiter===w.id?' on':''}" data-w="${w.id}">${w.name}<b>${w.from}–${w.to}</b>${n?` <span style="color:var(--ember)">●${n}</span>`:''}</button>`;
   }).join('') + `<button class="sound${soundOn?' on':''}" id="soundBtn">${soundOn?'Ton an':'Ton einschalten'}</button>`;
   const w = STATIONS.find(x=>x.id===activeWaiter);
-  $('#waiterNote').innerHTML = w
+  const st = SYNC.state();
+  const conn = st==='cloud' ? '<b style="color:var(--ok)">● Verbunden – alle Geräte</b>'
+             : st==='cloud-offline' ? '<b style="color:var(--ember)">● Keine Verbindung zum Server</b>'
+             : '<b style="color:var(--ember)">● Nur dieses Gerät</b> – Bestellungen von anderen Handys kommen hier nicht an. Dafür wird ein Server benötigt.';
+  $('#waiterNote').innerHTML = (w
     ? `Angemeldet als <b>${w.name}</b> – Sie werden nur für die Tische ${w.from}–${w.to} benachrichtigt.`
-    : `Ansicht für Restaurantleitung und Küche: alle 30 Tische. Im Betrieb meldet sich jede Station separat an.`;
+    : `Ansicht für Restaurantleitung und Küche: alle 30 Tische.`) + '<br>' + conn;
 }
 function orderCard(o){
     if(o.type!=='order'){
@@ -1281,7 +1354,7 @@ function orderCard(o){
         <span class="elapsed" data-ts="${o.ts}"></span><span class="o-time">${o.time}</span></div>
         <div class="o-items" style="color:var(--ember);font-weight:700">${txt}</div>
         <div class="o-foot"><span class="o-total"></span>
-          ${isClosed(o)?'<span class="h-st ok">Erledigt</span>':`<button class="sbtn act" data-done="${o.no}">Erledigt</button>`}</div></div>`;
+          ${isClosed(o)?'<span class="h-st ok">Erledigt</span>':`<button class="sbtn act" data-done="${o.id}">Erledigt</button>`}</div></div>`;
     }
     const next = {new:'accepted',accepted:'ready',ready:'served'}[o.status];
     const lbl  = {accepted:'Annehmen',ready:'Küche fertig',served:'Serviert'}[next];
@@ -1291,7 +1364,7 @@ function orderCard(o){
       <div class="o-items">${o.items.map(i=>`<div><span>${i.q}×</span>${i.n}${i.s?` <em style="font-style:normal;color:var(--ash)">(${i.s})</em>`:''}</div>`).join('')}</div>
       ${o.note?`<div class="o-note">${o.note.replace(/</g,'&lt;')}</div>`:''}
       <div class="o-foot"><span class="o-total">${eur(o.total)}</span>
-        ${next?`<button class="sbtn act" data-next="${o.no}">${lbl}</button>`:''}</div></div>`;
+        ${next?`<button class="sbtn act" data-next="${o.id}">${lbl}</button>`:''}</div></div>`;
 }
 function renderOrders(){
   renderWaiterSel();
@@ -1367,9 +1440,9 @@ document.addEventListener('click', e=>{
     if(it){ it.qty += el.dataset.inc?1:-1; if(it.qty<=0) cart.splice(cart.indexOf(it),1); }
     renderCart(); cartSheet();
   }
-  else if(el.dataset.next){ const o=orders.find(x=>x.no==el.dataset.next);
-    o.status={new:'accepted',accepted:'ready',ready:'served'}[o.status]; renderOrders(); badge(); }
-  else if(el.dataset.done){ const o=orders.find(x=>x.no==el.dataset.done); o.status='done'; o.closed=Date.now(); renderOrders(); badge(); }
+  else if(el.dataset.next){ const o=orders.find(x=>x.id===el.dataset.next);
+    o.status={new:'accepted',accepted:'ready',ready:'served'}[o.status]; SYNC.save(o); }
+  else if(el.dataset.done){ const o=orders.find(x=>x.id===el.dataset.done); o.status='done'; o.closed=Date.now(); SYNC.save(o); }
   else if(el.hasAttribute('data-hist')){ historySheet(); }
   else if(el.hasAttribute('data-toghist')){ showHist=!showHist; renderOrders(); }
 });
@@ -1424,7 +1497,7 @@ setInterval(()=>{
 },1000);
 
 renderAll();
-renderOrders();
+SYNC.init(onSync);
 </script>
 </body>
 </html>
