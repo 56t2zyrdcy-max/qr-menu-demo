@@ -490,10 +490,12 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
 .field input{width:100%;background:#fff;border:1px solid var(--rule-2);color:var(--ink);font-family:var(--mono);font-size:12px;padding:11px}
 .hint{font-family:var(--mono);font-size:10.5px;line-height:1.6;color:var(--ash);margin-top:6px;word-break:break-all}
 .hint b{color:var(--ink)}
-.qrgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;margin-top:18px}
-.qrcard{background:#fff;border:1px solid var(--rule);padding:13px 10px;text-align:center}
+.qrgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:14px;margin-top:18px}
+.qrcard{background:#fff;border:1px solid var(--rule);padding:12px 12px 13px;text-align:center}
 .qrcard .qbox{display:flex;justify-content:center;margin-bottom:9px}
-.qrcard .qbox img,.qrcard .qbox canvas,.qrcard .qbox svg{width:104px !important;height:104px !important;display:block}
+.qrcard .qbox svg{width:100%;height:auto;display:block;image-rendering:pixelated}
+.qrcard a{display:block;color:inherit;text-decoration:none}
+.qrcard .qhint{font-family:var(--mono);font-size:8px;color:#9A9285;margin-top:4px}
 .qrcard .qn{font-family:var(--mono);font-weight:600;font-size:30px;line-height:1}
 .qrcard .qt{font-size:8px;line-height:1.5;color:var(--ash);margin-top:6px}
 .warn{margin-top:14px;padding:11px;border:1px dashed var(--ember);font-size:12px;color:var(--ember)}
@@ -510,7 +512,8 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
 @media print{
   body{padding:0}
   .demobar,.cartbar,.hero,.noprint{display:none !important}
-  .qrgrid{grid-template-columns:repeat(3,1fr)}
+  .qrgrid{grid-template-columns:repeat(3,1fr);gap:10px}
+  .qrcard{break-inside:avoid;border:1px solid #ccc}
 }
 </style>
 </head>
@@ -1329,10 +1332,12 @@ function genQR(){
   for(let i=1;i<=count;i++){
     const url = `${base}?table=${i}`;
     const card = document.createElement('div'); card.className='qrcard';
-    card.innerHTML = `<div class="qbox"></div><div class="qn">${String(i).padStart(2,'0')}</div>
-      <div class="qt">Karte &amp; Bestellung · Menu &amp; order<br>Carta · Kaart · Menü</div>`;
+    card.innerHTML = `<a href="${url}" target="_blank" rel="noopener">
+        <div class="qbox"></div><div class="qn">${String(i).padStart(2,'0')}</div>
+        <div class="qt">Karte &amp; Bestellung · Menu &amp; order<br>Carta · Kaart · Menü</div>
+      </a><div class="qhint noprint">antippen zum Testen</div>`;
     grid.appendChild(card);
-    try{ card.querySelector('.qbox').innerHTML = QRC.svg(url, 208); }
+    try{ card.querySelector('.qbox').innerHTML = QRC.svg(url, 480); }
     catch(err){ card.querySelector('.qbox').innerHTML = `<code style="font-size:8px;word-break:break-all">${url}</code>`; }
   }
 }
