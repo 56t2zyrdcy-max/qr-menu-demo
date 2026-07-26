@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FJORDSIDE · QR Meny &amp; Bestilling</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700&family=Karla:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --ink:#08222B;
+  --deep:#0E2E38;
+  --sea:#17444F;
+  --sea-2:#1E5462;
+  --fog:#EDF0F1;
+  --muted:#9BB1B7;
+  --brass:#C9974A;
+  --sun:#F0B45C;
+  --alert:#E2725B;
+  --ok:#5FBF8F;
+  --line:rgba(237,240,241,.13);
+  --line-strong:rgba(237,240,241,.26);
+  --display:'Fraunces',ui-serif,Georgia,'Times New Roman',serif;
+  --body:'Karla',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --pad:20px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ink);
+  color:var(--fog);
+  font-family:var(--body);
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  line-height:1.5;
+  padding-bottom:132px;
+}
+img{max-width:100%;display:block}
+button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none}
+:focus-visible{outline:2px solid var(--sun);outline-offset:3px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.wrap{max-width:560px;margin:0 auto;padding:0 var(--pad)}
+.view{display:none}
+.view.on{display:block}
+
+/* ---------- header / horizon ---------- */
+.hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#071C24 0%,#0B2933 45%,#123B47 100%)}
+.hero .sun{
+  position:absolute;left:50%;top:96px;width:150px;height:150px;margin-left:-75px;border-radius:50%;
+  background:radial-gradient(circle at 50% 50%,rgba(240,180,92,.55),rgba(240,180,92,.10) 62%,transparent 70%);
+  filter:blur(1px);
+}
+.hero svg.waves{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:88px;display:block}
+.hero .wv{animation:drift 22s linear infinite}
+.hero .wv2{animation-duration:34s;animation-direction:reverse}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.hero .wv{animation:none}}
+.hero-in{position:relative;padding:38px var(--pad) 62px;text-align:center}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--brass)}
+.brand{font-family:var(--display);font-weight:300;font-size:clamp(38px,12vw,54px);letter-spacing:.14em;margin:10px 0 2px;text-transform:uppercase}
+.brand em{font-style:normal;font-weight:700}
+.tag{font-size:12.5px;color:var(--muted);letter-spacing:.06em}
+
+/* table plate + call bell */
+.plate-row{display:flex;align-items:center;justify-content:center;gap:26px;margin:20px 0 0 34px}
+.plate{
+  display:inline-flex;align-items:center;gap:12px;padding:9px 8px 9px 16px;
+  border:1px solid rgba(201,151,74,.45);border-radius:2px;
+  background:linear-gradient(180deg,rgba(201,151,74,.16),rgba(201,151,74,.05));
+}
+.plate .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--sun)}
+.plate .num{
+  font-family:var(--mono);font-weight:600;font-size:22px;line-height:1;padding:6px 12px;
+  background:var(--sun);color:#0A2029;border-radius:2px;
+}
+.bell-wrap{position:relative;width:124px;height:124px;flex:0 0 124px;display:flex;align-items:center;justify-content:center}
+.ring{position:absolute;inset:0;width:124px;height:124px;animation:spin 26s linear infinite;pointer-events:none}
+.ring text{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;fill:var(--alert);
+  text-transform:uppercase;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.bell-big{
+  position:relative;width:64px;height:64px;flex:0 0 64px;border-radius:50%;
+  background:radial-gradient(circle at 50% 40%,rgba(226,114,91,.22),rgba(226,114,91,.06));
+  border:2px solid var(--alert);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 24px rgba(226,114,91,.32);transition:.15s;
+}
+.bell-big svg{width:28px;height:28px;stroke:var(--sun);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.bell-big:active{transform:scale(.94);background:rgba(226,114,91,.3)}
+.bell-big::after{
+  content:'';position:absolute;inset:-6px;border:2px solid var(--alert);border-radius:50%;
+  opacity:0;animation:halo 2.6s ease-out infinite;pointer-events:none;
+}
+@keyframes halo{0%{opacity:.75;transform:scale(1)}70%,100%{opacity:0;transform:scale(1.3)}}
+.bell-big.ping{animation:ping .5s ease}
+@media (prefers-reduced-motion:reduce){.ring{animation:none}}
+@media (prefers-reduced-motion:reduce){.bell-big::after{animation:none}}
+
+/* ---------- language ---------- */
+.langbar{display:flex;justify-content:center;gap:7px;margin-top:20px;flex-wrap:wrap}
+.lang{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;padding:7px 13px;border-radius:2px;
+  border:1px solid var(--line-strong);color:var(--muted);background:rgba(255,255,255,.02);transition:.18s;
+}
+.lang:hover{color:var(--fog);border-color:var(--brass)}
+.lang.on{background:var(--fog);color:var(--ink);border-color:var(--fog);font-weight:600}
+.lang.more{border-style:dashed;color:var(--brass)}
+.langnote{
+  max-width:420px;margin:14px auto 0;font-size:11.5px;line-height:1.6;color:var(--muted);
+  border:1px dashed rgba(201,151,74,.4);border-radius:3px;padding:11px 14px;display:none;text-align:left;
+}
+.langnote.on{display:block}
+.langnote b{color:var(--sun);font-weight:500}
+
+/* ---------- category nav ---------- */
+html[lang="zh"]{--display:'Fraunces','Songti SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei',ui-serif,serif;--body:'Karla','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif}
+html[lang="zh"] .brand{letter-spacing:.14em}
+.navbar{position:sticky;top:0;z-index:40;background:rgba(8,34,43,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.navscroll{display:flex;gap:4px;overflow-x:auto;padding:11px var(--pad);scrollbar-width:none;max-width:560px;margin:0 auto}
+.navscroll::-webkit-scrollbar{display:none}
+.cbtn{white-space:nowrap;font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;padding:8px 13px;color:var(--muted);border-radius:2px;transition:.16s}
+.cbtn.on{color:var(--ink);background:var(--brass);font-weight:700}
+
+/* ---------- filters ---------- */
+.filters{display:flex;gap:6px;flex-wrap:wrap;padding:16px 0 4px}
+.fbtn{font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;border:1px solid var(--line-strong);border-radius:99px;color:var(--muted)}
+.fbtn.on{border-color:var(--sun);color:var(--sun)}
+
+/* ---------- menu ---------- */
+.sect{padding:30px 0 6px}
+.sect-h{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+.sect-h h2{font-family:var(--display);font-weight:300;font-size:29px;letter-spacing:.02em;margin:0}
+.sect-h .sub{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass)}
+.sect-rule{height:1px;background:linear-gradient(90deg,var(--brass),transparent);margin:14px 0 6px}
+
+.dish{display:flex;gap:14px;padding:18px 0;border-bottom:1px solid var(--line)}
+.thumb{
+  flex:0 0 74px;height:74px;border-radius:3px;overflow:hidden;position:relative;
+  background:linear-gradient(145deg,var(--sea) 0%,#0C2830 100%);
+  display:flex;align-items:center;justify-content:center;
+}
+.thumb svg{width:40px;height:40px;stroke:var(--brass);fill:none;stroke-width:1.15;opacity:.92}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.d-main{flex:1;min-width:0}
+.d-top{display:flex;gap:10px;align-items:baseline}
+.d-name{font-family:var(--display);font-size:17.5px;font-weight:500;line-height:1.25;margin:0;flex:1}
+.d-price{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--sun);white-space:nowrap}
+.d-desc{font-size:13px;line-height:1.55;color:var(--muted);margin:5px 0 0}
+.d-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.chip{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 6px;border:1px solid var(--line-strong);border-radius:2px;color:var(--muted)}
+.chip.veg{border-color:rgba(95,191,143,.5);color:var(--ok)}
+.chip.hot{border-color:rgba(201,151,74,.55);color:var(--brass)}
+.d-note{font-size:11.5px;color:var(--brass);margin-top:7px;font-style:italic}
+
+.sizes{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+.size{font-family:var(--mono);font-size:11px;padding:7px 10px;border:1px solid var(--line-strong);border-radius:2px;color:var(--fog);transition:.16s}
+.size:hover{border-color:var(--sun)}
+.size b{color:var(--sun);font-weight:600;margin-left:6px}
+
+.add{margin-top:11px;display:flex;align-items:center;gap:10px}
+.addbtn{
+  font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+  padding:9px 16px;border:1px solid var(--brass);color:var(--brass);border-radius:2px;transition:.16s;
+}
+.addbtn:hover{background:var(--brass);color:var(--ink)}
+.qty{display:flex;align-items:center;gap:2px;border:1px solid var(--line-strong);border-radius:2px}
+.qty button{width:32px;height:32px;font-size:17px;color:var(--fog);line-height:1}
+.qty span{font-family:var(--mono);font-size:13px;min-width:22px;text-align:center;font-weight:600}
+
+/* ---------- allergen legend ---------- */
+.legend{margin:34px 0 10px;padding:16px;border:1px solid var(--line);border-radius:3px;background:rgba(255,255,255,.02)}
+.legend h4{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass);margin:0 0 9px}
+.legend p{font-size:11.5px;line-height:1.7;color:var(--muted);margin:0}
+
+/* ---------- service row ---------- */
+.servicetop{padding:22px var(--pad) 4px;max-width:560px;margin:0 auto}
+.svc{width:100%;padding:15px 12px;border:1px solid var(--line-strong);border-radius:3px;text-align:center;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);transition:.16s}
+.svc:hover{border-color:var(--sun);color:var(--sun)}
+.svc small{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:var(--muted);margin-top:5px}
+@keyframes ping{0%,100%{transform:scale(1)}40%{transform:scale(1.18)}}
+
+/* waiter panel controls */
+.wctrl{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:16px 0 4px}
+.wchip{font-size:11.5px;letter-spacing:.06em;padding:8px 12px;border:1px solid var(--line-strong);border-radius:99px;color:var(--muted)}
+.wchip.on{border-color:var(--sun);color:var(--sun);font-weight:700}
+.wchip b{font-family:var(--mono);font-size:9.5px;color:var(--brass);margin-left:5px;font-weight:400}
+.sound{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:8px 12px;border:1px solid var(--line-strong);border-radius:2px;color:var(--muted)}
+.sound.on{border-color:var(--ok);color:var(--ok)}
+.elapsed{font-family:var(--mono);font-size:11px;color:var(--alert);margin-left:8px}
+.elapsed.warn{background:var(--alert);color:#fff;padding:2px 6px;border-radius:2px}
+.wnote{font-size:11.5px;color:var(--muted);line-height:1.6;margin-top:10px;padding:11px 13px;border:1px dashed var(--line-strong);border-radius:3px}
+.qz{font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:#7B8C91;margin-top:4px}
+
+/* ---------- cart bar ---------- */
+.cartbar{
+  position:fixed;left:0;right:0;bottom:54px;z-index:60;transform:translateY(140%);transition:transform .3s cubic-bezier(.2,.8,.3,1);
+}
+.cartbar.on{transform:translateY(0)}
+.cartbar-in{max-width:560px;margin:0 auto;padding:0 var(--pad) 10px}
+.cartbtn{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--brass);color:#0A2029;padding:15px 18px;border-radius:3px;
+  box-shadow:0 14px 40px rgba(0,0,0,.55);
+}
+.cartbtn .l{font-size:13px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+.cartbtn .r{font-family:var(--mono);font-size:14px;font-weight:600}
+
+/* ---------- sheet ---------- */
+.sheet{position:fixed;inset:0;z-index:90;display:none}
+.sheet.on{display:block}
+.sheet-bg{position:absolute;inset:0;background:rgba(3,14,18,.78);backdrop-filter:blur(3px)}
+.sheet-box{
+  position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;
+  background:var(--deep);border-top:2px solid var(--brass);border-radius:10px 10px 0 0;
+  max-width:560px;margin:0 auto;padding:22px var(--pad) 28px;
+}
+.sheet-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.sheet-h h3{font-family:var(--display);font-weight:300;font-size:25px;margin:0}
+.x{font-size:24px;line-height:1;color:var(--muted);padding:4px 8px}
+.sheet-sub{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass);margin-bottom:16px}
+.line{display:flex;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}
+.line .nm{flex:1;font-size:14px;line-height:1.35}
+.line .nm small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.line .pr{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--sun);white-space:nowrap}
+.totrow{display:flex;justify-content:space-between;align-items:baseline;padding:18px 0 6px;font-family:var(--mono)}
+.totrow .t1{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.totrow .t2{font-size:22px;font-weight:600;color:var(--sun)}
+textarea{
+  width:100%;margin-top:12px;background:rgba(0,0,0,.28);border:1px solid var(--line-strong);border-radius:3px;
+  color:var(--fog);font-family:var(--body);font-size:13px;padding:12px;resize:vertical;min-height:64px;
+}
+textarea::placeholder{color:#6C858C}
+.primary{
+  width:100%;margin-top:14px;background:var(--sun);color:#0A2029;padding:16px;border-radius:3px;
+  font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+}
+.ghost{width:100%;margin-top:9px;padding:13px;border:1px solid var(--line-strong);border-radius:3px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* ---------- ticket ---------- */
+.ticket{text-align:center;padding:14px 0 4px}
+.ticket .big{font-family:var(--mono);font-size:44px;font-weight:600;color:var(--sun);line-height:1}
+.ticket .sm{font-size:13px;color:var(--muted);margin-top:12px;line-height:1.6}
+.ticket .tick{width:52px;height:52px;border:1px solid var(--ok);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--ok);font-size:24px}
+
+/* ---------- waiter panel ---------- */
+.panel-h{padding:26px 0 6px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.panel-h h2{font-family:var(--display);font-weight:300;font-size:27px;margin:0 0 4px}
+.panel-h p{font-size:12px;color:var(--muted);margin:0}
+.order{border:1px solid var(--line-strong);border-radius:3px;padding:15px;margin-top:14px;background:rgba(255,255,255,.02)}
+.order.new{border-color:var(--sun);box-shadow:0 0 0 1px rgba(240,180,92,.25)}
+.order.call{border-color:var(--alert)}
+.o-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.o-table{font-family:var(--mono);font-weight:600;font-size:15px;background:var(--sun);color:#0A2029;padding:5px 10px;border-radius:2px}
+.o-table.alert{background:var(--alert);color:#fff}
+.o-id{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.o-time{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.o-items{font-size:13px;line-height:1.75;color:var(--fog)}
+.o-items span{font-family:var(--mono);color:var(--brass);margin-right:7px}
+.o-note{margin-top:9px;font-size:12px;color:var(--sun);border-left:2px solid var(--sun);padding-left:9px}
+.o-foot{display:flex;align-items:center;gap:7px;margin-top:13px;flex-wrap:wrap}
+.o-total{font-family:var(--mono);font-weight:600;font-size:14px;color:var(--sun);margin-right:auto}
+.sbtn{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;padding:8px 12px;border:1px solid var(--line-strong);border-radius:2px;color:var(--muted)}
+.sbtn.act{border-color:var(--ok);color:var(--ok)}
+.status{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;padding:4px 8px;border-radius:2px}
+.st-new{background:var(--sun);color:#0A2029}
+.st-acc{border:1px solid var(--brass);color:var(--brass)}
+.st-rdy{border:1px solid var(--ok);color:var(--ok)}
+.st-srv{border:1px solid var(--line-strong);color:var(--muted)}
+.empty{padding:44px 12px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed var(--line-strong);border-radius:3px;margin-top:16px}
+
+/* ---------- QR panel ---------- */
+.field{margin-top:14px}
+.field label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin-bottom:6px}
+.field input{
+  width:100%;background:rgba(0,0,0,.28);border:1px solid var(--line-strong);border-radius:3px;
+  color:var(--fog);font-family:var(--mono);font-size:12.5px;padding:12px;
+}
+.qrgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:20px}
+.qrcard{background:#fff;color:#0A2029;border-radius:4px;padding:13px 10px;text-align:center}
+.qrcard .qh{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
+.qrcard .qbox{display:flex;justify-content:center;margin:2px 0 10px}
+.qrcard .qbox img,.qrcard .qbox canvas{width:104px !important;height:104px !important}
+.qrcard .qn{font-family:var(--mono);font-weight:600;font-size:30px;line-height:1}
+.qrcard .qt{font-size:8.5px;line-height:1.5;color:#5C6E73;margin-top:5px}
+.warn{margin-top:16px;padding:12px;border:1px dashed var(--alert);border-radius:3px;font-size:12px;color:var(--alert)}
+
+/* ---------- demo bar ---------- */
+.demobar{position:fixed;left:0;right:0;bottom:0;z-index:70;background:rgba(4,18,24,.97);border-top:1px solid var(--line);backdrop-filter:blur(12px)}
+.demobar-in{max-width:560px;margin:0 auto;padding:8px var(--pad);display:flex;align-items:center;gap:6px}
+.dtag{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;color:var(--brass);border:1px solid rgba(201,151,74,.4);padding:4px 6px;border-radius:2px}
+.dbtn{flex:1;font-size:11px;letter-spacing:.09em;text-transform:uppercase;padding:9px 4px;border-radius:2px;color:var(--muted);text-align:center}
+.dbtn.on{background:rgba(237,240,241,.1);color:var(--fog);font-weight:700}
+.dbtn .badge{display:inline-block;min-width:16px;font-family:var(--mono);font-size:9px;background:var(--alert);color:#fff;border-radius:99px;padding:1px 5px;margin-left:4px}
+.tsel{background:rgba(0,0,0,.4);border:1px solid var(--line-strong);color:var(--fog);font-family:var(--mono);font-size:11px;padding:8px 6px;border-radius:2px}
+
+.foot{text-align:center;padding:30px 0 10px;font-size:11px;color:#5D757C;line-height:1.7}
+
+@media print{
+  body{background:#fff;color:#000;padding:0}
+  .demobar,.navbar,.cartbar,.hero,.noprint{display:none !important}
+  .qrgrid{grid-template-columns:repeat(3,1fr)}
+  .qrcard{border:1px solid #ddd}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ GUEST VIEW ============ -->
+<div class="view on" id="v-guest">
+  <header class="hero">
+    <div class="sun"></div>
+    <div class="hero-in wrap">
+      <div class="eyebrow">Akershusstranda · Oslo</div>
+      <h1 class="brand">Fjord<em>side</em></h1>
+      <div class="tag" id="tagline"></div>
+      <div class="plate-row">
+        <span class="plate">
+          <span class="lbl" id="tableLbl">Bord</span>
+          <span class="num" id="tableNum">11</span>
+        </span>
+        <span class="bell-wrap">
+          <svg class="ring" viewBox="0 0 124 124" aria-hidden="true">
+            <defs>
+              <path id="ringPath" fill="none" d="M62,62 m-48,0 a48,48 0 1,1 96,0 a48,48 0 1,1 -96,0"></path>
+            </defs>
+            <text><textPath href="#ringPath" xlink:href="#ringPath" id="ringText" startOffset="0"></textPath></text>
+          </svg>
+          <button class="bell-big" id="bellBig" aria-label="Tilkall servitør">
+            <svg viewBox="0 0 24 24"><path d="M18 15v-4a6 6 0 1 0-12 0v4l-2 3h16z"/><path d="M10 21h4"/></svg>
+          </button>
+        </span>
+      </div>
+      <div class="langbar">
+        <button class="lang on" data-lang="no">NORSK</button>
+        <button class="lang" data-lang="en">ENGLISH</button>
+        <button class="lang" data-lang="de">DEUTSCH</button>
+        <button class="lang" data-lang="tr">TÜRKÇE</button>
+        <button class="lang" data-lang="zh">中文</button>
+        <button class="lang more" id="moreLang">+ SPRÅK</button>
+      </div>
+      <div class="langnote" id="langNote"></div>
+    </div>
+    <svg class="waves" viewBox="0 0 1200 88" preserveAspectRatio="none" aria-hidden="true">
+      <path class="wv wv2" fill="rgba(23,68,79,.55)" d="M0,52 C150,26 250,74 400,52 C550,30 650,74 800,52 C950,30 1050,74 1200,52 L1200,88 L0,88 Z"></path>
+      <path class="wv" fill="#08222B" d="M0,64 C160,44 260,84 420,64 C580,44 680,84 840,64 C1000,44 1080,80 1200,64 L1200,88 L0,88 Z"></path>
+    </svg>
+  </header>
+
+  <div class="servicetop">
+    <button class="svc" id="svcBill"></button>
+  </div>
+
+  <nav class="navbar">
+    <div class="navscroll" id="catNav"></div>
+  </nav>
+
+  <main class="wrap">
+    <div class="filters" id="filters"></div>
+    <div id="menuRoot"></div>
+
+    <div class="legend">
+      <h4 id="legTitle">Allergener</h4>
+      <p id="legBody"></p>
+    </div>
+
+    <div class="foot" id="footNote"></div>
+  </main>
+</div>
+
+<!-- ============ WAITER VIEW ============ -->
+<div class="view" id="v-waiter">
+  <div class="wrap">
+    <div class="panel-h">
+      <h2>Servitørpanel</h2>
+      <p>Live bestillinger · Fjordside Oslo · <span id="waiterClock" style="font-family:var(--mono)"></span></p>
+    </div>
+    <div class="wctrl" id="waiterSel"></div>
+    <div class="wnote" id="waiterNote"></div>
+    <div id="orderRoot"></div>
+    <div class="foot">Hver servitør ser kun sine bord. Tilkalling gir lyd + vibrasjon, og ringer på nytt hvert 45. sekund til den er kvittert ut.</div>
+  </div>
+</div>
+
+<!-- ============ QR VIEW ============ -->
+<div class="view" id="v-qr">
+  <div class="wrap">
+    <div class="panel-h">
+      <h2>QR-koder · 30 bord</h2>
+      <p>Hver kode åpner menyen med sitt eget bordnummer. Skriv ut, laminer, sett på bordet.</p>
+    </div>
+    <div class="field noprint">
+      <label>Base-URL</label>
+      <input id="baseUrl" value="https://fjordside.no/meny" spellcheck="false">
+    </div>
+    <div class="field noprint">
+      <label>Antall bord</label>
+      <input id="tableCount" value="30" inputmode="numeric">
+    </div>
+    <button class="primary noprint" id="genQr">Lag QR-koder</button>
+    <button class="ghost noprint" onclick="window.print()">Skriv ut ark</button>
+    <div id="qrWarn"></div>
+    <div class="qrgrid" id="qrGrid"></div>
+  </div>
+</div>
+
+<!-- ============ CART BAR ============ -->
+<div class="cartbar" id="cartBar">
+  <div class="cartbar-in">
+    <button class="cartbtn" id="openCart">
+      <span class="l" id="cartLabel">Se bestilling</span>
+      <span class="r" id="cartSum">0 kr</span>
+    </button>
+  </div>
+</div>
+
+<!-- ============ SHEET ============ -->
+<div class="sheet" id="sheet">
+  <div class="sheet-bg" id="sheetBg"></div>
+  <div class="sheet-box" id="sheetBox"></div>
+</div>
+
+<!-- ============ DEMO BAR ============ -->
+<div class="demobar">
+  <div class="demobar-in">
+    <span class="dtag">DEMO</span>
+    <button class="dbtn on" data-view="guest">Gjest</button>
+    <button class="dbtn" data-view="waiter">Servitør<span class="badge" id="ordBadge" style="display:none">0</span></button>
+    <button class="dbtn" data-view="qr">QR</button>
+    <select class="tsel" id="tablePick" aria-label="Bord"></select>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   FJORDSIDE — QR table ordering demo
+   Menu modelled on a seafood restaurant at the Oslo cruise quay
+   (Solsiden, Akershusstranda 13). Prices in NOK.
+   ============================================================ */
+
+/* ---------- icons ---------- */
+const ICONS = {
+  oyster:'<svg viewBox="0 0 48 48"><path d="M24 8c9 0 17 7 17 16s-8 16-17 16S7 33 7 24 15 8 24 8z"/><path d="M24 12c6 3 10 7 12 12M24 12c-6 3-10 7-12 12M24 12v24"/></svg>',
+  lobster:'<svg viewBox="0 0 48 48"><path d="M24 14c4 0 7 4 7 9s-3 15-7 15-7-10-7-15 3-9 7-9z"/><path d="M17 17c-4-1-7-4-8-8M31 17c4-1 7-4 8-8M16 25H8M32 25h8M17 32l-7 4M31 32l7 4"/></svg>',
+  fish:'<svg viewBox="0 0 48 48"><path d="M6 24c6-9 14-13 22-13s14 5 14 13-6 13-14 13S12 33 6 24z"/><path d="M6 24l-2-7 2 7-2 7 2-7z"/><circle cx="33" cy="21" r="1.6" fill="currentColor" stroke="none"/><path d="M20 15c3 6 3 12 0 18"/></svg>',
+  scallop:'<svg viewBox="0 0 48 48"><path d="M24 40C12 40 5 31 5 22c0-3 3-4 5-2 1-3 4-3 6-1 1-3 5-4 8-1 3-3 7-2 8 1 2-2 5-2 6 1 2-2 5-1 5 2 0 9-7 18-19 18z"/><path d="M24 40V19M17 38l3-19M31 38l-3-19"/></svg>',
+  crab:'<svg viewBox="0 0 48 48"><ellipse cx="24" cy="26" rx="12" ry="8"/><path d="M14 20c-3-4-8-4-10-1M34 20c3-4 8-4 10-1M13 30l-7 5M35 30l7 5M18 34l-3 6M30 34l3 6"/><circle cx="20" cy="24" r="1.4" fill="currentColor" stroke="none"/><circle cx="28" cy="24" r="1.4" fill="currentColor" stroke="none"/></svg>',
+  leaf:'<svg viewBox="0 0 48 48"><path d="M38 10C22 10 12 18 12 30c0 4 2 7 2 7s12-2 18-8 6-19 6-19z"/><path d="M34 14C24 20 18 28 14 38"/></svg>',
+  cake:'<svg viewBox="0 0 48 48"><path d="M9 40V26c0-3 3-5 7-5h16c4 0 7 2 7 5v14z"/><path d="M9 32c3 0 3-3 6-3s3 3 6 3 3-3 6-3 3 3 6 3 3-3 6-3"/><path d="M24 21v-6M24 11a2 2 0 1 1 .01 0"/></svg>',
+  glass:'<svg viewBox="0 0 48 48"><path d="M15 8h18l-2 14a7 7 0 0 1-14 0z"/><path d="M24 29v9M17 40h14"/></svg>',
+  plateau:'<svg viewBox="0 0 48 48"><path d="M5 32h38M8 32c0-9 7-16 16-16s16 7 16 16"/><circle cx="24" cy="12" r="2"/><path d="M14 32c0-5 4-9 10-9s10 4 10 9M9 36h30"/></svg>'
+};
+
+/* ---------- i18n ---------- */
+const T = {
+  no:{
+    tagline:'Sjømat &amp; grill ved cruisekaia · siden 1993',
+    table:'Bord', menu:'Meny',
+    all:'Alle', veg:'Vegetar', gf:'Glutenfri',
+    add:'Legg til', cart:'Se bestilling', order:'Send bestilling',
+    yourOrder:'Din bestilling', tableIs:'Bord', empty:'Ingen retter valgt ennå.',
+    notes:'Allergier eller ønsker? Skriv her – kjøkkenet ser notatet.',
+    total:'Totalt', close:'Lukk',
+    sent:'Bestilling mottatt', ticketNo:'Bestillingsnr.',
+    sentBody:'Servitøren er varslet og kommer til bordet ditt. Du kan bestille mer når som helst.',
+    ok:'Tilbake til menyen',
+    callWaiter:'Tilkall servitør', callWaiterSub:'Vi kommer til bordet',
+    bill:'Be om regningen', billSub:'Kort · Vipps · kontant',
+    called:'Servitør er tilkalt', calledBody:'Vi er ved bordet ditt om et øyeblikk.',
+    billed:'Regningen kommer', billedBody:'Servitøren tar med regningen til bordet ditt.',
+    legTitle:'Allergener',
+    legBody:'b = bløtdyr · e = egg · f = fisk · g = gluten · ha = hasselnøtter · m = melk · se = selleri · s = sennep · ses = sesam · sk = skalldyr · so = soya · su = sulfitt.<br>De fleste retter kan tilpasses. Gi alltid beskjed om allergier ved bestilling.',
+    foot:'Alle priser i NOK inkl. mva. · Kjøkken 16:30–22:00 · Akershusstranda 13, Skur 34, 0150 Oslo',
+    langNote:'<b>Fem språk er aktive: norsk, engelsk, tysk, tyrkisk og kinesisk.</b> Menyen er bygget slik at nye språk legges til i én datablokk – uten ny design. Neste kandidater for cruisegjester: fransk, spansk, italiensk, russisk, japansk. Hvert nytt språk = én kolonne i menydataene.',
+    perPerson:'per person', min2:'min. 2 personer'
+  },
+  en:{
+    tagline:'Seafood &amp; grill at the cruise quay · since 1993',
+    table:'Table', menu:'Menu',
+    all:'All', veg:'Vegetarian', gf:'Gluten free',
+    add:'Add', cart:'View order', order:'Send order',
+    yourOrder:'Your order', tableIs:'Table', empty:'Nothing selected yet.',
+    notes:'Allergies or requests? Write here – the kitchen sees your note.',
+    total:'Total', close:'Close',
+    sent:'Order received', ticketNo:'Order no.',
+    sentBody:'Your waiter has been notified and is on the way to your table. You can order more at any time.',
+    ok:'Back to the menu',
+    callWaiter:'Call the waiter', callWaiterSub:'We come to your table',
+    bill:'Ask for the bill', billSub:'Card · Vipps · cash',
+    called:'Waiter called', calledBody:'Someone will be at your table in a moment.',
+    billed:'Bill on its way', billedBody:'Your waiter is bringing the bill to your table.',
+    legTitle:'Allergens',
+    legBody:'b = molluscs · e = egg · f = fish · g = gluten · ha = hazelnut · m = milk · se = celery · s = mustard · ses = sesame · sk = shellfish · so = soy · su = sulphites.<br>Most dishes can be adapted. Always tell us about allergies when ordering.',
+    foot:'All prices in NOK incl. VAT · Kitchen 4:30–10:00 PM · Akershusstranda 13, Skur 34, 0150 Oslo',
+    langNote:'<b>Five languages are live: Norwegian, English, German, Turkish and Chinese.</b> The menu is built so that a new language is added in one data block – no redesign needed. Next candidates for cruise guests: French, Spanish, Italian, Russian, Japanese. Each new language = one column in the menu data.',
+    perPerson:'per person', min2:'min. 2 people'
+  },
+  de:{
+    tagline:'Fisch &amp; Grill am Kreuzfahrtkai · seit 1993',
+    table:'Tisch', menu:'Speisekarte',
+    all:'Alle', veg:'Vegetarisch', gf:'Glutenfrei',
+    add:'Hinzufügen', cart:'Bestellung ansehen', order:'Bestellung senden',
+    yourOrder:'Ihre Bestellung', tableIs:'Tisch', empty:'Noch nichts ausgewählt.',
+    notes:'Allergien oder Wünsche? Hier eintragen – die Küche sieht Ihre Notiz.',
+    total:'Gesamt', close:'Schließen',
+    sent:'Bestellung eingegangen', ticketNo:'Bestell-Nr.',
+    sentBody:'Ihr Kellner ist informiert und kommt an Ihren Tisch. Sie können jederzeit nachbestellen.',
+    ok:'Zurück zur Speisekarte',
+    callWaiter:'Kellner rufen', callWaiterSub:'Wir kommen an den Tisch',
+    bill:'Rechnung bitte', billSub:'Karte · Vipps · bar',
+    called:'Kellner gerufen', calledBody:'Wir sind gleich an Ihrem Tisch.',
+    billed:'Rechnung kommt', billedBody:'Ihr Kellner bringt die Rechnung an den Tisch.',
+    legTitle:'Allergene',
+    legBody:'b = Weichtiere · e = Ei · f = Fisch · g = Gluten · ha = Haselnuss · m = Milch · se = Sellerie · s = Senf · ses = Sesam · sk = Krebstiere · so = Soja · su = Sulfite.<br>Die meisten Gerichte können angepasst werden. Bitte nennen Sie uns Ihre Allergien bei der Bestellung.',
+    foot:'Alle Preise in NOK inkl. MwSt. · Küche 16:30–22:00 · Akershusstranda 13, Skur 34, 0150 Oslo',
+    langNote:'<b>Fünf Sprachen sind aktiv: Norwegisch, Englisch, Deutsch, Türkisch und Chinesisch.</b> Die Karte ist so gebaut, dass eine neue Sprache in einem einzigen Datenblock ergänzt wird – ohne neues Design. Nächste Kandidaten für Kreuzfahrtgäste: Französisch, Spanisch, Italienisch, Russisch, Japanisch. Jede neue Sprache = eine Spalte in den Menüdaten.',
+    perPerson:'pro Person', min2:'mind. 2 Personen'
+  }
+};
+
+/* ---------- categories ---------- */
+const CATS = [
+  {id:'start', no:'Forretter', en:'Starters', de:'Vorspeisen', sub:'01'},
+  {id:'shell', no:'Skalldyr',  en:'Shellfish', de:'Meeresfrüchte', sub:'02'},
+  {id:'main',  no:'Hovedretter', en:'Main courses', de:'Hauptgerichte', sub:'03'},
+  {id:'dess',  no:'Desserter', en:'Desserts', de:'Desserts', sub:'04'},
+  {id:'drink', no:'Drikke',    en:'Drinks', de:'Getränke', sub:'05'}
+];
+
+/* ---------- menu data ----------
+   Add a language: put the same key (e.g. tr:'...') in name/desc.  */
+const MENU = [
+/* STARTERS */
+{id:'s1',cat:'start',icon:'fish',price:275,a:['f'],
+ name:{no:'Dagens forrett',en:"Today's starter",de:'Vorspeise des Tages'},
+ desc:{no:'Kokkens valg fra dagens fiskemarked.',en:"The chef's pick from today's fish market.",de:'Auswahl des Küchenchefs vom heutigen Fischmarkt.'}},
+{id:'s2',cat:'start',icon:'scallop',price:325,a:['b','m'],
+ name:{no:'Grillet kamskjell',en:'Grilled scallops',de:'Gegrillte Jakobsmuscheln'},
+ desc:{no:'Knutekål, nepe crudité og kremet kamskjellsaus med agretti.',en:'Kohlrabi, turnip crudité and creamy scallop sauce with agretti.',de:'Kohlrabi, Rüben-Crudité und cremige Jakobsmuschelsauce mit Agretti.'}},
+{id:'s3',cat:'start',icon:'fish',price:265,a:['f','m','g','e','s','su'],
+ name:{no:'Laksetartar',en:'Salmon tartare',de:'Lachstatar'},
+ desc:{no:'Pepperrotkrem, rugcrumble, agurk, syltet sennepsfrø og dillmajones.',en:'Horseradish cream, rye crumble, cucumber, pickled mustard seeds and dill mayonnaise.',de:'Meerrettichcreme, Roggencrumble, Gurke, eingelegte Senfkörner und Dillmayonnaise.'}},
+{id:'s4',cat:'start',icon:'fish',price:315,a:['f','m'],
+ name:{no:'Kingfish carpaccio',en:'Kingfish carpaccio',de:'Kingfish-Carpaccio'},
+ desc:{no:'Tørkede cherrytomater, fermenterte stikkelsbær, kjernemelk og dillolje.',en:'Sun-dried cherry tomatoes, fermented gooseberries, buttermilk and dill oil.',de:'Getrocknete Kirschtomaten, fermentierte Stachelbeeren, Buttermilch und Dillöl.'}},
+{id:'s5',cat:'start',icon:'leaf',price:285,a:['f','m','e','s','su'],
+ name:{no:'Asparges med löjrom',en:'Asparagus with vendace roe',de:'Spargel mit Maränenrogen'},
+ desc:{no:'Hvit eller grønn asparges etter sesong, brunet smør-majones og puffet bokhvete.',en:'White or green asparagus by season, browned butter mayonnaise and puffed buckwheat.',de:'Weißer oder grüner Spargel je nach Saison, Nussbutter-Mayonnaise und gepuffter Buchweizen.'}},
+{id:'s6',cat:'start',icon:'crab',price:235,a:['sk','b','m','s','su'],
+ name:{no:'Havsalat',en:'Seafood salad',de:'Meeresfrüchtesalat'},
+ desc:{no:'Grillet blekksprut, krabbe, feta, mynte og vinaigrette.',en:'Grilled octopus, crab, feta, mint and vinaigrette.',de:'Gegrillter Oktopus, Krabbe, Feta, Minze und Vinaigrette.'}},
+{id:'s7',cat:'start',icon:'leaf',price:145,a:['s','su'],tags:['veg','gf'],
+ name:{no:'Liten sommersalat',en:'Side salad',de:'Kleiner Sommersalat'},
+ desc:{no:'Sesongens grønt med urtevinaigrette.',en:'Seasonal greens with herb vinaigrette.',de:'Saisonales Grün mit Kräutervinaigrette.'}},
+
+/* SHELLFISH */
+{id:'h1',cat:'shell',icon:'oyster',a:['b','su'],tags:['gf'],
+ name:{no:'Østers · Fine de Claire',en:'Oysters · Fine de Claire',de:'Austern · Fine de Claire'},
+ desc:{no:'Naturell, Frankrike. Sitron og rødvinseddik.',en:'Natural, France. Lemon and red wine vinegar.',de:'Natur, Frankreich. Zitrone und Rotweinessig.'},
+ sizes:[{lbl:{no:'1 stk',en:'1 pc',de:'1 St.'},p:55},{lbl:{no:'6 stk',en:'6 pcs',de:'6 St.'},p:295},{lbl:{no:'12 stk',en:'12 pcs',de:'12 St.'},p:575}]},
+{id:'h2',cat:'shell',icon:'oyster',a:['b','su'],tags:['gf'],
+ name:{no:'Østers · Gillardeau',en:'Oysters · Gillardeau',de:'Austern · Gillardeau'},
+ desc:{no:'Naturell, Frankrike. Husets favoritt.',en:'Natural, France. The house favourite.',de:'Natur, Frankreich. Der Favorit des Hauses.'},
+ sizes:[{lbl:{no:'1 stk',en:'1 pc',de:'1 St.'},p:85},{lbl:{no:'6 stk',en:'6 pcs',de:'6 St.'},p:480},{lbl:{no:'12 stk',en:'12 pcs',de:'12 St.'},p:950}]},
+{id:'h3',cat:'shell',icon:'lobster',price:585,a:['sk','e','s','su'],
+ name:{no:'½ hummer naturell',en:'½ steamed lobster',de:'½ Hummer natur'},
+ desc:{no:'Dampet, servert med aioli og salat.',en:'Steamed, served with aioli and salad.',de:'Gedämpft, serviert mit Aioli und Salat.'}},
+{id:'h4',cat:'shell',icon:'lobster',price:585,a:['sk','m'],
+ name:{no:'½ hummer gratinert',en:'½ lobster au gratin',de:'½ Hummer überbacken'},
+ desc:{no:'Gratinert med urtesmør.',en:'Gratinated with herb butter.',de:'Mit Kräuterbutter überbacken.'}},
+{id:'h5',cat:'shell',icon:'crab',price:465,a:['sk','m'],
+ name:{no:'Gratinerte sjøkreps',en:'Norwegian crayfish au gratin',de:'Kaisergranat überbacken'},
+ desc:{no:'Når vi får tak i levende. Spør servitøren.',en:'When available live. Ask your waiter.',de:'Wenn lebend verfügbar. Fragen Sie Ihren Kellner.'}},
+{id:'h6',cat:'shell',icon:'oyster',price:255,a:['b','su'],
+ name:{no:'Dagens blåskjell',en:'Mussels of the day',de:'Miesmuscheln des Tages'},
+ desc:{no:'Spør servitøren om dagens garnityr.',en:'Ask your waiter about the garnish of the day.',de:'Fragen Sie nach der heutigen Beilage.'}},
+{id:'h7',cat:'shell',icon:'plateau',price:1395,a:['sk','b','s','e'],hot:true,
+ name:{no:'Plateau de Fruits de Mer',en:'Plateau de Fruits de Mer',de:'Plateau de Fruits de Mer'},
+ desc:{no:'Hummer, reker, kamskjell, krabbeklør, blåskjell, sjøkreps og snøkrabbe. Rikelig – både forrett og hovedrett.',en:'Lobster, shrimp, scallops, crab claws, mussels, crayfish and snow crab. Plenty – both starter and main.',de:'Hummer, Garnelen, Jakobsmuscheln, Krabbenscheren, Miesmuscheln, Kaisergranat und Schneekrabbe. Reichlich – Vorspeise und Hauptgang zugleich.'},
+ note:{no:'Min. 2 personer · pris per person',en:'Min. 2 people · price per person',de:'Mind. 2 Personen · Preis pro Person'}},
+
+/* MAINS */
+{id:'m1',cat:'main',icon:'fish',price:445,a:['f'],
+ name:{no:'Dagens fisk',en:"Today's fish",de:'Fisch des Tages'},
+ desc:{no:'Fra grillen, med dagens tilbehør.',en:'From the grill, with the accompaniment of the day.',de:'Vom Grill, mit der Beilage des Tages.'}},
+{id:'m2',cat:'main',icon:'fish',price:495,a:['f','sk','m','se','su'],
+ name:{no:'Stekt piggvar',en:'Pan-seared turbot',de:'Gebratener Steinbutt'},
+ desc:{no:'Potetpuré, ferskrevet pepperrot og kremet hummersaus.',en:'Potato purée, freshly grated horseradish and creamed lobster sauce.',de:'Kartoffelpüree, frisch geriebener Meerrettich und cremige Hummersauce.'}},
+{id:'m3',cat:'main',icon:'fish',price:455,a:['f','ses','g','m'],
+ name:{no:'Grillet breiflabb',en:'Grilled monkfish',de:'Gegrillter Seeteufel'},
+ desc:{no:'Bulgursalat med persille og chipotle, grillet squash og sesamsaus.',en:'Bulgur salad with parsley and chipotle, grilled zucchini and sesame sauce.',de:'Bulgursalat mit Petersilie und Chipotle, gegrillte Zucchini und Sesamsauce.'}},
+{id:'m4',cat:'main',icon:'fish',price:425,a:['f','m','so'],
+ name:{no:'Grillet laks',en:'Grilled salmon',de:'Gegrillter Lachs'},
+ desc:{no:'Thaikrydret hollandaise, brokkolini, spinat og grønn papayasalat.',en:'Thai-spiced hollandaise, broccolini, spinach and green papaya salad.',de:'Thai-Hollandaise, Broccolini, Spinat und grüner Papayasalat.'}},
+{id:'m5',cat:'main',icon:'leaf',price:315,a:['se','g','m'],tags:['veg'],
+ name:{no:'Grillet sellerirot',en:'Grilled celeriac',de:'Gegrillte Sellerieknolle'},
+ desc:{no:'Tunisisk chipotlesaus, urtevinaigrette og persille- og bulgursalat.',en:'Tunisian chipotle sauce, herb vinaigrette and parsley & bulgur salad.',de:'Tunesische Chipotlesauce, Kräutervinaigrette und Petersilien-Bulgur-Salat.'}},
+{id:'m6',cat:'main',icon:'plateau',price:795,a:['f','sk','m'],hot:true,
+ name:{no:'3-retters meny',en:'3-course menu',de:'3-Gänge-Menü'},
+ desc:{no:'Kokkens anbefaling, satt sammen av dagens råvarer.',en:"The chef's recommendation, built from today's best catch.",de:'Empfehlung des Küchenchefs aus den besten Zutaten des Tages.'}},
+{id:'m7',cat:'main',icon:'plateau',price:1015,a:['f','sk','m'],
+ name:{no:'5-retters meny',en:'5-course menu',de:'5-Gänge-Menü'},
+ desc:{no:'Serveres til hele bordet. Bestilles før kl. 21:00.',en:'Served to the whole table. Order before 9 PM.',de:'Wird für den ganzen Tisch serviert. Bestellung bis 21:00 Uhr.'}},
+
+/* DESSERTS */
+{id:'d1',cat:'dess',icon:'cake',price:215,a:['m','g','e'],
+ name:{no:'Dagens dessert',en:"Today's dessert",de:'Dessert des Tages'},
+ desc:{no:'Spør servitøren.',en:'Ask your waiter.',de:'Fragen Sie Ihren Kellner.'}},
+{id:'d2',cat:'dess',icon:'cake',price:205,a:['m'],tags:['veg','gf'],
+ name:{no:'Mynte- og limechantilly',en:'Mint & lime chantilly',de:'Minze-Limetten-Chantilly'},
+ desc:{no:'Karamellisert hvit sjokolade, limegelé og bringebærsorbet.',en:'Caramelised white chocolate, lime gel and raspberry sorbet.',de:'Karamellisierte weiße Schokolade, Limettengel und Himbeersorbet.'}},
+{id:'d3',cat:'dess',icon:'cake',price:215,a:['g','m','e'],tags:['veg'],
+ name:{no:'Sitronkake',en:'Lemon cake',de:'Zitronenkuchen'},
+ desc:{no:'Vaniljemousse, sitroncurd og blåbærsorbet.',en:'Vanilla mousse, lemon curd and blueberry sorbet.',de:'Vanillemousse, Lemon Curd und Blaubeersorbet.'}},
+{id:'d4',cat:'dess',icon:'cake',price:220,a:['g','m','e'],tags:['veg'],
+ name:{no:'Brownie',en:'Brownie',de:'Brownie'},
+ desc:{no:'Mascarponekrem, kaffeis og crumble.',en:'Mascarpone cream, coffee ice cream and crumble.',de:'Mascarponecreme, Kaffeeeis und Crumble.'}},
+{id:'d5',cat:'dess',icon:'cake',price:175,a:['e','m','g'],tags:['veg'],
+ name:{no:'Is og sorbet',en:'Ice cream and sorbet',de:'Eis und Sorbet'},
+ desc:{no:'Tre kuler etter eget valg.',en:'Three scoops of your choice.',de:'Drei Kugeln nach Wahl.'}},
+{id:'d6',cat:'dess',icon:'cake',price:215,a:['g','ha','m'],tags:['veg'],
+ name:{no:'Dagens oster',en:"Today's cheese",de:'Käse des Tages'},
+ desc:{no:'Norske oster med kjeks og syltetøy.',en:'Norwegian cheeses with crackers and preserves.',de:'Norwegische Käse mit Crackern und Konfitüre.'}},
+
+/* DRINKS */
+{id:'w1',cat:'drink',icon:'glass',a:['su'],tags:['gf'],
+ name:{no:'Chablis, Domaine — Frankrike',en:'Chablis, Domaine — France',de:'Chablis, Domaine — Frankreich'},
+ desc:{no:'Tørr, mineralsk. Klassikeren til østers.',en:'Dry, mineral. The classic with oysters.',de:'Trocken, mineralisch. Der Klassiker zu Austern.'},
+ sizes:[{lbl:{no:'Glass',en:'Glass',de:'Glas'},p:165},{lbl:{no:'Flaske',en:'Bottle',de:'Flasche'},p:745}]},
+{id:'w2',cat:'drink',icon:'glass',a:['su'],tags:['gf'],
+ name:{no:'Champagne brut',en:'Champagne brut',de:'Champagner brut'},
+ desc:{no:'Til solnedgangen på terrassen.',en:'For sunset on the terrace.',de:'Für den Sonnenuntergang auf der Terrasse.'},
+ sizes:[{lbl:{no:'Glass',en:'Glass',de:'Glas'},p:195},{lbl:{no:'Flaske',en:'Bottle',de:'Flasche'},p:1150}]},
+{id:'w3',cat:'drink',icon:'glass',price:119,a:['g'],
+ name:{no:'Fatøl 0,4 l',en:'Draught beer 0.4 l',de:'Fassbier 0,4 l'},
+ desc:{no:'Norsk pils fra tank.',en:'Norwegian pilsner on tap.',de:'Norwegisches Pils vom Fass.'}},
+{id:'w4',cat:'drink',icon:'glass',price:65,tags:['veg','gf'],
+ name:{no:'Farris mineralvann',en:'Sparkling water',de:'Mineralwasser'},
+ desc:{no:'0,33 l, med eller uten kullsyre.',en:'0.33 l, still or sparkling.',de:'0,33 l, still oder mit Kohlensäure.'}},
+{id:'w5',cat:'drink',icon:'glass',price:49,tags:['veg','gf'],
+ name:{no:'Kaffe / espresso',en:'Coffee / espresso',de:'Kaffee / Espresso'},
+ desc:{no:'Brent i Oslo.',en:'Roasted in Oslo.',de:'In Oslo geröstet.'}}
+];
+
+/* ---------- state ---------- */
+let lang = 'no';
+let table = 11;
+let cat = 'start';
+let filter = 'all';
+const cart = [];      // {key,id,name,size,price,qty}
+const orders = [];    // {no,table,items,total,note,status,time,type}
+let ticketSeq = 1040;
+
+/* ---- waiter zones: which waiter owns which tables ---- */
+const WAITERS = [
+  {id:'a', name:'Ingrid', zone:'A', from:1,  to:10},
+  {id:'b', name:'Marius', zone:'B', from:11, to:20},
+  {id:'c', name:'Sofia',  zone:'C', from:21, to:30}
+];
+const zoneOf = n => WAITERS.find(w => n >= w.from && n <= w.to) || null;
+let activeWaiter = 'all';
+let soundOn = false;
+let audioCtx = null;
+
+/* ---- sound + vibration ---- */
+function initAudio(){
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+  }catch(e){ audioCtx = null; }
+}
+function beep(freq, at, dur, vol){
+  if(!audioCtx) return;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type = 'sine'; o.frequency.value = freq;
+  const t0 = audioCtx.currentTime + at;
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(vol, t0 + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(t0); o.stop(t0 + dur + 0.05);
+}
+function chime(kind){
+  if(!soundOn) return;
+  initAudio();
+  const P = {
+    waiter:[[880,0,.16,.28],[1174,.15,.16,.28],[1568,.30,.34,.30],[1568,.72,.34,.24]],
+    bill:  [[698,0,.18,.22],[932,.17,.30,.22]],
+    order: [[523,0,.14,.16],[784,.13,.24,.16]]
+  }[kind] || [];
+  P.forEach(p => beep(p[0], p[1], p[2], p[3]));
+  try{
+    if(navigator.vibrate) navigator.vibrate(kind === 'waiter' ? [180,90,180,90,260] : [90,60,90]);
+  }catch(e){}
+}
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const kr = n => n.toLocaleString('nb-NO') + ' kr';
+const t = k => T[lang][k];
+const L = o => o[lang] || o.en || o.no;
+
+/* ---------- table from URL ---------- */
+(function(){
+  try{
+    const p = new URLSearchParams(location.search);
+    const v = parseInt(p.get('table') || p.get('bord') || p.get('masa'), 10);
+    if(v > 0 && v <= 99) table = v;
+  }catch(e){}
+})();
+
+/* ---------- render menu ---------- */
+function renderNav(){
+  $('#catNav').innerHTML = CATS.map(c =>
+    `<button class="cbtn${c.id===cat?' on':''}" data-cat="${c.id}">${L(c)}</button>`).join('');
+}
+function renderFilters(){
+  const f = [['all',t('all')],['veg',t('veg')],['gf',t('gf')]];
+  $('#filters').innerHTML = f.map(([k,v]) =>
+    `<button class="fbtn${filter===k?' on':''}" data-f="${k}">${v}</button>`).join('');
+}
+function dishHTML(d){
+  const tags = (d.tags||[]);
+  const chips = [
+    tags.includes('veg') ? `<span class="chip veg">${t('veg')}</span>` : '',
+    d.hot ? `<span class="chip hot">★</span>` : '',
+    (d.a||[]).length ? `<span class="chip">${d.a.join(' · ')}</span>` : ''
+  ].join('');
+  const price = d.sizes
+    ? `<span class="d-price">${kr(d.sizes[0].p)}+</span>`
+    : `<span class="d-price">${kr(d.price)}</span>`;
+  const buy = d.sizes
+    ? `<div class="sizes">${d.sizes.map((s,i)=>
+        `<button class="size" data-add="${d.id}" data-size="${i}">${L(s.lbl)}<b>${s.p}</b></button>`).join('')}</div>`
+    : `<div class="add"><button class="addbtn" data-add="${d.id}">${t('add')}</button></div>`;
+  return `<article class="dish">
+    <div class="thumb">${d.img?`<img src="${d.img}" alt="" onerror="this.remove()">`:''}${ICONS[d.icon]||ICONS.fish}</div>
+    <div class="d-main">
+      <div class="d-top"><h3 class="d-name">${L(d.name)}</h3>${price}</div>
+      <p class="d-desc">${L(d.desc)}</p>
+      ${d.note?`<div class="d-note">${L(d.note)}</div>`:''}
+      <div class="d-meta">${chips}</div>
+      ${buy}
+    </div>
+  </article>`;
+}
+function renderMenu(){
+  const c = CATS.find(x => x.id === cat);
+  let list = MENU.filter(d => d.cat === cat);
+  if(filter !== 'all') list = list.filter(d => (d.tags||[]).includes(filter));
+  $('#menuRoot').innerHTML = `
+    <section class="sect">
+      <div class="sect-h"><h2>${L(c)}</h2><span class="sub">${c.sub}</span></div>
+      <div class="sect-rule"></div>
+      ${list.length ? list.map(dishHTML).join('') : `<div class="empty">${t('empty')}</div>`}
+    </section>`;
+}
+function renderStatic(){
+  document.documentElement.lang = lang;
+  $('#tagline').innerHTML = t('tagline');
+  $('#tableLbl').textContent = t('table');
+  $('#tableNum').textContent = table;
+  $('#legTitle').textContent = t('legTitle');
+  $('#legBody').innerHTML = t('legBody');
+  $('#footNote').innerHTML = t('foot');
+  $('#langNote').innerHTML = t('langNote');
+  const ring = t('callWaiter').toUpperCase();
+  const cjk = /[\u3400-\u9fff]/.test(ring);
+  const unit = ring.length * (cjk ? 11.4 : 7.6) + 20;   // ~ pixels per repetition
+  const reps = Math.max(2, Math.min(5, Math.floor(301 / unit)));
+  $('#ringText').textContent = Array(reps).fill(ring).join('  ·  ') + '  ·  ';
+  $('#bellBig').setAttribute('aria-label', t('callWaiter'));
+  $('#svcBill').innerHTML = `${t('bill')}<small>${t('billSub')}</small>`;
+  $('#cartLabel').textContent = t('cart');
+  $$('.lang').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
+}
+function renderAll(){ renderStatic(); renderNav(); renderFilters(); renderMenu(); renderCart(); }
+
+/* ---------- cart ---------- */
+function addItem(id, sizeIdx){
+  const d = MENU.find(x => x.id === id);
+  const size = (sizeIdx !== undefined && d.sizes) ? d.sizes[sizeIdx] : null;
+  const key = id + (size ? '#' + sizeIdx : '');
+  const found = cart.find(c => c.key === key);
+  if(found){ found.qty++; }
+  else cart.push({key, id, size: size ? size.lbl : null, price: size ? size.p : d.price, qty:1, name:d.name});
+  renderCart(); bump();
+}
+function renderCart(){
+  const n = cart.reduce((a,c) => a + c.qty, 0);
+  const sum = cart.reduce((a,c) => a + c.qty * c.price, 0);
+  $('#cartBar').classList.toggle('on', n > 0);
+  $('#cartSum').textContent = `${n} · ${kr(sum)}`;
+  $('#cartLabel').textContent = t('cart');
+}
+function bump(){
+  const b = $('#cartBar');
+  b.animate([{transform:'translateY(0)'},{transform:'translateY(-6px)'},{transform:'translateY(0)'}],{duration:260});
+}
+
+/* ---------- sheet ---------- */
+function openSheet(html){ $('#sheetBox').innerHTML = html; $('#sheet').classList.add('on'); }
+function closeSheet(){ $('#sheet').classList.remove('on'); }
+$('#sheetBg').onclick = closeSheet;
+
+function cartSheet(){
+  const sum = cart.reduce((a,c) => a + c.qty * c.price, 0);
+  const lines = cart.map(c => `
+    <div class="line">
+      <div class="qty">
+        <button data-dec="${c.key}">−</button><span>${c.qty}</span><button data-inc="${c.key}">+</button>
+      </div>
+      <div class="nm">${L(c.name)}${c.size?`<small>${L(c.size)}</small>`:''}</div>
+      <div class="pr">${kr(c.qty*c.price)}</div>
+    </div>`).join('');
+  openSheet(`
+    <div class="sheet-h"><h3>${t('yourOrder')}</h3><button class="x" data-close>×</button></div>
+    <div class="sheet-sub">${t('tableIs')} ${table}</div>
+    ${cart.length ? lines : `<div class="empty">${t('empty')}</div>`}
+    <div class="totrow"><span class="t1">${t('total')}</span><span class="t2">${kr(sum)}</span></div>
+    <textarea id="orderNote" placeholder="${t('notes')}"></textarea>
+    <button class="primary" data-send ${cart.length?'':'disabled style="opacity:.4"'}>${t('order')}</button>
+    <button class="ghost" data-close>${t('close')}</button>
+  `);
+}
+function sentSheet(no){
+  openSheet(`
+    <div class="ticket">
+      <div class="tick">✓</div>
+      <div class="sheet-sub" style="margin-bottom:6px">${t('ticketNo')}</div>
+      <div class="big">#${no}</div>
+      <div class="sm">${t('tableIs')} ${table}<br>${t('sentBody')}</div>
+    </div>
+    <button class="primary" data-close>${t('ok')}</button>
+  `);
+}
+function msgSheet(title, body){
+  openSheet(`
+    <div class="ticket">
+      <div class="tick">✓</div>
+      <h3 style="font-family:var(--display);font-weight:300;font-size:25px;margin:0 0 10px">${title}</h3>
+      <div class="sm">${t('tableIs')} ${table}<br>${body}</div>
+    </div>
+    <button class="primary" data-close>${t('ok')}</button>
+  `);
+}
+
+/* ---------- orders ---------- */
+function pushOrder(type){
+  const now = new Date();
+  const w = zoneOf(table);
+  const o = {
+    no: ++ticketSeq, table, type,
+    waiter: w ? w.id : null, wname: w ? w.name : '—', zone: w ? w.zone : '—',
+    ts: Date.now(), rang: Date.now(),
+    items: type === 'order' ? cart.map(c => ({n:L(c.name), s:c.size?L(c.size):'', q:c.qty, p:c.price})) : [],
+    total: type === 'order' ? cart.reduce((a,c)=>a+c.qty*c.price,0) : 0,
+    note: type === 'order' ? ($('#orderNote')?.value || '') : '',
+    status: 'new',
+    time: now.toTimeString().slice(0,5)
+  };
+  orders.unshift(o);
+  if(activeWaiter === 'all' || activeWaiter === o.waiter){
+    chime(type === 'order' ? 'order' : type === 'bill' ? 'bill' : 'waiter');
+  }
+  renderOrders(); badge();
+  return o.no;
+}
+function mine(o){ return activeWaiter === 'all' || o.waiter === activeWaiter; }
+function badge(){
+  const n = orders.filter(o => o.status === 'new' && mine(o)).length;
+  const b = $('#ordBadge');
+  b.style.display = n ? 'inline-block' : 'none';
+  b.textContent = n;
+}
+const STLBL = {new:'NY', accepted:'MOTTATT', ready:'KLAR', served:'SERVERT'};
+const STCLS = {new:'st-new', accepted:'st-acc', ready:'st-rdy', served:'st-srv'};
+function renderWaiterSel(){
+  const cnt = id => orders.filter(o => o.status === 'new' && (id === 'all' || o.waiter === id)).length;
+  const items = [{id:'all', name:'Alle bord', zone:'1–30'}].concat(WAITERS);
+  $('#waiterSel').innerHTML = items.map(w => {
+    const n = cnt(w.id);
+    const rng = w.id === 'all' ? w.zone : `Sone ${w.zone} · ${w.from}–${w.to}`;
+    return `<button class="wchip${activeWaiter===w.id?' on':''}" data-w="${w.id}">${w.name}<b>${rng}</b>${n?` <span style="color:var(--alert)">●${n}</span>`:''}</button>`;
+  }).join('') + `<button class="sound${soundOn?' on':''}" id="soundBtn">${soundOn?'Lyd på':'Slå på lyd'}</button>`;
+  const w = WAITERS.find(x => x.id === activeWaiter);
+  $('#waiterNote').innerHTML = w
+    ? `Du er logget inn som <b style="color:var(--sun)">${w.name}</b> og får varsel kun for bord ${w.from}–${w.to}. Andre servitører varsles ikke.`
+    : `Visning for hovmester / kjøkken: alle 30 bord. I drift logger hver servitør seg inn på sin egen sone.`;
+}
+function renderOrders(){
+  renderWaiterSel();
+  const list = orders.filter(mine);
+  if(!list.length){
+    $('#orderRoot').innerHTML = `<div class="empty">Ingen aktive bestillinger.<br><span style="font-size:11px">Legg inn en bestilling eller trykk «Tilkall servitør» i gjestevisningen.</span></div>`;
+    return;
+  }
+  $('#orderRoot').innerHTML = list.map(o => {
+    if(o.type !== 'order'){
+      const txt = o.type === 'waiter' ? 'Tilkaller servitør' : 'Ber om regningen';
+      return `<div class="order call">
+        <div class="o-top"><span class="o-table alert">Bord ${o.table}</span>
+        <span class="o-id">${o.wname}</span>
+        <span class="elapsed" data-ts="${o.ts}"></span>
+        <span class="o-time">${o.time}</span></div>
+        <div class="o-items" style="color:var(--alert)">${txt}</div>
+        <div class="o-foot"><span class="o-total"></span>
+          <button class="sbtn act" data-done="${o.no}">Håndtert</button></div>
+      </div>`;
+    }
+    const next = {new:'accepted', accepted:'ready', ready:'served'}[o.status];
+    const nextLbl = {accepted:'Ta imot', ready:'Klar fra kjøkken', served:'Servert'}[next];
+    return `<div class="order${o.status==='new'?' new':''}">
+      <div class="o-top"><span class="o-table">Bord ${o.table}</span>
+        <span class="o-id">${o.wname} · #${o.no}</span>
+        <span class="status ${STCLS[o.status]}">${STLBL[o.status]}</span>
+        <span class="o-time">${o.time}</span></div>
+      <div class="o-items">${o.items.map(i=>`<div><span>${i.q}×</span>${i.n}${i.s?` <em style="color:var(--muted);font-style:normal">(${i.s})</em>`:''}</div>`).join('')}</div>
+      ${o.note?`<div class="o-note">${o.note.replace(/</g,'&lt;')}</div>`:''}
+      <div class="o-foot"><span class="o-total">${kr(o.total)}</span>
+        ${next?`<button class="sbtn act" data-next="${o.no}">${nextLbl}</button>`:''}
+        <button class="sbtn" data-done="${o.no}">Fjern</button></div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- QR ---------- */
+function genQR(){
+  const base = $('#baseUrl').value.trim() || 'https://fjordside.no/meny';
+  const count = Math.min(parseInt($('#tableCount').value,10) || 30, 60);
+  const grid = $('#qrGrid');
+  grid.innerHTML = '';
+  if(typeof QRCode === 'undefined'){
+    $('#qrWarn').innerHTML = `<div class="warn">QR-biblioteket lastet ikke i denne visningen. Lenkene under er likevel de riktige – bruk hvilken som helst QR-generator med samme URL.</div>`;
+  } else { $('#qrWarn').innerHTML=''; }
+  for(let i=1;i<=count;i++){
+    const url = `${base}?table=${i}`;
+    const card = document.createElement('div');
+    card.className = 'qrcard';
+    card.innerHTML = `<div class="qbox"></div>
+      <div class="qn">${String(i).padStart(2,'0')}</div>
+      <div class="qt">Skann for meny &amp; bestilling<br>Scan for menu &amp; order<br>Scannen für Karte &amp; Bestellung</div>`;
+    grid.appendChild(card);
+    if(typeof QRCode !== 'undefined'){
+      new QRCode(card.querySelector('.qbox'), {text:url, width:208, height:208, correctLevel:QRCode.CorrectLevel.M});
+    } else {
+      card.querySelector('.qbox').innerHTML = `<code style="font-size:8px;word-break:break-all">${url}</code>`;
+    }
+  }
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-lang],[data-cat],[data-f],[data-add],[data-view],[data-close],[data-send],[data-inc],[data-dec],[data-next],[data-done],[data-w]');
+  if(!el) return;
+
+  if(el.dataset.w){ activeWaiter = el.dataset.w; renderOrders(); badge(); }
+  else if(el.dataset.lang){ lang = el.dataset.lang; $('#langNote').classList.remove('on'); renderAll(); }
+  else if(el.dataset.cat){ cat = el.dataset.cat; renderNav(); renderMenu(); window.scrollTo({top:$('#menuRoot').offsetTop-120, behavior:'smooth'}); }
+  else if(el.dataset.f){ filter = el.dataset.f; renderFilters(); renderMenu(); }
+  else if(el.dataset.add){ addItem(el.dataset.add, el.dataset.size !== undefined ? +el.dataset.size : undefined); }
+  else if(el.dataset.view){ switchView(el.dataset.view); }
+  else if(el.hasAttribute('data-close')){ closeSheet(); }
+  else if(el.hasAttribute('data-send')){
+    if(!cart.length) return;
+    const no = pushOrder('order');
+    cart.length = 0; renderCart(); sentSheet(no);
+  }
+  else if(el.dataset.inc || el.dataset.dec){
+    const key = el.dataset.inc || el.dataset.dec;
+    const it = cart.find(c => c.key === key);
+    if(it){ it.qty += el.dataset.inc ? 1 : -1; if(it.qty <= 0) cart.splice(cart.indexOf(it),1); }
+    renderCart(); cartSheet();
+  }
+  else if(el.dataset.next){
+    const o = orders.find(x => x.no == el.dataset.next);
+    o.status = {new:'accepted', accepted:'ready', ready:'served'}[o.status];
+    renderOrders(); badge();
+  }
+  else if(el.dataset.done){
+    const i = orders.findIndex(x => x.no == el.dataset.done);
+    orders.splice(i,1); renderOrders(); badge();
+  }
+});
+
+$('#moreLang').onclick = () => $('#langNote').classList.toggle('on');
+$('#openCart').onclick = cartSheet;
+
+function callWaiter(){
+  const w = zoneOf(table);
+  pushOrder('waiter');
+  msgSheet(t('called'), (w ? `<b style="color:var(--sun)">${w.name}</b> · ` : '') + t('calledBody'));
+}
+$('#svcBill').onclick   = () => { pushOrder('bill'); msgSheet(t('billed'), t('billedBody')); };
+function bellPress(e){
+  const b = e.currentTarget;
+  b.classList.add('ping');
+  setTimeout(() => b.classList.remove('ping'), 500);
+  callWaiter();
+}
+$('#bellBig').onclick = bellPress;
+$('#genQr').onclick = genQR;
+
+/* sound toggle lives inside the waiter panel (re-rendered), so delegate */
+document.addEventListener('click', e => {
+  if(!e.target.closest('#soundBtn')) return;
+  soundOn = !soundOn;
+  if(soundOn){ initAudio(); chime('order'); }
+  renderWaiterSel();
+});
+
+/* wait timer + re-ring unhandled calls every 45 s */
+setInterval(() => {
+  const now = Date.now();
+  $$('.elapsed').forEach(el => {
+    const s = Math.floor((now - +el.dataset.ts) / 1000);
+    el.textContent = s < 60 ? s + ' s' : Math.floor(s/60) + ' min ' + (s%60) + ' s';
+    el.classList.toggle('warn', s >= 60);
+  });
+  orders.forEach(o => {
+    if(o.type !== 'order' && o.status === 'new' && now - o.rang > 45000){
+      o.rang = now;
+      if(mine(o)) chime('waiter');
+    }
+  });
+}, 1000);
+
+function switchView(v){
+  $$('.view').forEach(x => x.classList.remove('on'));
+  $('#v-' + v).classList.add('on');
+  $$('.dbtn').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+  $('#cartBar').style.display = v === 'guest' ? '' : 'none';
+  window.scrollTo({top:0});
+  if(v === 'qr' && !$('#qrGrid').children.length) genQR();
+}
+
+/* table picker (demo only) */
+(function(){
+  const sel = $('#tablePick');
+  for(let i=1;i<=30;i++){
+    const o = document.createElement('option');
+    o.value = i; o.textContent = 'Bord ' + i;
+    if(i === table) o.selected = true;
+    sel.appendChild(o);
+  }
+  sel.onchange = () => { table = +sel.value; $('#tableNum').textContent = table; };
+})();
+
+/* clock */
+setInterval(() => {
+  $('#waiterClock').textContent = new Date().toTimeString().slice(0,5);
+}, 1000);
+
+/* ============================================================
+   EKSTRA DİLLER / EXTRA LANGUAGES
+   Yeni dil eklemek = aşağıya tek bir blok eklemek.
+   ============================================================ */
+T.tr = {
+  tagline:'Cruise limanında deniz ürünleri &amp; ızgara · 1993\u2019ten beri',
+  table:'Masa', menu:'Menü',
+  all:'Tümü', veg:'Vejetaryen', gf:'Glutensiz',
+  add:'Ekle', cart:'Siparişi gör', order:'Siparişi gönder',
+  yourOrder:'Siparişiniz', tableIs:'Masa', empty:'Henüz seçim yapılmadı.',
+  notes:'Alerji veya özel isteğiniz var mı? Buraya yazın – mutfak notunuzu görür.',
+  total:'Toplam', close:'Kapat',
+  sent:'Sipariş alındı', ticketNo:'Sipariş no.',
+  sentBody:'Garsonunuza bildirim gitti, masanıza geliyor. Dilediğiniz zaman yeniden sipariş verebilirsiniz.',
+  ok:'Menüye dön',
+  callWaiter:'Garson çağır', callWaiterSub:'Masanıza geliyoruz',
+  bill:'Hesap isteyin', billSub:'Kart · Vipps · nakit',
+  called:'Garson çağrıldı', calledBody:'Birazdan masanızda olacağız.',
+  billed:'Hesap geliyor', billedBody:'Garsonunuz hesabı masanıza getiriyor.',
+  legTitle:'Alerjenler',
+  legBody:'b = yumuşakça · e = yumurta · f = balık · g = gluten · ha = fındık · m = süt · se = kereviz · s = hardal · ses = susam · sk = kabuklu deniz ürünü · so = soya · su = sülfit.<br>Yemeklerin çoğu isteğe göre uyarlanabilir. Sipariş verirken alerjilerinizi mutlaka belirtin.',
+  foot:'Fiyatlar NOK, KDV dahil · Mutfak 16:30–22:00 · Akershusstranda 13, Skur 34, 0150 Oslo',
+  langNote:'<b>Beş dil aktif: Norveççe, İngilizce, Almanca, Türkçe, Çince.</b> Menü, yeni bir dilin tek bir veri bloğuyla eklenebileceği şekilde kuruldu – tasarıma dokunmadan. Cruise misafirleri için sıradaki adaylar: Fransızca, İspanyolca, İtalyanca, Rusça, Japonca. Her yeni dil = menü verisinde tek bir sütun.',
+  perPerson:'kişi başı', min2:'en az 2 kişi'
+};
+T.zh = {
+  tagline:'邮轮码头旁的海鲜与炭烤 · 始于1993年',
+  table:'桌号', menu:'菜单',
+  all:'全部', veg:'素食', gf:'无麸质',
+  add:'加入', cart:'查看订单', order:'提交订单',
+  yourOrder:'您的订单', tableIs:'桌号', empty:'尚未选择菜品。',
+  notes:'有过敏或特殊要求吗？请写在这里——厨房会看到您的备注。',
+  total:'合计', close:'关闭',
+  sent:'订单已收到', ticketNo:'订单号',
+  sentBody:'服务员已收到通知，正前往您的餐桌。您可以随时继续点单。',
+  ok:'返回菜单',
+  callWaiter:'呼叫服务员', callWaiterSub:'我们马上到您的餐桌',
+  bill:'请求结账', billSub:'刷卡 · Vipps · 现金',
+  called:'已呼叫服务员', calledBody:'我们稍后就到您的餐桌。',
+  billed:'账单即将送到', billedBody:'服务员正把账单送到您的餐桌。',
+  legTitle:'过敏原',
+  legBody:'b = 软体动物 · e = 蛋 · f = 鱼 · g = 麸质 · ha = 榛子 · m = 奶 · se = 芹菜 · s = 芥末 · ses = 芝麻 · sk = 甲壳类 · so = 大豆 · su = 亚硫酸盐。<br>多数菜品可按需调整。点单时请务必告知您的过敏情况。',
+  foot:'价格均为挪威克朗，含增值税 · 厨房营业 16:30–22:00 · Akershusstranda 13, Skur 34, 0150 Oslo',
+  langNote:'<b>五种语言已启用：挪威语、英语、德语、土耳其语、中文。</b> 菜单的设计使新增语言只需添加一个数据块——无需改动设计。面向邮轮客人的下一批候选语言：法语、西班牙语、意大利语、俄语、日语。每种新语言 = 菜单数据中的一列。',
+  perPerson:'每位', min2:'至少2位'
+};
+
+const ADD = {
+  cats:{
+    start:{tr:'Başlangıçlar', zh:'前菜'},
+    shell:{tr:'Kabuklu Deniz Ürünleri', zh:'贝类海鲜'},
+    main :{tr:'Ana Yemekler', zh:'主菜'},
+    dess :{tr:'Tatlılar', zh:'甜点'},
+    drink:{tr:'İçecekler', zh:'饮品'}
+  },
+  dish:{
+    s1:{n:{tr:'Günün başlangıcı',zh:'今日前菜'},d:{tr:'Şefin bugünkü balık halinden seçtiği tabak.',zh:'主厨从今日鱼市精选。'}},
+    s2:{n:{tr:'Izgara deniz tarağı',zh:'炭烤扇贝'},d:{tr:'Alabaş, şalgam kruditesi ve agrettili kremalı deniz tarağı sosu.',zh:'苤蓝、芜菁生蔬与奶油扇贝酱配盐角草。'}},
+    s3:{n:{tr:'Somon tartar',zh:'三文鱼塔塔'},d:{tr:'Yaban turpu kreması, çavdar kırıntısı, salatalık, hardal tohumu turşusu ve dereotu mayonezi.',zh:'辣根奶油、黑麦酥粒、黄瓜、腌芥末籽与莳萝蛋黄酱。'}},
+    s4:{n:{tr:'Kingfish carpaccio',zh:'红甘鱼薄片'},d:{tr:'Kurutulmuş kiraz domates, fermente bektaşi üzümü, ayran ve dereotu yağı.',zh:'油渍樱桃番茄、发酵醋栗、白脱牛奶与莳萝油。'}},
+    s5:{n:{tr:'Kuşkonmaz ve balık yumurtası',zh:'芦笋配白鲑鱼子'},d:{tr:'Mevsime göre beyaz veya yeşil kuşkonmaz, kavrulmuş tereyağı mayonezi ve patlatılmış karabuğday.',zh:'时令白或绿芦笋、焦化黄油蛋黄酱与爆荞麦。'}},
+    s6:{n:{tr:'Deniz salatası',zh:'海鲜沙拉'},d:{tr:'Izgara ahtapot, yengeç, beyaz peynir, nane ve vinegret.',zh:'炭烤章鱼、蟹肉、菲达奶酪、薄荷与油醋汁。'}},
+    s7:{n:{tr:'Küçük yeşil salata',zh:'田园小沙拉'},d:{tr:'Mevsim yeşillikleri ve otlu vinegret.',zh:'时令绿叶菜配香草油醋汁。'}},
+    h1:{n:{tr:'İstiridye · Fine de Claire',zh:'生蚝 · Fine de Claire'},d:{tr:'Natürel, Fransa. Limon ve kırmızı şarap sirkesi.',zh:'原味，法国。配柠檬与红酒醋。'},
+        sizes:[{tr:'1 adet',zh:'1只'},{tr:'6 adet',zh:'6只'},{tr:'12 adet',zh:'12只'}]},
+    h2:{n:{tr:'İstiridye · Gillardeau',zh:'生蚝 · Gillardeau'},d:{tr:'Natürel, Fransa. Evin favorisi.',zh:'原味，法国。本店招牌。'},
+        sizes:[{tr:'1 adet',zh:'1只'},{tr:'6 adet',zh:'6只'},{tr:'12 adet',zh:'12只'}]},
+    h3:{n:{tr:'½ ıstakoz · buharda',zh:'半只清蒸龙虾'},d:{tr:'Buharda pişmiş, aioli ve salata ile.',zh:'清蒸，配蒜香蛋黄酱与沙拉。'}},
+    h4:{n:{tr:'½ ıstakoz · graten',zh:'半只焗龙虾'},d:{tr:'Otlu tereyağı ile gratine edilmiş.',zh:'香草黄油焗制。'}},
+    h5:{n:{tr:'Graten Norveç kerevidi',zh:'焗挪威海螯虾'},d:{tr:'Canlı bulabildiğimiz zaman. Garsonunuza sorun.',zh:'视活鲜供应情况。请询问服务员。'}},
+    h6:{n:{tr:'Günün midyesi',zh:'今日青口贝'},d:{tr:'Günün sosu için garsonunuza danışın.',zh:'今日配汁请询问服务员。'}},
+    h7:{n:{tr:'Plateau de Fruits de Mer',zh:'海鲜拼盘 Plateau de Fruits de Mer'},
+        d:{tr:'Istakoz, karides, deniz tarağı, yengeç kıskacı, midye, kerevit ve kar yengeci. Bol porsiyon – hem başlangıç hem ana yemek.',zh:'龙虾、虾、扇贝、蟹钳、青口、海螯虾与雪蟹。分量充足——既是前菜也是主菜。'},
+        note:{tr:'En az 2 kişi · kişi başı fiyat',zh:'至少2位 · 每位价格'}},
+    m1:{n:{tr:'Günün balığı',zh:'今日鲜鱼'},d:{tr:'Izgaradan, günün garnitürüyle.',zh:'炭烤，配今日时蔬。'}},
+    m2:{n:{tr:'Tavada kalkan balığı',zh:'香煎多宝鱼'},d:{tr:'Patates püresi, taze rendelenmiş yaban turpu ve kremalı ıstakoz sosu.',zh:'土豆泥、现磨辣根与奶油龙虾酱。'}},
+    m3:{n:{tr:'Izgara fener balığı',zh:'炭烤鮟鱇鱼'},d:{tr:'Maydanozlu ve chipotleli bulgur salatası, ızgara kabak ve susam sosu.',zh:'欧芹奇波雷辣椒布格麦沙拉、炭烤西葫芦与芝麻酱。'}},
+    m4:{n:{tr:'Izgara somon',zh:'炭烤三文鱼'},d:{tr:'Tay baharatlı hollandaise, brokolini, ıspanak ve yeşil papaya salatası.',zh:'泰式荷兰酱、迷你西兰花、菠菜与青木瓜沙拉。'}},
+    m5:{n:{tr:'Izgara kereviz kökü',zh:'炭烤根芹'},d:{tr:'Tunus usulü chipotle sos, otlu vinegret ve maydanozlu bulgur salatası.',zh:'突尼斯风味奇波雷酱、香草油醋汁与欧芹布格麦沙拉。'}},
+    m6:{n:{tr:'3 kap menü',zh:'三道式套餐'},d:{tr:'Şefin önerisi, günün malzemeleriyle hazırlanır.',zh:'主厨推荐，选用当日食材。'}},
+    m7:{n:{tr:'5 kap menü',zh:'五道式套餐'},d:{tr:'Masanın tamamına servis edilir. Saat 21:00 öncesinde sipariş edilmelidir.',zh:'需全桌同点。请于21:00前下单。'}},
+    d1:{n:{tr:'Günün tatlısı',zh:'今日甜点'},d:{tr:'Garsonunuza sorun.',zh:'请询问服务员。'}},
+    d2:{n:{tr:'Nane ve misket limonlu chantilly',zh:'薄荷青柠香缇'},d:{tr:'Karamelize beyaz çikolata, misket limonu jölesi ve ahududu sorbesi.',zh:'焦糖白巧克力、青柠啫喱与覆盆子雪葩。'}},
+    d3:{n:{tr:'Limonlu kek',zh:'柠檬蛋糕'},d:{tr:'Vanilyalı mus, limon kreması ve yaban mersini sorbesi.',zh:'香草慕斯、柠檬酱与蓝莓雪葩。'}},
+    d4:{n:{tr:'Brownie',zh:'布朗尼'},d:{tr:'Mascarpone kreması, kahve dondurması ve crumble.',zh:'马斯卡彭奶油、咖啡冰淇淋与酥粒。'}},
+    d5:{n:{tr:'Dondurma ve sorbe',zh:'冰淇淋与雪葩'},d:{tr:'Seçeceğiniz üç top.',zh:'自选三球。'}},
+    d6:{n:{tr:'Günün peynirleri',zh:'今日奶酪'},d:{tr:'Norveç peynirleri, kraker ve reçel ile.',zh:'挪威奶酪配饼干与果酱。'}},
+    w1:{n:{tr:'Chablis, Domaine — Fransa',zh:'夏布利 Chablis — 法国'},d:{tr:'Kuru, mineralli. İstiridyenin klasik eşlikçisi.',zh:'干型，矿物感。生蚝的经典搭配。'},
+        sizes:[{tr:'Kadeh',zh:'单杯'},{tr:'Şişe',zh:'整瓶'}]},
+    w2:{n:{tr:'Şampanya brut',zh:'香槟 Brut'},d:{tr:'Terasta gün batımı için.',zh:'露台日落时的佳选。'},
+        sizes:[{tr:'Kadeh',zh:'单杯'},{tr:'Şişe',zh:'整瓶'}]},
+    w3:{n:{tr:'Fıçı bira 0,4 l',zh:'扎啤 0.4升'},d:{tr:'Tanktan Norveç pilseni.',zh:'挪威皮尔森鲜啤。'}},
+    w4:{n:{tr:'Maden suyu',zh:'矿泉水'},d:{tr:'0,33 l, sade veya gazlı.',zh:'0.33升，无气或含气。'}},
+    w5:{n:{tr:'Kahve / espresso',zh:'咖啡 / 浓缩咖啡'},d:{tr:'Oslo\'da kavruldu.',zh:'奥斯陆本地烘焙。'}}
+  }
+};
+
+CATS.forEach(c => Object.assign(c, ADD.cats[c.id] || {}));
+MENU.forEach(m => {
+  const a = ADD.dish[m.id];
+  if(!a) return;
+  Object.assign(m.name, a.n);
+  Object.assign(m.desc, a.d);
+  if(a.note && m.note) Object.assign(m.note, a.note);
+  if(a.sizes && m.sizes) m.sizes.forEach((s,i) => a.sizes[i] && Object.assign(s.lbl, a.sizes[i]));
+});
+
+renderAll();
+renderOrders();
+</script>
+</body>
+</html>
