@@ -627,15 +627,23 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
 <div class="view" id="v-waiter">
   <div class="wrap">
     <div class="panel-h">
-      <h2>Service-Panel</h2>
-      <p>Live-Bestellungen · Churrascaria Steakhouse · <span id="waiterClock" style="font-family:var(--mono)"></span></p>
+      <h2 id="wTitle">Service-Panel</h2>
+      <p><span id="wSub">Live-Bestellungen</span> · Churrascaria Steakhouse · <span id="waiterClock" style="font-family:var(--mono)"></span></p>
+    </div>
+    <div class="langbar" style="margin:12px 0 4px">
+      <button class="lang" data-lang="de">DEUTSCH</button>
+      <button class="lang" data-lang="en">ENGLISH</button>
+      <button class="lang" data-lang="es">ESPAÑOL</button>
+      <button class="lang" data-lang="nl">NEDERLANDS</button>
+      <button class="lang" data-lang="tr">TÜRKÇE</button>
+      <button class="lang" data-lang="ru">РУССКИЙ</button>
     </div>
     <div class="wctrl" id="waiterSel"></div>
     <div class="wnote" id="waiterNote"></div>
     <div id="orderRoot"></div>
     <div class="closerow" id="dayRow"></div>
     <div class="closerow" id="closeRow"></div>
-    <div class="foot"><a href="?view=service" style="color:var(--ash)">Servicelink</a> · <a href="./" style="color:var(--ash)">Gastansicht</a><br>Jede Station sieht nur ihre Tische. Ein Ruf löst Ton und Vibration aus und wiederholt sich alle 45 Sekunden, bis er quittiert ist.</div>
+    <div class="foot"><a href="?view=service" style="color:var(--ash)" id="wSvcLink">Servicelink</a> · <a href="./" style="color:var(--ash)" id="wGuestLink">Gastansicht</a><br><span id="wFoot"></span></div>
   </div>
 </div>
 
@@ -643,14 +651,22 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
 <div class="view" id="v-qr">
   <div class="wrap">
     <div class="panel-h">
-      <h2>QR-Codes</h2>
-      <p>Jeder Code öffnet die Karte mit seiner eigenen Tischnummer.</p>
+      <h2 id="qrTitle">QR-Codes</h2>
+      <p id="qrSub">Jeder Code öffnet die Karte mit seiner eigenen Tischnummer.</p>
     </div>
-    <div class="field noprint"><label>Basis-URL</label><input id="baseUrl" spellcheck="false">
+    <div class="langbar noprint" style="margin:12px 0 4px">
+      <button class="lang" data-lang="de">DEUTSCH</button>
+      <button class="lang" data-lang="en">ENGLISH</button>
+      <button class="lang" data-lang="es">ESPAÑOL</button>
+      <button class="lang" data-lang="nl">NEDERLANDS</button>
+      <button class="lang" data-lang="tr">TÜRKÇE</button>
+      <button class="lang" data-lang="ru">РУССКИЙ</button>
+    </div>
+    <div class="field noprint"><label id="qrBaseLbl">Basis-URL</label><input id="baseUrl" spellcheck="false">
       <div class="hint" id="urlHint"></div></div>
-    <div class="field noprint"><label>Anzahl Tische</label><input id="tableCount" value="30" inputmode="numeric"></div>
+    <div class="field noprint"><label id="qrCountLbl">Anzahl Tische</label><input id="tableCount" value="30" inputmode="numeric"></div>
     <button class="primary noprint" id="genQr">QR-Codes erzeugen</button>
-    <button class="ghost noprint" onclick="window.print()">Bogen drucken</button>
+    <button class="ghost noprint" id="qrPrintBtn" onclick="window.print()">Bogen drucken</button>
     <div id="qrWarn"></div>
     <div class="qrgrid" id="qrGrid"></div>
   </div>
@@ -669,11 +685,11 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
 
 <div class="demobar" id="demobar" hidden>
   <div class="demobar-in">
-    <span class="dtag">ANSICHT</span>
-    <button class="dbtn on" data-view="guest">Gast</button>
-    <button class="dbtn" data-view="waiter">Service<span class="badge" id="ordBadge" style="display:none">0</span></button>
-    <button class="dbtn" data-view="qr">QR</button>
-    <span style="flex:0 0 auto"></span>
+    <span class="dtag" id="dbTag">ANSICHT</span>
+    <button class="dbtn on" data-view="guest" id="dbGuest">Gast</button>
+    <button class="dbtn" data-view="waiter"><span id="dbWaiterLbl">Service</span><span class="badge" id="ordBadge" style="display:none">0</span></button>
+    <button class="dbtn" data-view="qr" id="dbQr">QR</button>
+    <select id="demoTable" aria-label="Tisch" style="margin-left:auto;background:transparent;color:inherit;border:1px solid rgba(255,255,255,.28);border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px"></select>
   </div>
 </div>
 
@@ -702,7 +718,7 @@ const ART = {
 
 /* ---------------- UI-Texte ---------------- */
 const T = {
-de:{sub:'Brasilianisches Grillhaus an Bord', cookTitle:'Garstufe wählen', cookNote:'Ihre Auswahl geht direkt an den Grill.', index:'Inhalt', pickTable:'Tisch wählen', myOrders:'Ihre Bestellungen', histEmpty:'Noch keine Bestellung an diesem Tisch.', grandTotal:'Summe bisher', stNew:'Eingegangen', stAcc:'Angenommen', stRdy:'Fertig', stSrv:'Serviert', noteBtn:'Anmerkung', noteEdit:'Anmerkung ändern', noteTitle:'Anmerkung zu diesem Gericht', noteFree:'Eigener Text (optional)', noteSave:'Übernehmen', noteOne:'Gilt für eine Portion. Wählen Sie für weitere Portionen erneut.', orderNote:'Anmerkung für die ganze Bestellung', table:'Tisch', noTable:'Tischnummer fehlt', noTableBody:'Bitte scannen Sie den QR-Code an Ihrem Tisch. Erst dann kann die Bestellung dem richtigen Tisch zugeordnet werden.',
+de:{sub:'Brasilianisches Grillhaus an Bord', cookTitle:'Garstufe wählen', cookNote:'Ihre Auswahl geht direkt an den Grill.', index:'Inhalt', pickTable:'Tisch wählen', myOrders:'Ihre Bestellungen', histEmpty:'Noch keine Bestellung an diesem Tisch.', grandTotal:'Summe bisher', stNew:'Eingegangen', stAcc:'Angenommen', stRdy:'Fertig', stSrv:'Serviert', noteBtn:'Anmerkung', noteEdit:'Anmerkung ändern', noteTitle:'Anmerkung zu diesem Gericht', noteFree:'Eigener Text (optional)', noteSave:'Übernehmen', noteOne:'Gilt für eine Portion. Wählen Sie für weitere Portionen erneut.', orderNote:'Anmerkung für die ganze Bestellung', table:'Tisch', dView:'ANSICHT', dGuest:'Gast', dWaiter:'Service', dQr:'QR', wTitle:'Service-Panel', wSub:'Live-Bestellungen', wSvcLink:'Servicelink', wGuestLink:'Gastansicht', wFoot:'Jede Station sieht nur ihre Tische. Ein Ruf löst Ton und Vibration aus und wiederholt sich alle 45 Sekunden, bis er quittiert ist.', wAllPostas:'Alle Postas', wSoundOn:'Ton an', wSoundOff:'Ton einschalten', wConnCloud:'Verbunden – alle Geräte', wConnOffline:'Keine Verbindung zum Server', wConnLocal:'Nur dieses Gerät – Bestellungen von anderen Handys kommen hier nicht an.', wLoggedIn:'Angemeldet als <b>{name}</b> – Sie werden nur für die Tische {from}–{to} benachrichtigt.', wHeadView:'Ansicht für Restaurantleitung und Küche: alle 30 Tische.', wCalling:'Ruft den Service', wBillReq:'Bittet um die Rechnung', wDone:'Erledigt', wAccept:'Annehmen', wKitchen:'Küche fertig', wServedBtn:'Serviert', wClosed:'Abgeschlossen', wEmpty:'Keine offenen Bestellungen.', wEmptyHint:'In der Gastansicht bestellen oder den Serviceruf auslösen.', wServiceDay:'Servicetag:', wCloseTable:'Tisch abschließen:', wHistShow:'Verlauf anzeigen', wHistHide:'Verlauf ausblenden', wOrdersWord:'Bestellungen', wRevenue:'Umsatz', qrTitle:'QR-Codes', qrSub:'Jeder Code öffnet die Karte mit seiner eigenen Tischnummer.', qrBase:'Basis-URL', qrCount:'Anzahl Tische', qrGen:'QR-Codes erzeugen', qrPrint:'Bogen drucken', qrHintEmpty:'Bitte die Web-Adresse eintragen, unter der diese Karte online liegt. Ohne gültige Adresse führen die QR-Codes ins Leere.', noTable:'Tischnummer fehlt', noTableBody:'Bitte scannen Sie den QR-Code an Ihrem Tisch. Erst dann kann die Bestellung dem richtigen Tisch zugeordnet werden.',
   add:'Hinzufügen', cart:'Bestellung ansehen', order:'Bestellung senden',
   yourOrder:'Ihre Bestellung', tableIs:'Tisch', empty:'Noch nichts ausgewählt.',
   notes:'Allergien, Garstufe oder Wünsche? Hier eintragen – die Küche sieht Ihre Notiz.',
@@ -722,7 +738,7 @@ de:{sub:'Brasilianisches Grillhaus an Bord', cookTitle:'Garstufe wählen', cookN
   langNote:'<b>Fünf Sprachen sind aktiv: Deutsch, Englisch, Spanisch, Niederländisch, Türkisch.</b> Weitere Sprachen werden als einzelner Datenblock ergänzt – ohne neues Design. Naheliegend an Bord: Italienisch, Französisch, Portugiesisch, Russisch.',
   vegan:'vegan', alc:'enthält Alkohol', star:'Hinweis *'},
 
-en:{sub:'Brazilian grill house on board', cookTitle:'Choose your doneness', cookNote:'Your choice goes straight to the grill.', index:'Contents', pickTable:'Choose your table', myOrders:'Your orders', histEmpty:'No orders at this table yet.', grandTotal:'Total so far', stNew:'Received', stAcc:'Accepted', stRdy:'Ready', stSrv:'Served', noteBtn:'Note', noteEdit:'Change note', noteTitle:'Note for this dish', noteFree:'Your own words (optional)', noteSave:'Apply', noteOne:'Applies to one portion. Repeat for further portions.', orderNote:'Note for the whole order', table:'Table', noTable:'Table number missing', noTableBody:'Please scan the QR code on your table. Only then can the order be assigned to the right table.',
+en:{sub:'Brazilian grill house on board', cookTitle:'Choose your doneness', cookNote:'Your choice goes straight to the grill.', index:'Contents', pickTable:'Choose your table', myOrders:'Your orders', histEmpty:'No orders at this table yet.', grandTotal:'Total so far', stNew:'Received', stAcc:'Accepted', stRdy:'Ready', stSrv:'Served', noteBtn:'Note', noteEdit:'Change note', noteTitle:'Note for this dish', noteFree:'Your own words (optional)', noteSave:'Apply', noteOne:'Applies to one portion. Repeat for further portions.', orderNote:'Note for the whole order', table:'Table', dView:'VIEW', dGuest:'Guest', dWaiter:'Service', dQr:'QR', wTitle:'Service panel', wSub:'Live orders', wSvcLink:'Service link', wGuestLink:'Guest view', wFoot:'Each station only sees its own tables. A call gives sound and vibration and repeats every 45 seconds until acknowledged.', wAllPostas:'All stations', wSoundOn:'Sound on', wSoundOff:'Turn on sound', wConnCloud:'Connected – all devices', wConnOffline:'No connection to the server', wConnLocal:'This device only – orders from other phones will not arrive here.', wLoggedIn:'Signed in as <b>{name}</b> – you are alerted only for tables {from}–{to}.', wHeadView:'View for management and kitchen: all 30 tables.', wCalling:'Calling the service', wBillReq:'Asking for the bill', wDone:'Handled', wAccept:'Accept', wKitchen:'Kitchen ready', wServedBtn:'Served', wClosed:'Closed', wEmpty:'No open orders.', wEmptyHint:'Place an order in the guest view or trigger the service call.', wServiceDay:'Service day:', wCloseTable:'Close table:', wHistShow:'Show history', wHistHide:'Hide history', wOrdersWord:'orders', wRevenue:'Revenue', qrTitle:'QR codes', qrSub:'Each code opens the menu with its own table number.', qrBase:'Base URL', qrCount:'Number of tables', qrGen:'Create QR codes', qrPrint:'Print sheet', qrHintEmpty:'Enter the web address where this menu is hosted. Without a valid address the QR codes lead nowhere.', noTable:'Table number missing', noTableBody:'Please scan the QR code on your table. Only then can the order be assigned to the right table.',
   add:'Select', cart:'View order', order:'Send order',
   yourOrder:'Your order', tableIs:'Table', empty:'Nothing selected yet.',
   notes:'Allergies, cooking preference or requests? Write here – the kitchen sees your note.',
@@ -742,7 +758,7 @@ en:{sub:'Brazilian grill house on board', cookTitle:'Choose your doneness', cook
   langNote:'<b>Five languages are live: German, English, Spanish, Dutch, Turkish.</b> Further languages are added as a single data block – no redesign needed. Obvious next steps on board: Italian, French, Portuguese, Russian.',
   vegan:'vegan', alc:'contains alcohol', star:'note *'},
 
-es:{sub:'Parrilla brasileña a bordo', cookTitle:'Elija el punto de cocción', cookNote:'Su elección va directamente a la parrilla.', index:'Contenido', pickTable:'Elija su mesa', myOrders:'Sus pedidos', histEmpty:'Aún no hay pedidos en esta mesa.', grandTotal:'Total hasta ahora', stNew:'Recibido', stAcc:'Aceptado', stRdy:'Listo', stSrv:'Servido', noteBtn:'Nota', noteEdit:'Cambiar nota', noteTitle:'Nota para este plato', noteFree:'Sus propias palabras (opcional)', noteSave:'Aplicar', noteOne:'Se aplica a una ración. Repita para más raciones.', orderNote:'Nota para todo el pedido', table:'Mesa', noTable:'Falta el número de mesa', noTableBody:'Escanee el código QR de su mesa. Solo así el pedido se asigna a la mesa correcta.',
+es:{sub:'Parrilla brasileña a bordo', cookTitle:'Elija el punto de cocción', cookNote:'Su elección va directamente a la parrilla.', index:'Contenido', pickTable:'Elija su mesa', myOrders:'Sus pedidos', histEmpty:'Aún no hay pedidos en esta mesa.', grandTotal:'Total hasta ahora', stNew:'Recibido', stAcc:'Aceptado', stRdy:'Listo', stSrv:'Servido', noteBtn:'Nota', noteEdit:'Cambiar nota', noteTitle:'Nota para este plato', noteFree:'Sus propias palabras (opcional)', noteSave:'Aplicar', noteOne:'Se aplica a una ración. Repita para más raciones.', orderNote:'Nota para todo el pedido', table:'Mesa', dView:'VISTA', dGuest:'Cliente', dWaiter:'Servicio', dQr:'QR', wTitle:'Panel de servicio', wSub:'Pedidos en vivo', wSvcLink:'Enlace de servicio', wGuestLink:'Vista del cliente', wFoot:'Cada puesto ve solo sus mesas. Una llamada suena y vibra, y se repite cada 45 segundos hasta confirmarse.', wAllPostas:'Todos los puestos', wSoundOn:'Sonido activado', wSoundOff:'Activar sonido', wConnCloud:'Conectado – todos los dispositivos', wConnOffline:'Sin conexión con el servidor', wConnLocal:'Solo este dispositivo – los pedidos de otros móviles no llegan aquí.', wLoggedIn:'Conectado como <b>{name}</b> – solo recibe avisos de las mesas {from}–{to}.', wHeadView:'Vista para dirección y cocina: las 30 mesas.', wCalling:'Llama al servicio', wBillReq:'Pide la cuenta', wDone:'Atendido', wAccept:'Aceptar', wKitchen:'Cocina lista', wServedBtn:'Servido', wClosed:'Cerrado', wEmpty:'No hay pedidos abiertos.', wEmptyHint:'Haga un pedido en la vista del cliente o pulse la llamada al servicio.', wServiceDay:'Día de servicio:', wCloseTable:'Cerrar mesa:', wHistShow:'Mostrar historial', wHistHide:'Ocultar historial', wOrdersWord:'pedidos', wRevenue:'Ingresos', qrTitle:'Códigos QR', qrSub:'Cada código abre la carta con su propio número de mesa.', qrBase:'URL base', qrCount:'Número de mesas', qrGen:'Crear códigos QR', qrPrint:'Imprimir hoja', qrHintEmpty:'Introduzca la dirección web donde está publicada esta carta. Sin una dirección válida los códigos QR no llevan a ninguna parte.', noTable:'Falta el número de mesa', noTableBody:'Escanee el código QR de su mesa. Solo así el pedido se asigna a la mesa correcta.',
   add:'Elegir', cart:'Ver pedido', order:'Enviar pedido',
   yourOrder:'Su pedido', tableIs:'Mesa', empty:'Aún no ha elegido nada.',
   notes:'¿Alergias, punto de cocción o peticiones? Escríbalo aquí: la cocina verá su nota.',
@@ -762,7 +778,7 @@ es:{sub:'Parrilla brasileña a bordo', cookTitle:'Elija el punto de cocción', c
   langNote:'<b>Cinco idiomas activos: alemán, inglés, español, neerlandés y turco.</b> Cada idioma nuevo se añade como un único bloque de datos, sin rediseñar nada. Siguientes candidatos a bordo: italiano, francés, portugués y ruso.',
   vegan:'vegano', alc:'contiene alcohol', star:'aviso *'},
 
-nl:{sub:'Braziliaans grillhuis aan boord', cookTitle:'Kies de gaarheid', cookNote:'Uw keuze gaat rechtstreeks naar de grill.', index:'Inhoud', pickTable:'Kies uw tafel', myOrders:'Uw bestellingen', histEmpty:'Nog geen bestelling aan deze tafel.', grandTotal:'Totaal tot nu toe', stNew:'Ontvangen', stAcc:'Aangenomen', stRdy:'Klaar', stSrv:'Geserveerd', noteBtn:'Notitie', noteEdit:'Notitie wijzigen', noteTitle:'Notitie bij dit gerecht', noteFree:'Eigen tekst (optioneel)', noteSave:'Toepassen', noteOne:'Geldt voor één portie. Herhaal voor meer porties.', orderNote:'Notitie voor de hele bestelling', table:'Tafel', noTable:'Tafelnummer ontbreekt', noTableBody:'Scan de QR-code op uw tafel. Alleen dan komt de bestelling bij de juiste tafel terecht.',
+nl:{sub:'Braziliaans grillhuis aan boord', cookTitle:'Kies de gaarheid', cookNote:'Uw keuze gaat rechtstreeks naar de grill.', index:'Inhoud', pickTable:'Kies uw tafel', myOrders:'Uw bestellingen', histEmpty:'Nog geen bestelling aan deze tafel.', grandTotal:'Totaal tot nu toe', stNew:'Ontvangen', stAcc:'Aangenomen', stRdy:'Klaar', stSrv:'Geserveerd', noteBtn:'Notitie', noteEdit:'Notitie wijzigen', noteTitle:'Notitie bij dit gerecht', noteFree:'Eigen tekst (optioneel)', noteSave:'Toepassen', noteOne:'Geldt voor één portie. Herhaal voor meer porties.', orderNote:'Notitie voor de hele bestelling', table:'Tafel', dView:'WEERGAVE', dGuest:'Gast', dWaiter:'Service', dQr:'QR', wTitle:'Servicepaneel', wSub:'Live bestellingen', wSvcLink:'Servicelink', wGuestLink:'Gastweergave', wFoot:'Elke post ziet alleen zijn eigen tafels. Een oproep geeft geluid en vibratie en herhaalt elke 45 seconden tot bevestiging.', wAllPostas:'Alle posten', wSoundOn:'Geluid aan', wSoundOff:'Geluid aanzetten', wConnCloud:'Verbonden – alle apparaten', wConnOffline:'Geen verbinding met de server', wConnLocal:'Alleen dit apparaat – bestellingen van andere telefoons komen hier niet aan.', wLoggedIn:'Aangemeld als <b>{name}</b> – u krijgt alleen meldingen voor tafels {from}–{to}.', wHeadView:'Weergave voor directie en keuken: alle 30 tafels.', wCalling:'Roept de service', wBillReq:'Vraagt om de rekening', wDone:'Afgehandeld', wAccept:'Aannemen', wKitchen:'Keuken klaar', wServedBtn:'Geserveerd', wClosed:'Afgesloten', wEmpty:'Geen openstaande bestellingen.', wEmptyHint:'Bestel in de gastweergave of gebruik de serviceoproep.', wServiceDay:'Servicedag:', wCloseTable:'Tafel afsluiten:', wHistShow:'Geschiedenis tonen', wHistHide:'Geschiedenis verbergen', wOrdersWord:'bestellingen', wRevenue:'Omzet', qrTitle:'QR-codes', qrSub:'Elke code opent de kaart met zijn eigen tafelnummer.', qrBase:'Basis-URL', qrCount:'Aantal tafels', qrGen:'QR-codes maken', qrPrint:'Blad afdrukken', qrHintEmpty:'Voer het webadres in waar deze kaart online staat. Zonder geldig adres leiden de QR-codes nergens naartoe.', noTable:'Tafelnummer ontbreekt', noTableBody:'Scan de QR-code op uw tafel. Alleen dan komt de bestelling bij de juiste tafel terecht.',
   add:'Kiezen', cart:'Bestelling bekijken', order:'Bestelling versturen',
   yourOrder:'Uw bestelling', tableIs:'Tafel', empty:'Nog niets gekozen.',
   notes:'Allergieën, gaarheid of wensen? Schrijf het hier – de keuken ziet uw notitie.',
@@ -782,7 +798,7 @@ nl:{sub:'Braziliaans grillhuis aan boord', cookTitle:'Kies de gaarheid', cookNot
   langNote:'<b>Vijf talen zijn actief: Duits, Engels, Spaans, Nederlands en Turks.</b> Elke nieuwe taal wordt als één datablok toegevoegd – zonder nieuw ontwerp. Voor de hand liggend aan boord: Italiaans, Frans, Portugees, Russisch.',
   vegan:'vegan', alc:'bevat alcohol', star:'let op *'},
 
-tr:{sub:'Gemide Brezilya usulü ızgara evi', cookTitle:'Pişirme derecesini seçin', cookNote:'Seçiminiz doğrudan ızgaraya iletilir.', index:'İçindekiler', pickTable:'Masanızı seçin', myOrders:'Siparişleriniz', histEmpty:'Bu masada henüz sipariş yok.', grandTotal:'Şu ana kadar toplam', stNew:'Alındı', stAcc:'Onaylandı', stRdy:'Hazır', stSrv:'Servis edildi', noteBtn:'Not', noteEdit:'Notu değiştir', noteTitle:'Bu yemek için not', noteFree:'Kendi cümlenizle (isteğe bağlı)', noteSave:'Uygula', noteOne:'Tek porsiyon için geçerlidir. Diğer porsiyonlar için tekrarlayın.', orderNote:'Siparişin tamamı için not', table:'Masa', noTable:'Masa numarası yok', noTableBody:'Lütfen masanızdaki QR kodu okutun. Sipariş ancak o zaman doğru masaya iletilir.',
+tr:{sub:'Gemide Brezilya usulü ızgara evi', cookTitle:'Pişirme derecesini seçin', cookNote:'Seçiminiz doğrudan ızgaraya iletilir.', index:'İçindekiler', pickTable:'Masanızı seçin', myOrders:'Siparişleriniz', histEmpty:'Bu masada henüz sipariş yok.', grandTotal:'Şu ana kadar toplam', stNew:'Alındı', stAcc:'Onaylandı', stRdy:'Hazır', stSrv:'Servis edildi', noteBtn:'Not', noteEdit:'Notu değiştir', noteTitle:'Bu yemek için not', noteFree:'Kendi cümlenizle (isteğe bağlı)', noteSave:'Uygula', noteOne:'Tek porsiyon için geçerlidir. Diğer porsiyonlar için tekrarlayın.', orderNote:'Siparişin tamamı için not', table:'Masa', dView:'GÖRÜNÜM', dGuest:'Misafir', dWaiter:'Servis', dQr:'QR', wTitle:'Servis paneli', wSub:'Canlı siparişler', wSvcLink:'Servis bağlantısı', wGuestLink:'Misafir görünümü', wFoot:'Her posta yalnızca kendi masalarını görür. Çağrı ses ve titreşim verir, onaylanana kadar 45 saniyede bir tekrarlar.', wAllPostas:'Tüm postalar', wSoundOn:'Ses açık', wSoundOff:'Sesi aç', wConnCloud:'Bağlı – tüm cihazlar', wConnOffline:'Sunucuya bağlantı yok', wConnLocal:'Yalnızca bu cihaz – diğer telefonlardan gelen siparişler buraya ulaşmaz.', wLoggedIn:'<b>{name}</b> olarak giriş yapıldı – yalnızca {from}–{to} masaları için bildirim alırsınız.', wHeadView:'Restoran müdürü ve mutfak görünümü: 30 masanın tamamı.', wCalling:'Servis çağırıyor', wBillReq:'Hesap istiyor', wDone:'İlgilenildi', wAccept:'Onayla', wKitchen:'Mutfak hazır', wServedBtn:'Servis edildi', wClosed:'Kapatıldı', wEmpty:'Açık sipariş yok.', wEmptyHint:'Misafir görünümünden sipariş verin veya servis çağrısına basın.', wServiceDay:'Servis günü:', wCloseTable:'Masayı kapat:', wHistShow:'Geçmişi göster', wHistHide:'Geçmişi gizle', wOrdersWord:'sipariş', wRevenue:'Ciro', qrTitle:'QR kodları', qrSub:'Her kod menüyü kendi masa numarasıyla açar.', qrBase:'Temel adres', qrCount:'Masa sayısı', qrGen:'QR kodları oluştur', qrPrint:'Sayfayı yazdır', qrHintEmpty:'Bu menünün yayında olduğu web adresini yazın. Geçerli adres olmadan QR kodları hiçbir yere gitmez.', noTable:'Masa numarası yok', noTableBody:'Lütfen masanızdaki QR kodu okutun. Sipariş ancak o zaman doğru masaya iletilir.',
   add:'Sepete ekle', cart:'Sepeti gör', order:'Siparişi gönder',
   yourOrder:'Siparişiniz', tableIs:'Masa', empty:'Henüz seçim yapılmadı.',
   notes:'Alerji, pişirme derecesi veya özel isteğiniz? Buraya yazın – mutfak notunuzu görür.',
@@ -1203,7 +1219,7 @@ const SYNC = (function(){
 
 /* ---------------- Zustand ---------------- */
 const PARAMS = new URLSearchParams(location.search);
-const TABLE_FIXED = /^\d{1,2}$/.test(PARAMS.get('table')||PARAMS.get('tisch')||PARAMS.get('masa')||'');
+let TABLE_FIXED = /^\d{1,2}$/.test(PARAMS.get('table')||PARAMS.get('tisch')||PARAMS.get('masa')||'');
 const DEMO_MODE = PARAMS.get('demo') === '1';
 const START_VIEW = ['service','qr'].includes(PARAMS.get('view')) ? PARAMS.get('view') : 'guest';
 /* Die Tischnummer kommt ausschliesslich aus dem QR-Code (?table=N).
@@ -1348,6 +1364,27 @@ function renderStatic(){
   $('#heroSub').textContent = t('sub');
   $('#tableLbl').textContent = t('table');
   $('#tableNum').textContent = TABLE_FIXED ? table : '–';
+  if(window.__fillDemoTable) window.__fillDemoTable();
+
+  /* Demo-Leiste, Service-Panel und QR-Ansicht folgen jetzt der gewaehlten
+     Sprache — vorher waren sie fest deutsch. */
+  $('#dbTag').textContent       = t('dView');
+  $('#dbGuest').textContent     = t('dGuest');
+  $('#dbWaiterLbl').textContent = t('dWaiter');
+  $('#dbQr').textContent        = t('dQr');
+  $('#wTitle').textContent      = t('wTitle');
+  $('#wSub').textContent        = t('wSub');
+  $('#wSvcLink').textContent    = t('wSvcLink');
+  $('#wGuestLink').textContent  = t('wGuestLink');
+  $('#wFoot').textContent       = t('wFoot');
+  $('#qrTitle').textContent     = t('qrTitle');
+  $('#qrSub').textContent       = t('qrSub');
+  $('#qrBaseLbl').textContent   = t('qrBase');
+  $('#qrCountLbl').textContent  = t('qrCount');
+  $('#genQr').textContent       = t('qrGen');
+  $('#qrPrintBtn').textContent  = t('qrPrint');
+  urlHint();
+  renderOrders();
   $('#legTitle').textContent = t('legTitle');
   $('#legStar').textContent  = t('legStar');
   $('#legAllerg').textContent= t('legAllerg');
@@ -1593,6 +1630,8 @@ function badge(){
   b.style.display = n?'inline-block':'none'; b.textContent = n;
 }
 const STLBL={new:'NEU',accepted:'ANGENOMMEN',ready:'FERTIG',served:'SERVIERT'};
+/* Statusetikett in der gewaehlten Sprache, gross geschrieben. */
+const GSTU = st => ({new:t('stNew'),accepted:t('stAcc'),ready:t('stRdy'),served:t('stSrv')}[st] || t('wClosed')).toUpperCase();
 /* Nach dem Bezahlen: Tisch freigeben, damit der nächste Gast bei null anfängt */
 function closeTable(tbl){
   orders.filter(o=>o.table===tbl && !isClosed(o)).forEach(o=>{
@@ -1602,35 +1641,35 @@ function closeTable(tbl){
 const STCLS={new:'st-new',accepted:'',ready:'',served:''};
 function renderWaiterSel(){
   const cnt = id => orders.filter(o=>o.status==='new'&&(id==='all'||o.waiter===id)).length;
-  const items = [{id:'all',name:'Alle Postas',from:1,to:30}].concat(STATIONS);
+  const items = [{id:'all',name:t('wAllPostas'),from:1,to:30}].concat(STATIONS);
   $('#waiterSel').innerHTML = items.map(w=>{
     const n=cnt(w.id);
     return `<button class="wchip${activeWaiter===w.id?' on':''}" data-w="${w.id}">${w.name}<b>${w.from}–${w.to}</b>${n?` <span style="color:var(--ember)">●${n}</span>`:''}</button>`;
-  }).join('') + `<button class="sound${soundOn?' on':''}" id="soundBtn">${soundOn?'Ton an':'Ton einschalten'}</button>`;
+  }).join('') + `<button class="sound${soundOn?' on':''}" id="soundBtn">${soundOn?t('wSoundOn'):t('wSoundOff')}</button>`;
   const w = STATIONS.find(x=>x.id===activeWaiter);
   const st = SYNC.state();
-  const conn = st==='cloud' ? '<b style="color:var(--ok)">● Verbunden – alle Geräte</b>'
-             : st==='cloud-offline' ? '<b style="color:var(--ember)">● Keine Verbindung zum Server</b>'
-             : '<b style="color:var(--ember)">● Nur dieses Gerät</b> – Bestellungen von anderen Handys kommen hier nicht an. Dafür wird ein Server benötigt.';
+  const conn = st==='cloud' ? `<b style="color:var(--ok)">● ${t('wConnCloud')}</b>`
+             : st==='cloud-offline' ? `<b style="color:var(--ember)">● ${t('wConnOffline')}</b>`
+             : `<b style="color:var(--ember)">● ${t('wConnLocal')}</b>`;
   $('#waiterNote').innerHTML = (w
-    ? `Angemeldet als <b>${w.name}</b> – Sie werden nur für die Tische ${w.from}–${w.to} benachrichtigt.`
-    : `Ansicht für Restaurantleitung und Küche: alle 30 Tische.`) + '<br>' + conn;
+    ? t('wLoggedIn').replace('{name}', w.name).replace('{from}', w.from).replace('{to}', w.to)
+    : t('wHeadView')) + '<br>' + conn;
 }
 function orderCard(o){
     if(o.type!=='order'){
-      const txt = o.type==='waiter' ? 'Ruft den Service' : 'Bittet um die Rechnung';
+      const txt = o.type==='waiter' ? t('wCalling') : t('wBillReq');
       return `<div class="order call${isClosed(o)?' closed':''}"><div class="o-top">
-        <span class="o-table alert">Tisch ${o.table}</span><span class="o-id">${o.wname}</span>
+        <span class="o-table alert">${t('table')} ${o.table}</span><span class="o-id">${o.wname}</span>
         <span class="elapsed" data-ts="${o.ts}"></span><span class="o-time">${o.time}</span></div>
         <div class="o-items" style="color:var(--ember);font-weight:700">${txt}</div>
         <div class="o-foot"><span class="o-total"></span>
-          ${isClosed(o)?'<span class="h-st ok">Erledigt</span>':`<button class="sbtn act" data-done="${o.id}">Erledigt</button>`}</div></div>`;
+          ${isClosed(o)?`<span class="h-st ok">${t('wDone')}</span>`:`<button class="sbtn act" data-done="${o.id}">${t('wDone')}</button>`}</div></div>`;
     }
     const next = {new:'accepted',accepted:'ready',ready:'served'}[o.status];
-    const lbl  = {accepted:'Annehmen',ready:'Küche fertig',served:'Serviert'}[next];
+    const lbl  = {accepted:t('wAccept'),ready:t('wKitchen'),served:t('wServedBtn')}[next];
     return `<div class="order${o.status==='new'?' new':''}${isClosed(o)?' closed':''}"><div class="o-top">
-      <span class="o-table">Tisch ${o.table}</span><span class="o-id">${o.wname} · #${o.no}</span>
-      <span class="status ${STCLS[o.status]}">${STLBL[o.status]||'ABGESCHLOSSEN'}</span><span class="o-time">${o.time}</span></div>
+      <span class="o-table">${t('table')} ${o.table}</span><span class="o-id">${o.wname} · #${o.no}</span>
+      <span class="status ${STCLS[o.status]}">${GSTU(o.status)}</span><span class="o-time">${o.time}</span></div>
       <div class="o-items">${o.items.map((i,k)=>`<div class="oi">
           <span class="pos">${k+1}.</span><span>${i.q}×</span>${i.n}${i.s?` <em style="font-style:normal;color:var(--ash)">(${i.s})</em>`:''}
           ${i.note?`<div class="inote">${i.note.replace(/</g,'&lt;')}</div>`:''}
@@ -1646,14 +1685,14 @@ function renderOrders(){
   const days  = [...new Set(orders.map(o=>serviceDay(o.ts)))].sort().reverse().slice(0,7);
   const dr = $('#dayRow');
   if(dr) dr.innerHTML = days.length>1
-    ? `<span class="cl-lbl">Servicetag:</span>` + days.map(k=>
+    ? `<span class="cl-lbl">${t('wServiceDay')}</span>` + days.map(k=>
         `<button class="cl-btn${k===day?' on':''}" data-day="${k}">${dayLabel(k)}</button>`).join('')
     : '';
   const openTables = [...new Set(orders.filter(o=>mine(o) && !isClosed(o) && serviceDay(o.ts)===today).map(o=>o.table))].sort((a,b)=>a-b);
   const cr=$('#closeRow');
   if(cr) cr.innerHTML = (openTables.length && day===today)
-    ? `<span class="cl-lbl">Tisch abschließen:</span>` +
-      openTables.map(t=>`<button class="cl-btn" data-closetable="${t}">Tisch ${t}</button>`).join('')
+    ? `<span class="cl-lbl">${t('wCloseTable')}</span>` +
+      openTables.map(n=>`<button class="cl-btn" data-closetable="${n}">${t('table')} ${n}</button>`).join('')
     : '';
   const all    = orders.filter(o=>mine(o) && serviceDay(o.ts)===day);
   const active = all.filter(o=>!isClosed(o) && day===today);
@@ -1661,12 +1700,12 @@ function renderOrders(){
   const ords   = all.filter(o=>o.type==='order');
   const sum    = ords.reduce((a,o)=>a+o.total,0);
   const histBlock = hist.length ? `
-    <button class="histtog${showHist?' on':''}" data-toghist>${showHist?'Verlauf ausblenden':'Verlauf anzeigen'} (${hist.length})</button>
+    <button class="histtog${showHist?' on':''}" data-toghist>${showHist?t('wHistHide'):t('wHistShow')} (${hist.length})</button>
     ${showHist ? hist.map(orderCard).join('') : ''}
-    <div class="daysum">${dayLabel(day)} · ${ords.length} Bestellungen · Umsatz <b>${eur(sum)}</b></div>` : '';
+    <div class="daysum">${dayLabel(day)} · ${ords.length} ${t('wOrdersWord')} · ${t('wRevenue')} <b>${eur(sum)}</b></div>` : '';
   $('#orderRoot').innerHTML =
     (active.length ? active.map(orderCard).join('')
-      : `<div class="empty">Keine offenen Bestellungen.<br><span style="font-size:11px">In der Gastansicht bestellen oder den Serviceruf auslösen.</span></div>`)
+      : `<div class="empty">${t('wEmpty')}<br><span style="font-size:11px">${t('wEmptyHint')}</span></div>`)
     + histBlock;
 }
 
@@ -1679,8 +1718,8 @@ function selfURL(){
 function urlHint(){
   const b = $('#baseUrl').value.trim();
   $('#urlHint').innerHTML = b
-    ? `Tisch 1 öffnet: <b>${b}?table=1</b>`
-    : `<span style="color:var(--ember)">Bitte die Web-Adresse eintragen, unter der diese Karte online liegt. Ohne gültige Adresse führen die QR-Codes ins Leere.</span>`;
+    ? `${t('table')} 1 &rarr; <b>${b}?table=1</b>`
+    : `<span style="color:var(--ember)">${t('qrHintEmpty')}</span>`;
 }
 function genQR(){
   const base = $('#baseUrl').value.trim();
@@ -1794,8 +1833,30 @@ function switchView(v){
   }
 }
 (function(){
-  /* Keine Tischauswahl in der Gastansicht. Die Nummer stammt allein aus dem
-     QR-Code am Tisch — ein zweiter, umschaltbarer Wert wäre eine Fehlerquelle. */
+  /* In der Gastansicht gibt es keine Tischauswahl — die Nummer kommt allein
+     aus dem QR-Code am Tisch. In der Demo-Leiste (?demo=1) gibt es sie
+     dagegen schon: die Leiste ist ein Vorfuehrwerkzeug und fuer Gaeste
+     unsichtbar. So laesst sich bei einer Praesentation der Tisch wechseln,
+     ohne die Adresse neu zu tippen. */
+  const dsel = $('#demoTable');
+  if(dsel){
+    const fill = () => {
+      const keep = dsel.value;
+      dsel.innerHTML = `<option value="">${t('table')} –</option>` +
+        Array.from({length:30}, (_,i)=>`<option value="${i+1}">${t('table')} ${i+1}</option>`).join('');
+      dsel.value = keep || (table ? String(table) : '');
+    };
+    fill();
+    window.__fillDemoTable = fill;
+    dsel.onchange = () => {
+      const v = parseInt(dsel.value, 10);
+      if(v > 0 && v <= 99){ table = v; TABLE_FIXED = true; }
+      else { table = null; TABLE_FIXED = false; }
+      SESS.touch(table);
+      renderAll();
+      renderMyOrdersBtn();
+    };
+  }
 
   /* Rollen: Gast (Standard) · ?view=service · ?view=qr · ?demo=1 zeigt den Umschalter */
   if(DEMO_MODE){ $('#demobar').hidden = false; document.body.classList.add('has-bar'); }
@@ -1825,7 +1886,7 @@ T.ru = {
   noteFree:'Свой текст (необязательно)', noteSave:'Применить',
   noteOne:'Относится к одной порции. Для других порций повторите.',
   orderNote:'Пожелание ко всему заказу',
-  table:'Стол', noTable:'Номер стола отсутствует', noTableBody:'Пожалуйста, отсканируйте QR-код на вашем столе. Только тогда заказ попадёт к нужному столу.',
+  table:'Стол', dView:'ВИД', dGuest:'Гость', dWaiter:'Сервис', dQr:'QR', wTitle:'Панель сервиса', wSub:'Заказы в реальном времени', wSvcLink:'Ссылка сервиса', wGuestLink:'Вид гостя', wFoot:'Каждый пост видит только свои столы. Вызов даёт звук и вибрацию и повторяется каждые 45 секунд до подтверждения.', wAllPostas:'Все посты', wSoundOn:'Звук включён', wSoundOff:'Включить звук', wConnCloud:'Подключено – все устройства', wConnOffline:'Нет связи с сервером', wConnLocal:'Только это устройство – заказы с других телефонов сюда не поступают.', wLoggedIn:'Вы вошли как <b>{name}</b> – уведомления только по столам {from}–{to}.', wHeadView:'Вид для руководства и кухни: все 30 столов.', wCalling:'Вызывает официанта', wBillReq:'Просит счёт', wDone:'Обработано', wAccept:'Принять', wKitchen:'Кухня готова', wServedBtn:'Подано', wClosed:'Закрыто', wEmpty:'Открытых заказов нет.', wEmptyHint:'Сделайте заказ в виде гостя или вызовите официанта.', wServiceDay:'Сервисный день:', wCloseTable:'Закрыть стол:', wHistShow:'Показать историю', wHistHide:'Скрыть историю', wOrdersWord:'заказов', wRevenue:'Выручка', qrTitle:'QR-коды', qrSub:'Каждый код открывает меню со своим номером стола.', qrBase:'Базовый URL', qrCount:'Количество столов', qrGen:'Создать QR-коды', qrPrint:'Печать листа', qrHintEmpty:'Укажите веб-адрес, по которому размещено это меню. Без действительного адреса QR-коды никуда не ведут.', noTable:'Номер стола отсутствует', noTableBody:'Пожалуйста, отсканируйте QR-код на вашем столе. Только тогда заказ попадёт к нужному столу.',
   add:'Добавить', cart:'Посмотреть заказ', order:'Отправить заказ',
   yourOrder:'Ваш заказ', tableIs:'Стол', empty:'Пока ничего не выбрано.',
   notes:'Аллергия, прожарка или пожелания? Напишите здесь — кухня увидит вашу заметку.',
