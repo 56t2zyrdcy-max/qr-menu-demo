@@ -353,6 +353,7 @@ textarea::placeholder{color:#6C858C}
 
   <div class="servicetop">
     <button class="svc" id="svcBill"></button>
+    <button class="svc" id="histBtn" style="margin-top:8px"></button>
   </div>
 
   <nav class="navbar">
@@ -395,7 +396,8 @@ textarea::placeholder{color:#6C858C}
     </div>
     <div class="field noprint">
       <label>Base-URL</label>
-      <input id="baseUrl" value="https://fjordside.no/meny" spellcheck="false">
+      <input id="baseUrl" value="" spellcheck="false">
+      <div class="hint" id="urlHint" style="font-size:11px;color:var(--muted);margin-top:6px"></div>
     </div>
     <div class="field noprint">
       <label>Antall bord</label>
@@ -458,7 +460,7 @@ const ICONS = {
 const T = {
   no:{
     tagline:'Sjømat &amp; grill ved cruisekaia · siden 1993',
-    table:'Bord', noTable:'Bordnummer mangler', noTableBody:'Skann QR-koden pa bordet ditt. Forst da kan bestillingen knyttes til riktig bord.', menu:'Meny',
+    table:'Bord', myOrders:'Mine bestillinger', histEmpty:'Ingen bestilling ved dette bordet enna.', grandTotal:'Totalt sa langt', stNew:'Mottatt', stAcc:'Bekreftet', stRdy:'Klar', stSrv:'Servert', noTable:'Bordnummer mangler', noTableBody:'Skann QR-koden pa bordet ditt. Forst da kan bestillingen knyttes til riktig bord.', menu:'Meny',
     all:'Alle', veg:'Vegetar', gf:'Glutenfri',
     add:'Legg til', cart:'Se bestilling', order:'Send bestilling',
     yourOrder:'Din bestilling', tableIs:'Bord', empty:'Ingen retter valgt ennå.',
@@ -479,7 +481,7 @@ const T = {
   },
   en:{
     tagline:'Seafood &amp; grill at the cruise quay · since 1993',
-    table:'Table', noTable:'Table number missing', noTableBody:'Please scan the QR code on your table. Only then can the order be assigned to the right table.', menu:'Menu',
+    table:'Table', myOrders:'Your orders', histEmpty:'No orders at this table yet.', grandTotal:'Total so far', stNew:'Received', stAcc:'Accepted', stRdy:'Ready', stSrv:'Served', noTable:'Table number missing', noTableBody:'Please scan the QR code on your table. Only then can the order be assigned to the right table.', menu:'Menu',
     all:'All', veg:'Vegetarian', gf:'Gluten free',
     add:'Add', cart:'View order', order:'Send order',
     yourOrder:'Your order', tableIs:'Table', empty:'Nothing selected yet.',
@@ -500,7 +502,7 @@ const T = {
   },
   de:{
     tagline:'Fisch &amp; Grill am Kreuzfahrtkai · seit 1993',
-    table:'Tisch', noTable:'Tischnummer fehlt', noTableBody:'Bitte scannen Sie den QR-Code an Ihrem Tisch. Erst dann kann die Bestellung dem richtigen Tisch zugeordnet werden.', menu:'Speisekarte',
+    table:'Tisch', myOrders:'Ihre Bestellungen', histEmpty:'Noch keine Bestellung an diesem Tisch.', grandTotal:'Summe bisher', stNew:'Eingegangen', stAcc:'Angenommen', stRdy:'Fertig', stSrv:'Serviert', noTable:'Tischnummer fehlt', noTableBody:'Bitte scannen Sie den QR-Code an Ihrem Tisch. Erst dann kann die Bestellung dem richtigen Tisch zugeordnet werden.', menu:'Speisekarte',
     all:'Alle', veg:'Vegetarisch', gf:'Glutenfrei',
     add:'Hinzufügen', cart:'Bestellung ansehen', order:'Bestellung senden',
     yourOrder:'Ihre Bestellung', tableIs:'Tisch', empty:'Noch nichts ausgewählt.',
@@ -778,6 +780,7 @@ function renderStatic(){
   $('#ringText').textContent = Array(reps).fill(ring).join('  ·  ') + '  ·  ';
   $('#bellBig').setAttribute('aria-label', t('callWaiter'));
   $('#svcBill').innerHTML = `${t('bill')}<small>${t('billSub')}</small>`;
+  renderMyOrdersBtn();
   $('#cartLabel').textContent = t('cart');
   $$('.lang').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
 }
@@ -881,7 +884,7 @@ function pushOrder(type){
   if(activeWaiter === 'all' || activeWaiter === o.waiter){
     chime(type === 'order' ? 'order' : type === 'bill' ? 'bill' : 'waiter');
   }
-  renderOrders(); badge();
+  renderOrders(); badge(); renderMyOrdersBtn();
   return o.no;
 }
 function mine(o){ return activeWaiter === 'all' || o.waiter === activeWaiter; }
@@ -942,9 +945,63 @@ function renderOrders(){
   }).join('');
 }
 
+/* ---------- Gjestens egne bestillinger ---------- */
+/* Bare bestillinger fra dette bordet, og bare varebestillinger — service-
+   kall og regningsforespoersler hoerer ikke i en handleliste. */
+function myOrders(){
+  return orders.filter(o => o.table === table && o.type === 'order');
+}
+function guestStatus(o){
+  return { new:t('stNew'), accepted:t('stAcc'), ready:t('stRdy'), served:t('stSrv') }[o.status] || o.status;
+}
+function renderMyOrdersBtn(){
+  const btn = $('#histBtn'); if(!btn) return;
+  const n = myOrders().length;
+  btn.innerHTML = `${t('myOrders')}<small>${n ? n + ' \u00B7 ' + kr(myOrders().reduce((a,o)=>a+o.total,0)) : t('histEmpty')}</small>`;
+}
+function historySheet(){
+  const list = myOrders();
+  const sum = list.reduce((a,o) => a + o.total, 0);
+  openSheet(`
+    <div class="ticket" style="text-align:left">
+      <h3 style="font-family:var(--display);font-weight:300;font-size:24px;margin:0 0 4px;text-align:center">${t('myOrders')}</h3>
+      <div class="sm" style="text-align:center;margin-bottom:14px">${t('tableIs')} ${table}</div>
+      ${list.length ? list.map(o => `
+        <div class="order" style="margin-bottom:10px">
+          <div class="o-top">
+            <span class="o-table">${t('ticketNo')} #${o.no}</span>
+            <span class="status ${STCLS[o.status]}">${guestStatus(o)}</span>
+            <span class="o-time">${o.time}</span>
+          </div>
+          <div class="o-items">${o.items.map((i,k) => `<div><span>${k+1}. ${i.q}\u00D7</span>${i.n}${i.s?` <em style="color:var(--muted);font-style:normal">(${i.s})</em>`:''}</div>`).join('')}</div>
+          ${o.note?`<div class="o-note">${o.note.replace(/</g,'&lt;')}</div>`:''}
+          <div class="o-foot"><span class="o-total">${kr(o.total)}</span></div>
+        </div>`).join('') : `<div class="sm" style="text-align:center;padding:18px 0">${t('histEmpty')}</div>`}
+      ${list.length ? `<div class="o-top" style="border:0;margin-top:12px"><span class="o-table">${t('grandTotal')}</span><span class="o-total" style="margin-left:auto">${kr(sum)}</span></div>` : ''}
+    </div>
+    <button class="primary" data-close>${t('close')}</button>
+  `);
+}
+
 /* ---------- QR ---------- */
+/* Standard-Basis-URL ist die Seite selbst. Vorher stand hier eine erfundene
+   Demo-Adresse, deshalb fuehrten alle gedruckten Codes ins Leere. */
+function selfURL(){
+  let u = location.origin + location.pathname;
+  if(location.protocol === 'file:') u = '';
+  return u;
+}
+function urlHint(){
+  const el = $('#urlHint'); if(!el) return;
+  const b = $('#baseUrl').value.trim();
+  el.innerHTML = b
+    ? `Bord 1 apner: <b>${b}?table=1</b>`
+    : `<span style="color:var(--sun)">Skriv inn nettadressen der denne menyen ligger. Uten gyldig adresse peker QR-kodene ingen steder.</span>`;
+}
 function genQR(){
-  const base = $('#baseUrl').value.trim() || 'https://fjordside.no/meny';
+  const base = $('#baseUrl').value.trim();
+  urlHint();
+  if(!base){ $('#qrGrid').innerHTML=''; return; }
   const count = Math.min(parseInt($('#tableCount').value,10) || 30, 60);
   const grid = $('#qrGrid');
   grid.innerHTML = '';
@@ -994,16 +1051,17 @@ document.addEventListener('click', e => {
   else if(el.dataset.next){
     const o = orders.find(x => x.no == el.dataset.next);
     o.status = {new:'accepted', accepted:'ready', ready:'served'}[o.status];
-    renderOrders(); badge();
+    renderOrders(); badge(); renderMyOrdersBtn();
   }
   else if(el.dataset.done){
     const i = orders.findIndex(x => x.no == el.dataset.done);
-    orders.splice(i,1); renderOrders(); badge();
+    orders.splice(i,1); renderOrders(); badge(); renderMyOrdersBtn();
   }
 });
 
 $('#moreLang').onclick = () => $('#langNote').classList.toggle('on');
 $('#openCart').onclick = cartSheet;
+$('#histBtn').onclick  = historySheet;
 
 function callWaiter(){
   if(!requireTable()) return;
@@ -1055,6 +1113,11 @@ function switchView(v){
   if(v === 'qr' && !$('#qrGrid').children.length) genQR();
 }
 
+/* Basis-URL beim Start mit der eigenen Adresse fuellen. */
+if($('#baseUrl') && !$('#baseUrl').value) $('#baseUrl').value = selfURL();
+urlHint();
+$('#baseUrl').addEventListener('input', urlHint);
+
 /* Ingen bordvelger i gjestevisningen. Nummeret kommer utelukkende fra
    QR-koden pa bordet — en ekstra, omstillbar verdi ville vaert en feilkilde. */
 
@@ -1069,7 +1132,7 @@ setInterval(() => {
    ============================================================ */
 T.tr = {
   tagline:'Cruise limanında deniz ürünleri &amp; ızgara · 1993\u2019ten beri',
-  table:'Masa', noTable:'Masa numarası yok', noTableBody:'Lütfen masanızdaki QR kodu okutun. Sipariş ancak o zaman doğru masaya iletilir.', menu:'Menü',
+  table:'Masa', myOrders:'Siparişleriniz', histEmpty:'Bu masada henüz sipariş yok.', grandTotal:'Şu ana kadar toplam', stNew:'Alındı', stAcc:'Onaylandı', stRdy:'Hazır', stSrv:'Servis edildi', noTable:'Masa numarası yok', noTableBody:'Lütfen masanızdaki QR kodu okutun. Sipariş ancak o zaman doğru masaya iletilir.', menu:'Menü',
   all:'Tümü', veg:'Vejetaryen', gf:'Glutensiz',
   add:'Ekle', cart:'Siparişi gör', order:'Siparişi gönder',
   yourOrder:'Siparişiniz', tableIs:'Masa', empty:'Henüz seçim yapılmadı.',
@@ -1090,7 +1153,7 @@ T.tr = {
 };
 T.zh = {
   tagline:'邮轮码头旁的海鲜与炭烤 · 始于1993年',
-  table:'桌号', noTable:'缺少桌号', noTableBody:'请扫描您桌上的二维码。只有这样订单才能送到正确的桌子。', menu:'菜单',
+  table:'桌号', myOrders:'您的订单', histEmpty:'此桌尚无订单。', grandTotal:'目前合计', stNew:'已收到', stAcc:'已确认', stRdy:'已就绪', stSrv:'已上菜', noTable:'缺少桌号', noTableBody:'请扫描您桌上的二维码。只有这样订单才能送到正确的桌子。', menu:'菜单',
   all:'全部', veg:'素食', gf:'无麸质',
   add:'加入', cart:'查看订单', order:'提交订单',
   yourOrder:'您的订单', tableIs:'桌号', empty:'尚未选择菜品。',
