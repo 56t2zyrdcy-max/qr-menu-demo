@@ -1536,10 +1536,13 @@ function sentSheet(no){
     <button class="primary" data-close>${t('ok')}</button>
     <button class="ghost" data-hist>${t('myOrders')}</button>`);
 }
-function msgSheet(title,body){
-  openSheet(`<div class="ticket"><div class="tick">✓</div>
+function msgSheet(title,body,icon){
+  /* Tischzeile nur, wenn es wirklich eine Nummer gibt — sonst stand hier
+     "Tisch null". Das Symbol ist bei Hinweisen kein Haken. */
+  const line = (TABLE_FIXED && table) ? `${t('tableIs')} ${table}<br>` : '';
+  openSheet(`<div class="ticket"><div class="tick">${icon || '✓'}</div>
     <h3 style="font-family:var(--display);font-weight:400;font-size:19px;margin:0 0 10px">${title}</h3>
-    <div class="sm">${t('tableIs')} ${table}<br>${body}</div></div>
+    <div class="sm">${line}${body}</div></div>
     <button class="primary" data-close>${t('ok')}</button>`);
 }
 
@@ -1549,7 +1552,7 @@ function msgSheet(title,body){
    nichts zu tun. */
 function requireTable(){
   if(TABLE_FIXED && table) return true;
-  msgSheet(t('noTable'), t('noTableBody'));
+  msgSheet(t('noTable'), t('noTableBody'), '!');
   return false;
 }
 

@@ -841,12 +841,15 @@ function sentSheet(no){
     <button class="primary" data-close>${t('ok')}</button>
   `);
 }
-function msgSheet(title, body){
+function msgSheet(title, body, icon){
+  /* Bordlinjen vises bare naar det finnes et nummer — ellers stod det
+     "Bord null". Ved en advarsel er symbolet ikke en hake. */
+  const line = (TABLE_FIXED && table) ? `${t('tableIs')} ${table}<br>` : '';
   openSheet(`
     <div class="ticket">
-      <div class="tick">✓</div>
+      <div class="tick">${icon || '✓'}</div>
       <h3 style="font-family:var(--display);font-weight:300;font-size:25px;margin:0 0 10px">${title}</h3>
-      <div class="sm">${t('tableIs')} ${table}<br>${body}</div>
+      <div class="sm">${line}${body}</div>
     </div>
     <button class="primary" data-close>${t('ok')}</button>
   `);
@@ -857,7 +860,7 @@ function msgSheet(title, body){
    ubrukelig for servitoren, og a gjette ville vaere verre enn a gjore ingenting. */
 function requireTable(){
   if(TABLE_FIXED && table) return true;
-  msgSheet(t('noTable'), t('noTableBody'));
+  msgSheet(t('noTable'), t('noTableBody'), '!');
   return false;
 }
 
