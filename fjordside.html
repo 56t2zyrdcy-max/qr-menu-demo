@@ -377,13 +377,20 @@ textarea::placeholder{color:#6C858C}
 <div class="view" id="v-waiter">
   <div class="wrap">
     <div class="panel-h">
-      <h2>Servitørpanel</h2>
-      <p>Live bestillinger · Fjordside Oslo · <span id="waiterClock" style="font-family:var(--mono)"></span></p>
+      <h2 id="wTitle">Servitørpanel</h2>
+      <p><span id="wSub">Live bestillinger</span> · Fjordside Oslo · <span id="waiterClock" style="font-family:var(--mono)"></span></p>
+    </div>
+    <div class="langbar" style="margin-top:12px">
+      <button class="lang" data-lang="no">NORSK</button>
+      <button class="lang" data-lang="en">ENGLISH</button>
+      <button class="lang" data-lang="de">DEUTSCH</button>
+      <button class="lang" data-lang="tr">TÜRKÇE</button>
+      <button class="lang" data-lang="zh">中文</button>
     </div>
     <div class="wctrl" id="waiterSel"></div>
     <div class="wnote" id="waiterNote"></div>
     <div id="orderRoot"></div>
-    <div class="foot">Hver servitør ser kun sine bord. Tilkalling gir lyd + vibrasjon, og ringer på nytt hvert 45. sekund til den er kvittert ut.</div>
+    <div class="foot" id="wFoot"></div>
   </div>
 </div>
 
@@ -391,20 +398,27 @@ textarea::placeholder{color:#6C858C}
 <div class="view" id="v-qr">
   <div class="wrap">
     <div class="panel-h">
-      <h2>QR-koder · 30 bord</h2>
-      <p>Hver kode åpner menyen med sitt eget bordnummer. Skriv ut, laminer, sett på bordet.</p>
+      <h2 id="qrTitle">QR-koder · 30 bord</h2>
+      <p id="qrSub">Hver kode åpner menyen med sitt eget bordnummer.</p>
+    </div>
+    <div class="langbar noprint" style="margin-top:12px">
+      <button class="lang" data-lang="no">NORSK</button>
+      <button class="lang" data-lang="en">ENGLISH</button>
+      <button class="lang" data-lang="de">DEUTSCH</button>
+      <button class="lang" data-lang="tr">TÜRKÇE</button>
+      <button class="lang" data-lang="zh">中文</button>
     </div>
     <div class="field noprint">
-      <label>Base-URL</label>
+      <label id="qrBaseLbl">Base-URL</label>
       <input id="baseUrl" value="" spellcheck="false">
       <div class="hint" id="urlHint" style="font-size:11px;color:var(--muted);margin-top:6px"></div>
     </div>
     <div class="field noprint">
-      <label>Antall bord</label>
+      <label id="qrCountLbl">Antall bord</label>
       <input id="tableCount" value="30" inputmode="numeric">
     </div>
     <button class="primary noprint" id="genQr">Lag QR-koder</button>
-    <button class="ghost noprint" onclick="window.print()">Skriv ut ark</button>
+    <button class="ghost noprint" id="qrPrintBtn" onclick="window.print()">Skriv ut ark</button>
     <div id="qrWarn"></div>
     <div class="qrgrid" id="qrGrid"></div>
   </div>
@@ -430,9 +444,9 @@ textarea::placeholder{color:#6C858C}
 <div class="demobar">
   <div class="demobar-in">
     <span class="dtag">DEMO</span>
-    <button class="dbtn on" data-view="guest">Gjest</button>
-    <button class="dbtn" data-view="waiter">Servitør<span class="badge" id="ordBadge" style="display:none">0</span></button>
-    <button class="dbtn" data-view="qr">QR</button>
+    <button class="dbtn on" data-view="guest" id="dbGuest">Gjest</button>
+    <button class="dbtn" data-view="waiter" id="dbWaiter"><span id="dbWaiterLbl">Servitør</span><span class="badge" id="ordBadge" style="display:none">0</span></button>
+    <button class="dbtn" data-view="qr" id="dbQr">QR</button>
   </div>
 </div>
 
@@ -460,7 +474,7 @@ const ICONS = {
 const T = {
   no:{
     tagline:'Sjømat &amp; grill ved cruisekaia · siden 1993',
-    table:'Bord', myOrders:'Mine bestillinger', histEmpty:'Ingen bestilling ved dette bordet enna.', grandTotal:'Totalt sa langt', stNew:'Mottatt', stAcc:'Bekreftet', stRdy:'Klar', stSrv:'Servert', noTable:'Bordnummer mangler', noTableBody:'Skann QR-koden pa bordet ditt. Forst da kan bestillingen knyttes til riktig bord.', menu:'Meny',
+    table:'Bord', myOrders:'Mine bestillinger', histEmpty:'Ingen bestilling ved dette bordet enna.', grandTotal:'Totalt sa langt', stNew:'Mottatt', stAcc:'Bekreftet', stRdy:'Klar', stSrv:'Servert', dGuest:'Gjest', dWaiter:'Servitør', dQr:'QR', wTitle:'Servitørpanel', wSub:'Live bestillinger', wFoot:'Hver servitør ser kun sine bord. Tilkalling gir lyd + vibrasjon, og ringer på nytt hvert 45. sekund til den er kvittert ut.', wAllTables:'Alle bord', wZone:'Sone', wSoundOn:'Lyd på', wSoundOff:'Slå på lyd', wLoggedIn:'Du er logget inn som <b>{name}</b> og får varsel kun for bord {from}–{to}. Andre servitører varsles ikke.', wHeadView:'Visning for hovmester / kjøkken: alle 30 bord. I drift logger hver servitør seg inn på sin egen sone.', wEmpty:'Ingen aktive bestillinger.', wEmptyHint:'Legg inn en bestilling eller trykk «Tilkall servitør» i gjestevisningen.', wCalling:'Tilkaller servitør', wBillReq:'Ber om regningen', wHandled:'Håndtert', wAccept:'Ta imot', wReady:'Klar fra kjøkken', wServedBtn:'Servert', wRemove:'Fjern', qrTitle:'QR-koder · 30 bord', qrSub:'Hver kode åpner menyen med sitt eget bordnummer. Skriv ut, laminer, sett på bordet.', qrBase:'Base-URL', qrCount:'Antall bord', qrGen:'Lag QR-koder', qrPrint:'Skriv ut ark', qrScan:'Skann for meny & bestilling', noTable:'Bordnummer mangler', noTableBody:'Skann QR-koden pa bordet ditt. Forst da kan bestillingen knyttes til riktig bord.', menu:'Meny',
     all:'Alle', veg:'Vegetar', gf:'Glutenfri',
     add:'Legg til', cart:'Se bestilling', order:'Send bestilling',
     yourOrder:'Din bestilling', tableIs:'Bord', empty:'Ingen retter valgt ennå.',
@@ -481,7 +495,7 @@ const T = {
   },
   en:{
     tagline:'Seafood &amp; grill at the cruise quay · since 1993',
-    table:'Table', myOrders:'Your orders', histEmpty:'No orders at this table yet.', grandTotal:'Total so far', stNew:'Received', stAcc:'Accepted', stRdy:'Ready', stSrv:'Served', noTable:'Table number missing', noTableBody:'Please scan the QR code on your table. Only then can the order be assigned to the right table.', menu:'Menu',
+    table:'Table', myOrders:'Your orders', histEmpty:'No orders at this table yet.', grandTotal:'Total so far', stNew:'Received', stAcc:'Accepted', stRdy:'Ready', stSrv:'Served', dGuest:'Guest', dWaiter:'Waiter', dQr:'QR', wTitle:'Waiter panel', wSub:'Live orders', wFoot:'Each waiter only sees their own tables. A call gives sound + vibration and rings again every 45 seconds until acknowledged.', wAllTables:'All tables', wZone:'Zone', wSoundOn:'Sound on', wSoundOff:'Turn on sound', wLoggedIn:'You are signed in as <b>{name}</b> and are alerted only for tables {from}–{to}. Other waiters are not notified.', wHeadView:'View for the head waiter / kitchen: all 30 tables. In service each waiter signs in to their own zone.', wEmpty:'No active orders.', wEmptyHint:'Place an order or press “Call the waiter” in the guest view.', wCalling:'Calling the waiter', wBillReq:'Asking for the bill', wHandled:'Handled', wAccept:'Accept', wReady:'Ready from kitchen', wServedBtn:'Served', wRemove:'Remove', qrTitle:'QR codes · 30 tables', qrSub:'Each code opens the menu with its own table number. Print, laminate, place on the table.', qrBase:'Base URL', qrCount:'Number of tables', qrGen:'Create QR codes', qrPrint:'Print sheet', qrScan:'Scan for menu & order', noTable:'Table number missing', noTableBody:'Please scan the QR code on your table. Only then can the order be assigned to the right table.', menu:'Menu',
     all:'All', veg:'Vegetarian', gf:'Gluten free',
     add:'Add', cart:'View order', order:'Send order',
     yourOrder:'Your order', tableIs:'Table', empty:'Nothing selected yet.',
@@ -502,7 +516,7 @@ const T = {
   },
   de:{
     tagline:'Fisch &amp; Grill am Kreuzfahrtkai · seit 1993',
-    table:'Tisch', myOrders:'Ihre Bestellungen', histEmpty:'Noch keine Bestellung an diesem Tisch.', grandTotal:'Summe bisher', stNew:'Eingegangen', stAcc:'Angenommen', stRdy:'Fertig', stSrv:'Serviert', noTable:'Tischnummer fehlt', noTableBody:'Bitte scannen Sie den QR-Code an Ihrem Tisch. Erst dann kann die Bestellung dem richtigen Tisch zugeordnet werden.', menu:'Speisekarte',
+    table:'Tisch', myOrders:'Ihre Bestellungen', histEmpty:'Noch keine Bestellung an diesem Tisch.', grandTotal:'Summe bisher', stNew:'Eingegangen', stAcc:'Angenommen', stRdy:'Fertig', stSrv:'Serviert', dGuest:'Gast', dWaiter:'Service', dQr:'QR', wTitle:'Servicepanel', wSub:'Live-Bestellungen', wFoot:'Jede Station sieht nur ihre Tische. Ein Ruf löst Ton und Vibration aus und wiederholt sich alle 45 Sekunden, bis er quittiert ist.', wAllTables:'Alle Tische', wZone:'Zone', wSoundOn:'Ton an', wSoundOff:'Ton einschalten', wLoggedIn:'Angemeldet als <b>{name}</b> – Sie werden nur für die Tische {from}–{to} benachrichtigt. Andere Stationen nicht.', wHeadView:'Ansicht für Restaurantleitung und Küche: alle 30 Tische. Im Betrieb meldet sich jede Station in ihrer eigenen Zone an.', wEmpty:'Keine offenen Bestellungen.', wEmptyHint:'In der Gastansicht bestellen oder den Serviceruf auslösen.', wCalling:'Ruft den Service', wBillReq:'Bittet um die Rechnung', wHandled:'Erledigt', wAccept:'Annehmen', wReady:'Fertig aus der Küche', wServedBtn:'Serviert', wRemove:'Entfernen', qrTitle:'QR-Codes · 30 Tische', qrSub:'Jeder Code öffnet die Karte mit seiner eigenen Tischnummer. Ausdrucken, laminieren, auf den Tisch stellen.', qrBase:'Basis-URL', qrCount:'Anzahl Tische', qrGen:'QR-Codes erzeugen', qrPrint:'Blatt drucken', qrScan:'Scannen für Karte & Bestellung', noTable:'Tischnummer fehlt', noTableBody:'Bitte scannen Sie den QR-Code an Ihrem Tisch. Erst dann kann die Bestellung dem richtigen Tisch zugeordnet werden.', menu:'Speisekarte',
     all:'Alle', veg:'Vegetarisch', gf:'Glutenfrei',
     add:'Hinzufügen', cart:'Bestellung ansehen', order:'Bestellung senden',
     yourOrder:'Ihre Bestellung', tableIs:'Tisch', empty:'Noch nichts ausgewählt.',
@@ -781,6 +795,23 @@ function renderStatic(){
   $('#bellBig').setAttribute('aria-label', t('callWaiter'));
   $('#svcBill').innerHTML = `${t('bill')}<small>${t('billSub')}</small>`;
   renderMyOrdersBtn();
+
+  /* Demo-Leiste, Servicepanel und QR-Ansicht folgen jetzt derselben Sprache
+     wie die Gastansicht — vorher waren sie fest norwegisch. */
+  $('#dbGuest').textContent     = t('dGuest');
+  $('#dbWaiterLbl').textContent = t('dWaiter');
+  $('#dbQr').textContent        = t('dQr');
+  $('#wTitle').textContent      = t('wTitle');
+  $('#wSub').textContent        = t('wSub');
+  $('#wFoot').textContent       = t('wFoot');
+  $('#qrTitle').textContent     = t('qrTitle');
+  $('#qrSub').textContent       = t('qrSub');
+  $('#qrBaseLbl').textContent   = t('qrBase');
+  $('#qrCountLbl').textContent  = t('qrCount');
+  $('#genQr').textContent       = t('qrGen');
+  $('#qrPrintBtn').textContent  = t('qrPrint');
+  urlHint();
+  renderOrders();
   $('#cartLabel').textContent = t('cart');
   $$('.lang').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
 }
@@ -898,49 +929,49 @@ const STLBL = {new:'NY', accepted:'MOTTATT', ready:'KLAR', served:'SERVERT'};
 const STCLS = {new:'st-new', accepted:'st-acc', ready:'st-rdy', served:'st-srv'};
 function renderWaiterSel(){
   const cnt = id => orders.filter(o => o.status === 'new' && (id === 'all' || o.waiter === id)).length;
-  const items = [{id:'all', name:'Alle bord', zone:'1–30'}].concat(WAITERS);
+  const items = [{id:'all', name:t('wAllTables'), zone:'1–30'}].concat(WAITERS);
   $('#waiterSel').innerHTML = items.map(w => {
     const n = cnt(w.id);
-    const rng = w.id === 'all' ? w.zone : `Sone ${w.zone} · ${w.from}–${w.to}`;
+    const rng = w.id === 'all' ? w.zone : `${t('wZone')} ${w.zone} · ${w.from}–${w.to}`;
     return `<button class="wchip${activeWaiter===w.id?' on':''}" data-w="${w.id}">${w.name}<b>${rng}</b>${n?` <span style="color:var(--alert)">●${n}</span>`:''}</button>`;
-  }).join('') + `<button class="sound${soundOn?' on':''}" id="soundBtn">${soundOn?'Lyd på':'Slå på lyd'}</button>`;
+  }).join('') + `<button class="sound${soundOn?' on':''}" id="soundBtn">${soundOn?t('wSoundOn'):t('wSoundOff')}</button>`;
   const w = WAITERS.find(x => x.id === activeWaiter);
   $('#waiterNote').innerHTML = w
-    ? `Du er logget inn som <b style="color:var(--sun)">${w.name}</b> og får varsel kun for bord ${w.from}–${w.to}. Andre servitører varsles ikke.`
-    : `Visning for hovmester / kjøkken: alle 30 bord. I drift logger hver servitør seg inn på sin egen sone.`;
+    ? t('wLoggedIn').replace('{name}', w.name).replace('{from}', w.from).replace('{to}', w.to)
+    : t('wHeadView');
 }
 function renderOrders(){
   renderWaiterSel();
   const list = orders.filter(mine);
   if(!list.length){
-    $('#orderRoot').innerHTML = `<div class="empty">Ingen aktive bestillinger.<br><span style="font-size:11px">Legg inn en bestilling eller trykk «Tilkall servitør» i gjestevisningen.</span></div>`;
+    $('#orderRoot').innerHTML = `<div class="empty">${t('wEmpty')}<br><span style="font-size:11px">${t('wEmptyHint')}</span></div>`;
     return;
   }
   $('#orderRoot').innerHTML = list.map(o => {
     if(o.type !== 'order'){
-      const txt = o.type === 'waiter' ? 'Tilkaller servitør' : 'Ber om regningen';
+      const txt = o.type === 'waiter' ? t('wCalling') : t('wBillReq');
       return `<div class="order call">
-        <div class="o-top"><span class="o-table alert">Bord ${o.table}</span>
+        <div class="o-top"><span class="o-table alert">${t('table')} ${o.table}</span>
         <span class="o-id">${o.wname}</span>
         <span class="elapsed" data-ts="${o.ts}"></span>
         <span class="o-time">${o.time}</span></div>
         <div class="o-items" style="color:var(--alert)">${txt}</div>
         <div class="o-foot"><span class="o-total"></span>
-          <button class="sbtn act" data-done="${o.no}">Håndtert</button></div>
+          <button class="sbtn act" data-done="${o.no}">${t('wHandled')}</button></div>
       </div>`;
     }
     const next = {new:'accepted', accepted:'ready', ready:'served'}[o.status];
-    const nextLbl = {accepted:'Ta imot', ready:'Klar fra kjøkken', served:'Servert'}[next];
+    const nextLbl = {accepted:t('wAccept'), ready:t('wReady'), served:t('wServedBtn')}[next];
     return `<div class="order${o.status==='new'?' new':''}">
-      <div class="o-top"><span class="o-table">Bord ${o.table}</span>
+      <div class="o-top"><span class="o-table">${t('table')} ${o.table}</span>
         <span class="o-id">${o.wname} · #${o.no}</span>
-        <span class="status ${STCLS[o.status]}">${STLBL[o.status]}</span>
+        <span class="status ${STCLS[o.status]}">${guestStatus(o).toUpperCase()}</span>
         <span class="o-time">${o.time}</span></div>
       <div class="o-items">${o.items.map(i=>`<div><span>${i.q}×</span>${i.n}${i.s?` <em style="color:var(--muted);font-style:normal">(${i.s})</em>`:''}</div>`).join('')}</div>
       ${o.note?`<div class="o-note">${o.note.replace(/</g,'&lt;')}</div>`:''}
       <div class="o-foot"><span class="o-total">${kr(o.total)}</span>
         ${next?`<button class="sbtn act" data-next="${o.no}">${nextLbl}</button>`:''}
-        <button class="sbtn" data-done="${o.no}">Fjern</button></div>
+        <button class="sbtn" data-done="${o.no}">${t('wRemove')}</button></div>
     </div>`;
   }).join('');
 }
@@ -1014,7 +1045,7 @@ function genQR(){
     card.className = 'qrcard';
     card.innerHTML = `<div class="qbox"></div>
       <div class="qn">${String(i).padStart(2,'0')}</div>
-      <div class="qt">Skann for meny &amp; bestilling<br>Scan for menu &amp; order<br>Scannen für Karte &amp; Bestellung</div>`;
+      <div class="qt">${t('qrScan')}<br>Scan for menu &amp; order</div>`;
     grid.appendChild(card);
     if(typeof QRCode !== 'undefined'){
       new QRCode(card.querySelector('.qbox'), {text:url, width:208, height:208, correctLevel:QRCode.CorrectLevel.M});
@@ -1132,7 +1163,7 @@ setInterval(() => {
    ============================================================ */
 T.tr = {
   tagline:'Cruise limanında deniz ürünleri &amp; ızgara · 1993\u2019ten beri',
-  table:'Masa', myOrders:'Siparişleriniz', histEmpty:'Bu masada henüz sipariş yok.', grandTotal:'Şu ana kadar toplam', stNew:'Alındı', stAcc:'Onaylandı', stRdy:'Hazır', stSrv:'Servis edildi', noTable:'Masa numarası yok', noTableBody:'Lütfen masanızdaki QR kodu okutun. Sipariş ancak o zaman doğru masaya iletilir.', menu:'Menü',
+  table:'Masa', myOrders:'Siparişleriniz', histEmpty:'Bu masada henüz sipariş yok.', grandTotal:'Şu ana kadar toplam', stNew:'Alındı', stAcc:'Onaylandı', stRdy:'Hazır', stSrv:'Servis edildi', dGuest:'Misafir', dWaiter:'Garson', dQr:'QR', wTitle:'Garson paneli', wSub:'Canlı siparişler', wFoot:'Her garson yalnızca kendi masalarını görür. Çağrı ses ve titreşim verir, onaylanana kadar 45 saniyede bir tekrarlar.', wAllTables:'Tüm masalar', wZone:'Bölge', wSoundOn:'Ses açık', wSoundOff:'Sesi aç', wLoggedIn:'<b>{name}</b> olarak giriş yaptınız; yalnızca {from}–{to} masaları için bildirim alırsınız. Diğer garsonlara bildirim gitmez.', wHeadView:'Restoran müdürü ve mutfak görünümü: 30 masanın tamamı. Serviste her garson kendi bölgesine giriş yapar.', wEmpty:'Açık sipariş yok.', wEmptyHint:'Misafir görünümünden sipariş verin veya “Garson çağır”a basın.', wCalling:'Garson çağırıyor', wBillReq:'Hesap istiyor', wHandled:'İlgilenildi', wAccept:'Onayla', wReady:'Mutfaktan hazır', wServedBtn:'Servis edildi', wRemove:'Kaldır', qrTitle:'QR kodları · 30 masa', qrSub:'Her kod menüyü kendi masa numarasıyla açar. Yazdırın, laminatlayın, masaya koyun.', qrBase:'Temel adres', qrCount:'Masa sayısı', qrGen:'QR kodları oluştur', qrPrint:'Sayfayı yazdır', qrScan:'Menü ve sipariş için okutun', noTable:'Masa numarası yok', noTableBody:'Lütfen masanızdaki QR kodu okutun. Sipariş ancak o zaman doğru masaya iletilir.', menu:'Menü',
   all:'Tümü', veg:'Vejetaryen', gf:'Glutensiz',
   add:'Ekle', cart:'Siparişi gör', order:'Siparişi gönder',
   yourOrder:'Siparişiniz', tableIs:'Masa', empty:'Henüz seçim yapılmadı.',
@@ -1153,7 +1184,7 @@ T.tr = {
 };
 T.zh = {
   tagline:'邮轮码头旁的海鲜与炭烤 · 始于1993年',
-  table:'桌号', myOrders:'您的订单', histEmpty:'此桌尚无订单。', grandTotal:'目前合计', stNew:'已收到', stAcc:'已确认', stRdy:'已就绪', stSrv:'已上菜', noTable:'缺少桌号', noTableBody:'请扫描您桌上的二维码。只有这样订单才能送到正确的桌子。', menu:'菜单',
+  table:'桌号', myOrders:'您的订单', histEmpty:'此桌尚无订单。', grandTotal:'目前合计', stNew:'已收到', stAcc:'已确认', stRdy:'已就绪', stSrv:'已上菜', dGuest:'客人', dWaiter:'服务员', dQr:'二维码', wTitle:'服务员面板', wSub:'实时订单', wFoot:'每位服务员只看到自己的桌子。呼叫会有声音和震动，并每 45 秒重复一次，直到确认。', wAllTables:'所有桌子', wZone:'区域', wSoundOn:'声音已开', wSoundOff:'开启声音', wLoggedIn:'您以 <b>{name}</b> 身份登录，仅接收 {from}–{to} 桌的提醒。其他服务员不会收到通知。', wHeadView:'主管与厨房视图：全部 30 张桌子。运营时每位服务员登录自己的区域。', wEmpty:'暂无进行中的订单。', wEmptyHint:'在客人视图下点单，或按“呼叫服务员”。', wCalling:'正在呼叫服务员', wBillReq:'请求结账', wHandled:'已处理', wAccept:'接单', wReady:'厨房已备好', wServedBtn:'已上菜', wRemove:'移除', qrTitle:'二维码 · 30 张桌子', qrSub:'每个码都会以自己的桌号打开菜单。打印、覆膜、放在桌上。', qrBase:'基础网址', qrCount:'桌子数量', qrGen:'生成二维码', qrPrint:'打印页面', qrScan:'扫码查看菜单并下单', noTable:'缺少桌号', noTableBody:'请扫描您桌上的二维码。只有这样订单才能送到正确的桌子。', menu:'菜单',
   all:'全部', veg:'素食', gf:'无麸质',
   add:'加入', cart:'查看订单', order:'提交订单',
   yourOrder:'您的订单', tableIs:'桌号', empty:'尚未选择菜品。',
