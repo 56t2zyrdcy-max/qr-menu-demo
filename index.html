@@ -682,6 +682,15 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
   </div>
 </div>
 
+<!-- Firebase SDK: Auth (anonyme Gastsitzung), App Check (reCAPTCHA v3)
+     und Realtime Database (echte Push-Updates statt Polling).
+     Laedt eines dieser Skripte nicht, laeuft die Seite automatisch
+     im reinen Geraete-Modus weiter. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
 <script>
 /* ==========================================================
    CHURRASCARIA STEAKHOUSE — digitale Menükarte
@@ -1082,56 +1091,114 @@ const COOK = [
 
 
 /* ============================================================
-   SYNCHRONISATION
-   Ohne CLOUD.url: nur dieses Gerät (Tabs synchron, Neustart-fest).
-   Mit CLOUD.url: alle Geräte in Echtzeit über Firebase Realtime DB.
+   SYNCHRONISATION — Firebase SDK
+   Ohne Firebase SDK: nur dieses Gerät (Tabs synchron, Neustart-fest).
+   Mit SDK: alle Geräte in Echtzeit, anonyme Gastsitzung, App Check.
+
+   Früher lief das über die REST-Schnittstelle (fetch/PATCH), einen
+   EventSource-Stream und ein Polling alle 4 Sekunden. Der Umbau auf das
+   SDK bringt drei Dinge: echte Push-Updates (Bestellungen erscheinen
+   sofort statt bis zu 4 Sekunden später), eine Offline-Warteschlange
+   (schwaches Bordnetz — Schreibvorgänge werden nachgeholt, sobald die
+   Verbindung zurück ist) und App Check, das mit EventSource technisch
+   nicht möglich war, weil dort keine HTTP-Header gesetzt werden können.
    ============================================================ */
-const CLOUD = { url:'https://djozmen-53d67-default-rtdb.europe-west1.firebasedatabase.app', node:'qrmenu/churrascaria' };
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBcGSMD9MCmSml8epSDbCnkykyk1wW-w6E",
+  authDomain: "djozmen-53d67.firebaseapp.com",
+  databaseURL: "https://djozmen-53d67-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "djozmen-53d67",
+  storageBucket: "djozmen-53d67.firebasestorage.app",
+  messagingSenderId: "1097752024636",
+  appId: "1:1097752024636:web:1c022d20fba91a2d6e5539"
+};
+/* Öffentlicher reCAPTCHA-v3-Websiteschlüssel. Gehört in den Quelltext —
+   der geheime Schlüssel liegt ausschließlich in der Firebase Console. */
+const RECAPTCHA_SITE_KEY = "6Lc0VWwtAAAAAH_TPLUbDocEpUwQ7v6ryqNpB_B1";
+
+const CLOUD = { url: FIREBASE_CONFIG.databaseURL, node:'qrmenu/churrascaria' };
 
 const SYNC = (function(){
   const KEY='chs_orders_v1';
-  const on  = CLOUD.url && /^https?:\/\//.test(CLOUD.url);
-  let MAP={}, bc=null, notify=()=>{}, poll=null, live=false;
+  const on  = !!(window.firebase && CLOUD.url);
+  let MAP={}, bc=null, notify=()=>{}, live=false, ordersRef=null;
+  const pending = new Set();          // lokal gespeichert, noch nicht bestätigt
 
   const load=()=>{ try{ return JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ return {}; } };
   const stash=m=>{ try{ localStorage.setItem(KEY, JSON.stringify(m)); }catch(e){} };
 
-  function apply(m){ MAP=m||{}; notify(MAP); }
-
-  const path = ()=> CLOUD.url.replace(/\/$/,'') + '/' + (CLOUD.node||'qrmenu') + '/orders.json';
+  function apply(m){ MAP=m||{}; stash(MAP); notify(MAP); }
 
   function push(one){
     stash(MAP);
     if(bc) try{ bc.postMessage(MAP); }catch(e){}
-    if(on && one) fetch(path(), {method:'PATCH',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({[one.id]: one})}).catch(()=>{});   // nur diesen Datensatz, nichts überschreiben
+    if(ordersRef && one){
+      pending.add(one.id);
+      ordersRef.child(one.id).set(one)
+        .then(()=>{ pending.delete(one.id); })
+        .catch(e=>{ console.warn('Schreiben fehlgeschlagen:', e && (e.code||e.message)); });
+    }
     notify(MAP);
   }
-  function pull(){
-    if(!on) return;
-    fetch(path()).then(r=>r.json())
-      .then(d=>{ live=true; apply(Object.assign({}, d||{}, MAP)); })
-      .catch(()=>{ live=false; notify(MAP); });
+
+  async function connect(){
+    firebase.initializeApp(FIREBASE_CONFIG);
+
+    if(firebase.appCheck && RECAPTCHA_SITE_KEY){
+      try{ firebase.appCheck().activate(RECAPTCHA_SITE_KEY, true); }
+      catch(e){ console.warn('App Check nicht aktiv:', e && e.message); }
+    }
+
+    await firebase.auth().signInAnonymously();
+
+    const db = firebase.database();
+    const base = (CLOUD.node||'qrmenu') + '/orders';
+    ordersRef = db.ref(base);
+
+    db.ref('.info/connected').on('value', s=>{ live = !!s.val(); notify(MAP); });
+
+    ordersRef.on('value', snap=>{
+      // Serverstand gewinnt. Nur eigene, noch nicht bestätigte Datensätze
+      // bleiben stehen — sonst überschreibt ein altes lokales Exemplar
+      // dauerhaft die Änderung eines anderen Geräts.
+      const remote = snap.val() || {};
+      const keep = {};
+      pending.forEach(id => { if(MAP[id]) keep[id] = MAP[id]; });
+      apply(Object.assign({}, remote, keep));
+    }, err=>{
+      console.warn('Lesen fehlgeschlagen:', err && (err.code||err.message));
+      live=false; notify(MAP);
+    });
+
+    cleanupOld(db, base);
   }
-  function startPoll(){ if(poll) return; poll=setInterval(pull, 4000); pull(); }
+
+  /* Aufräumen: Bestellungen älter als sieben Servicetage löschen.
+     Genau so weit reicht die Verlaufsansicht, deshalb dieselbe Frist. */
+  function cleanupOld(db, base){
+    const cutoff = Date.now() - 7*24*3600*1000;
+    db.ref(base).orderByChild('ts').endAt(cutoff).once('value')
+      .then(snap=>{
+        let n=0;
+        snap.forEach(c=>{ db.ref(base + '/' + c.key).remove(); n++; });
+        if(n) console.log('Aufräumen: ' + n + ' alte Bestellung(en) entfernt.');
+      })
+      .catch(e=>console.warn('Aufräumen übersprungen:', e && (e.code||e.message)));
+  }
 
   function init(cb){
     notify=cb;
     MAP = load();
     try{ bc=new BroadcastChannel('chs_orders'); bc.onmessage=e=>apply(e.data); }catch(e){}
     window.addEventListener('storage', e=>{ if(e.key===KEY) apply(load()); });
-    if(on){
-      try{
-        const es=new EventSource(path());
-        es.addEventListener('put', e=>{ live=true;
-          try{ const d=JSON.parse(e.data); if(d.path==='/') apply(d.data||{}); else pull(); }catch(err){ pull(); } });
-        es.addEventListener('patch', ()=>pull());
-        es.onerror = ()=>{ live=false; startPoll(); };
-      }catch(e){ startPoll(); }
-    }
     notify(MAP);
+    if(!on){ console.warn('Firebase SDK nicht geladen — nur dieses Gerät.'); return; }
+    connect().catch(e=>{
+      console.error('Cloud-Synchronisation fehlgeschlagen:', e);
+      live=false; notify(MAP);
+    });
   }
+
   return {
     init, all:()=>MAP,
     save(o){ MAP[o.id]=o; push(o); },
