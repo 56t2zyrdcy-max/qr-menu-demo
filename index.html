@@ -588,11 +588,6 @@ textarea{width:100%;margin-top:12px;background:#fff;border:1px solid var(--rule-
         </span>
       </div>
 
-      <div class="tablepick" id="tablePickWrap">
-        <label id="tablePickLbl"></label>
-        <select id="tablePick" aria-label="Tisch"></select>
-      </div>
-
       <div class="langbar">
         <button class="lang on" data-lang="de">DEUTSCH</button>
         <button class="lang" data-lang="en">ENGLISH</button>
@@ -707,7 +702,7 @@ const ART = {
 
 /* ---------------- UI-Texte ---------------- */
 const T = {
-de:{sub:'Brasilianisches Grillhaus an Bord', cookTitle:'Garstufe wählen', cookNote:'Ihre Auswahl geht direkt an den Grill.', index:'Inhalt', pickTable:'Tisch wählen', myOrders:'Ihre Bestellungen', histEmpty:'Noch keine Bestellung an diesem Tisch.', grandTotal:'Summe bisher', stNew:'Eingegangen', stAcc:'Angenommen', stRdy:'Fertig', stSrv:'Serviert', noteBtn:'Anmerkung', noteEdit:'Anmerkung ändern', noteTitle:'Anmerkung zu diesem Gericht', noteFree:'Eigener Text (optional)', noteSave:'Übernehmen', noteOne:'Gilt für eine Portion. Wählen Sie für weitere Portionen erneut.', orderNote:'Anmerkung für die ganze Bestellung', table:'Tisch',
+de:{sub:'Brasilianisches Grillhaus an Bord', cookTitle:'Garstufe wählen', cookNote:'Ihre Auswahl geht direkt an den Grill.', index:'Inhalt', pickTable:'Tisch wählen', myOrders:'Ihre Bestellungen', histEmpty:'Noch keine Bestellung an diesem Tisch.', grandTotal:'Summe bisher', stNew:'Eingegangen', stAcc:'Angenommen', stRdy:'Fertig', stSrv:'Serviert', noteBtn:'Anmerkung', noteEdit:'Anmerkung ändern', noteTitle:'Anmerkung zu diesem Gericht', noteFree:'Eigener Text (optional)', noteSave:'Übernehmen', noteOne:'Gilt für eine Portion. Wählen Sie für weitere Portionen erneut.', orderNote:'Anmerkung für die ganze Bestellung', table:'Tisch', noTable:'Tischnummer fehlt', noTableBody:'Bitte scannen Sie den QR-Code an Ihrem Tisch. Erst dann kann die Bestellung dem richtigen Tisch zugeordnet werden.',
   add:'Hinzufügen', cart:'Bestellung ansehen', order:'Bestellung senden',
   yourOrder:'Ihre Bestellung', tableIs:'Tisch', empty:'Noch nichts ausgewählt.',
   notes:'Allergien, Garstufe oder Wünsche? Hier eintragen – die Küche sieht Ihre Notiz.',
@@ -727,7 +722,7 @@ de:{sub:'Brasilianisches Grillhaus an Bord', cookTitle:'Garstufe wählen', cookN
   langNote:'<b>Fünf Sprachen sind aktiv: Deutsch, Englisch, Spanisch, Niederländisch, Türkisch.</b> Weitere Sprachen werden als einzelner Datenblock ergänzt – ohne neues Design. Naheliegend an Bord: Italienisch, Französisch, Portugiesisch, Russisch.',
   vegan:'vegan', alc:'enthält Alkohol', star:'Hinweis *'},
 
-en:{sub:'Brazilian grill house on board', cookTitle:'Choose your doneness', cookNote:'Your choice goes straight to the grill.', index:'Contents', pickTable:'Choose your table', myOrders:'Your orders', histEmpty:'No orders at this table yet.', grandTotal:'Total so far', stNew:'Received', stAcc:'Accepted', stRdy:'Ready', stSrv:'Served', noteBtn:'Note', noteEdit:'Change note', noteTitle:'Note for this dish', noteFree:'Your own words (optional)', noteSave:'Apply', noteOne:'Applies to one portion. Repeat for further portions.', orderNote:'Note for the whole order', table:'Table',
+en:{sub:'Brazilian grill house on board', cookTitle:'Choose your doneness', cookNote:'Your choice goes straight to the grill.', index:'Contents', pickTable:'Choose your table', myOrders:'Your orders', histEmpty:'No orders at this table yet.', grandTotal:'Total so far', stNew:'Received', stAcc:'Accepted', stRdy:'Ready', stSrv:'Served', noteBtn:'Note', noteEdit:'Change note', noteTitle:'Note for this dish', noteFree:'Your own words (optional)', noteSave:'Apply', noteOne:'Applies to one portion. Repeat for further portions.', orderNote:'Note for the whole order', table:'Table', noTable:'Table number missing', noTableBody:'Please scan the QR code on your table. Only then can the order be assigned to the right table.',
   add:'Select', cart:'View order', order:'Send order',
   yourOrder:'Your order', tableIs:'Table', empty:'Nothing selected yet.',
   notes:'Allergies, cooking preference or requests? Write here – the kitchen sees your note.',
@@ -747,7 +742,7 @@ en:{sub:'Brazilian grill house on board', cookTitle:'Choose your doneness', cook
   langNote:'<b>Five languages are live: German, English, Spanish, Dutch, Turkish.</b> Further languages are added as a single data block – no redesign needed. Obvious next steps on board: Italian, French, Portuguese, Russian.',
   vegan:'vegan', alc:'contains alcohol', star:'note *'},
 
-es:{sub:'Parrilla brasileña a bordo', cookTitle:'Elija el punto de cocción', cookNote:'Su elección va directamente a la parrilla.', index:'Contenido', pickTable:'Elija su mesa', myOrders:'Sus pedidos', histEmpty:'Aún no hay pedidos en esta mesa.', grandTotal:'Total hasta ahora', stNew:'Recibido', stAcc:'Aceptado', stRdy:'Listo', stSrv:'Servido', noteBtn:'Nota', noteEdit:'Cambiar nota', noteTitle:'Nota para este plato', noteFree:'Sus propias palabras (opcional)', noteSave:'Aplicar', noteOne:'Se aplica a una ración. Repita para más raciones.', orderNote:'Nota para todo el pedido', table:'Mesa',
+es:{sub:'Parrilla brasileña a bordo', cookTitle:'Elija el punto de cocción', cookNote:'Su elección va directamente a la parrilla.', index:'Contenido', pickTable:'Elija su mesa', myOrders:'Sus pedidos', histEmpty:'Aún no hay pedidos en esta mesa.', grandTotal:'Total hasta ahora', stNew:'Recibido', stAcc:'Aceptado', stRdy:'Listo', stSrv:'Servido', noteBtn:'Nota', noteEdit:'Cambiar nota', noteTitle:'Nota para este plato', noteFree:'Sus propias palabras (opcional)', noteSave:'Aplicar', noteOne:'Se aplica a una ración. Repita para más raciones.', orderNote:'Nota para todo el pedido', table:'Mesa', noTable:'Falta el número de mesa', noTableBody:'Escanee el código QR de su mesa. Solo así el pedido se asigna a la mesa correcta.',
   add:'Elegir', cart:'Ver pedido', order:'Enviar pedido',
   yourOrder:'Su pedido', tableIs:'Mesa', empty:'Aún no ha elegido nada.',
   notes:'¿Alergias, punto de cocción o peticiones? Escríbalo aquí: la cocina verá su nota.',
@@ -767,7 +762,7 @@ es:{sub:'Parrilla brasileña a bordo', cookTitle:'Elija el punto de cocción', c
   langNote:'<b>Cinco idiomas activos: alemán, inglés, español, neerlandés y turco.</b> Cada idioma nuevo se añade como un único bloque de datos, sin rediseñar nada. Siguientes candidatos a bordo: italiano, francés, portugués y ruso.',
   vegan:'vegano', alc:'contiene alcohol', star:'aviso *'},
 
-nl:{sub:'Braziliaans grillhuis aan boord', cookTitle:'Kies de gaarheid', cookNote:'Uw keuze gaat rechtstreeks naar de grill.', index:'Inhoud', pickTable:'Kies uw tafel', myOrders:'Uw bestellingen', histEmpty:'Nog geen bestelling aan deze tafel.', grandTotal:'Totaal tot nu toe', stNew:'Ontvangen', stAcc:'Aangenomen', stRdy:'Klaar', stSrv:'Geserveerd', noteBtn:'Notitie', noteEdit:'Notitie wijzigen', noteTitle:'Notitie bij dit gerecht', noteFree:'Eigen tekst (optioneel)', noteSave:'Toepassen', noteOne:'Geldt voor één portie. Herhaal voor meer porties.', orderNote:'Notitie voor de hele bestelling', table:'Tafel',
+nl:{sub:'Braziliaans grillhuis aan boord', cookTitle:'Kies de gaarheid', cookNote:'Uw keuze gaat rechtstreeks naar de grill.', index:'Inhoud', pickTable:'Kies uw tafel', myOrders:'Uw bestellingen', histEmpty:'Nog geen bestelling aan deze tafel.', grandTotal:'Totaal tot nu toe', stNew:'Ontvangen', stAcc:'Aangenomen', stRdy:'Klaar', stSrv:'Geserveerd', noteBtn:'Notitie', noteEdit:'Notitie wijzigen', noteTitle:'Notitie bij dit gerecht', noteFree:'Eigen tekst (optioneel)', noteSave:'Toepassen', noteOne:'Geldt voor één portie. Herhaal voor meer porties.', orderNote:'Notitie voor de hele bestelling', table:'Tafel', noTable:'Tafelnummer ontbreekt', noTableBody:'Scan de QR-code op uw tafel. Alleen dan komt de bestelling bij de juiste tafel terecht.',
   add:'Kiezen', cart:'Bestelling bekijken', order:'Bestelling versturen',
   yourOrder:'Uw bestelling', tableIs:'Tafel', empty:'Nog niets gekozen.',
   notes:'Allergieën, gaarheid of wensen? Schrijf het hier – de keuken ziet uw notitie.',
@@ -787,7 +782,7 @@ nl:{sub:'Braziliaans grillhuis aan boord', cookTitle:'Kies de gaarheid', cookNot
   langNote:'<b>Vijf talen zijn actief: Duits, Engels, Spaans, Nederlands en Turks.</b> Elke nieuwe taal wordt als één datablok toegevoegd – zonder nieuw ontwerp. Voor de hand liggend aan boord: Italiaans, Frans, Portugees, Russisch.',
   vegan:'vegan', alc:'bevat alcohol', star:'let op *'},
 
-tr:{sub:'Gemide Brezilya usulü ızgara evi', cookTitle:'Pişirme derecesini seçin', cookNote:'Seçiminiz doğrudan ızgaraya iletilir.', index:'İçindekiler', pickTable:'Masanızı seçin', myOrders:'Siparişleriniz', histEmpty:'Bu masada henüz sipariş yok.', grandTotal:'Şu ana kadar toplam', stNew:'Alındı', stAcc:'Onaylandı', stRdy:'Hazır', stSrv:'Servis edildi', noteBtn:'Not', noteEdit:'Notu değiştir', noteTitle:'Bu yemek için not', noteFree:'Kendi cümlenizle (isteğe bağlı)', noteSave:'Uygula', noteOne:'Tek porsiyon için geçerlidir. Diğer porsiyonlar için tekrarlayın.', orderNote:'Siparişin tamamı için not', table:'Masa',
+tr:{sub:'Gemide Brezilya usulü ızgara evi', cookTitle:'Pişirme derecesini seçin', cookNote:'Seçiminiz doğrudan ızgaraya iletilir.', index:'İçindekiler', pickTable:'Masanızı seçin', myOrders:'Siparişleriniz', histEmpty:'Bu masada henüz sipariş yok.', grandTotal:'Şu ana kadar toplam', stNew:'Alındı', stAcc:'Onaylandı', stRdy:'Hazır', stSrv:'Servis edildi', noteBtn:'Not', noteEdit:'Notu değiştir', noteTitle:'Bu yemek için not', noteFree:'Kendi cümlenizle (isteğe bağlı)', noteSave:'Uygula', noteOne:'Tek porsiyon için geçerlidir. Diğer porsiyonlar için tekrarlayın.', orderNote:'Siparişin tamamı için not', table:'Masa', noTable:'Masa numarası yok', noTableBody:'Lütfen masanızdaki QR kodu okutun. Sipariş ancak o zaman doğru masaya iletilir.',
   add:'Sepete ekle', cart:'Sepeti gör', order:'Siparişi gönder',
   yourOrder:'Siparişiniz', tableIs:'Masa', empty:'Henüz seçim yapılmadı.',
   notes:'Alerji, pişirme derecesi veya özel isteğiniz? Buraya yazın – mutfak notunuzu görür.',
@@ -1211,7 +1206,10 @@ const PARAMS = new URLSearchParams(location.search);
 const TABLE_FIXED = /^\d{1,2}$/.test(PARAMS.get('table')||PARAMS.get('tisch')||PARAMS.get('masa')||'');
 const DEMO_MODE = PARAMS.get('demo') === '1';
 const START_VIEW = ['service','qr'].includes(PARAMS.get('view')) ? PARAMS.get('view') : 'guest';
-let lang='de', table=11, cat='rodizio';
+/* Die Tischnummer kommt ausschliesslich aus dem QR-Code (?table=N).
+   Ohne Nummer bleibt sie leer — es wird keine geraten und der Gast kann
+   keine wählen, sonst landen Bestellungen am falschen Tisch. */
+let lang='de', table=null, cat='rodizio';
 const cart=[], orders=[];
 
 /* Gastsitzung — jeder Besuch bekommt eine eigene Kennung.
@@ -1349,8 +1347,7 @@ function renderStatic(){
   document.documentElement.lang = lang;
   $('#heroSub').textContent = t('sub');
   $('#tableLbl').textContent = t('table');
-  $('#tablePickLbl').textContent = t('pickTable');
-  $('#tableNum').textContent = table;
+  $('#tableNum').textContent = TABLE_FIXED ? table : '–';
   $('#legTitle').textContent = t('legTitle');
   $('#legStar').textContent  = t('legStar');
   $('#legAllerg').textContent= t('legAllerg');
@@ -1547,6 +1544,15 @@ function msgSheet(title,body){
 }
 
 /* ---------------- Bestellungen ---------------- */
+/* Ohne Tischnummer aus dem QR-Code wird nichts abgeschickt. Eine Bestellung
+   ohne Tisch ist für den Service wertlos, und raten wäre schlimmer als
+   nichts zu tun. */
+function requireTable(){
+  if(TABLE_FIXED && table) return true;
+  msgSheet(t('noTable'), t('noTableBody'));
+  return false;
+}
+
 function pushOrder(type){
   const w = zoneOf(table);
   const stamp = Date.now();
@@ -1734,6 +1740,7 @@ document.addEventListener('click', e=>{
   else if(el.dataset.view){ switchView(el.dataset.view); }
   else if(el.hasAttribute('data-close')){ closeSheet(); }
   else if(el.hasAttribute('data-send')){ if(!cart.length) return;
+    if(!requireTable()) return;
     const no=pushOrder('order'); cart.length=0; tableNote=''; renderCart(); showStrip(no); sentSheet(no); }
   else if(el.dataset.inc||el.dataset.dec){
     const key=el.dataset.inc||el.dataset.dec, it=cart.find(c=>c.key===key);
@@ -1760,9 +1767,11 @@ $('#histLink').onclick = historySheet;
 $('#myOrdersBtn').onclick = historySheet;
 $('#moreLang').onclick = ()=> $('#langNote').classList.toggle('on');
 $('#openCart').onclick = cartSheet;
-$('#svcBill').onclick  = ()=>{ pushOrder('bill'); msgSheet(t('billed'), t('billedBody')); };
+$('#svcBill').onclick  = ()=>{ if(!requireTable()) return;
+  pushOrder('bill'); msgSheet(t('billed'), t('billedBody')); };
 $('#bellBig').onclick  = e=>{
   const b=e.currentTarget; b.classList.add('ping'); setTimeout(()=>b.classList.remove('ping'),500);
+  if(!requireTable()) return;
   pushOrder('waiter');
   msgSheet(t('called'), t('calledBody'));
 };
@@ -1782,15 +1791,8 @@ function switchView(v){
   }
 }
 (function(){
-  const sel=$('#tablePick');
-  for(let i=1;i<=30;i++){ const o=document.createElement('option'); o.value=i; o.textContent=String(i);
-    if(i===table) o.selected=true; sel.appendChild(o); }
-  sel.onchange=()=>{ table=+sel.value; $('#tableNum').textContent=table;
-    SESS.touch(table); renderMyOrdersBtn(); };
-
-  /* Gast sieht die Tischauswahl nur, wenn der QR-Code keine Tischnummer mitgebracht hat */
-  const showPick = !TABLE_FIXED || DEMO_MODE;
-  $('#tablePickWrap').style.display = showPick ? '' : 'none';
+  /* Keine Tischauswahl in der Gastansicht. Die Nummer stammt allein aus dem
+     QR-Code am Tisch — ein zweiter, umschaltbarer Wert wäre eine Fehlerquelle. */
 
   /* Rollen: Gast (Standard) · ?view=service · ?view=qr · ?demo=1 zeigt den Umschalter */
   if(DEMO_MODE){ $('#demobar').hidden = false; document.body.classList.add('has-bar'); }
@@ -1820,7 +1822,7 @@ T.ru = {
   noteFree:'Свой текст (необязательно)', noteSave:'Применить',
   noteOne:'Относится к одной порции. Для других порций повторите.',
   orderNote:'Пожелание ко всему заказу',
-  table:'Стол',
+  table:'Стол', noTable:'Номер стола отсутствует', noTableBody:'Пожалуйста, отсканируйте QR-код на вашем столе. Только тогда заказ попадёт к нужному столу.',
   add:'Добавить', cart:'Посмотреть заказ', order:'Отправить заказ',
   yourOrder:'Ваш заказ', tableIs:'Стол', empty:'Пока ничего не выбрано.',
   notes:'Аллергия, прожарка или пожелания? Напишите здесь — кухня увидит вашу заметку.',
