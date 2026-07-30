@@ -431,7 +431,6 @@ textarea::placeholder{color:#6C858C}
     <button class="dbtn on" data-view="guest">Gjest</button>
     <button class="dbtn" data-view="waiter">Servitør<span class="badge" id="ordBadge" style="display:none">0</span></button>
     <button class="dbtn" data-view="qr">QR</button>
-    <select class="tsel" id="tablePick" aria-label="Bord"></select>
   </div>
 </div>
 
@@ -459,7 +458,7 @@ const ICONS = {
 const T = {
   no:{
     tagline:'Sjømat &amp; grill ved cruisekaia · siden 1993',
-    table:'Bord', menu:'Meny',
+    table:'Bord', noTable:'Bordnummer mangler', noTableBody:'Skann QR-koden pa bordet ditt. Forst da kan bestillingen knyttes til riktig bord.', menu:'Meny',
     all:'Alle', veg:'Vegetar', gf:'Glutenfri',
     add:'Legg til', cart:'Se bestilling', order:'Send bestilling',
     yourOrder:'Din bestilling', tableIs:'Bord', empty:'Ingen retter valgt ennå.',
@@ -480,7 +479,7 @@ const T = {
   },
   en:{
     tagline:'Seafood &amp; grill at the cruise quay · since 1993',
-    table:'Table', menu:'Menu',
+    table:'Table', noTable:'Table number missing', noTableBody:'Please scan the QR code on your table. Only then can the order be assigned to the right table.', menu:'Menu',
     all:'All', veg:'Vegetarian', gf:'Gluten free',
     add:'Add', cart:'View order', order:'Send order',
     yourOrder:'Your order', tableIs:'Table', empty:'Nothing selected yet.',
@@ -501,7 +500,7 @@ const T = {
   },
   de:{
     tagline:'Fisch &amp; Grill am Kreuzfahrtkai · seit 1993',
-    table:'Tisch', menu:'Speisekarte',
+    table:'Tisch', noTable:'Tischnummer fehlt', noTableBody:'Bitte scannen Sie den QR-Code an Ihrem Tisch. Erst dann kann die Bestellung dem richtigen Tisch zugeordnet werden.', menu:'Speisekarte',
     all:'Alle', veg:'Vegetarisch', gf:'Glutenfrei',
     add:'Hinzufügen', cart:'Bestellung ansehen', order:'Bestellung senden',
     yourOrder:'Ihre Bestellung', tableIs:'Tisch', empty:'Noch nichts ausgewählt.',
@@ -648,7 +647,11 @@ const MENU = [
 
 /* ---------- state ---------- */
 let lang = 'no';
-let table = 11;
+/* Bordnummeret kommer kun fra QR-koden (?table=N). Uten nummer forblir det
+   tomt — vi gjetter ikke, og gjesten kan ikke velge, ellers havner
+   bestillinger pa feil bord. */
+let table = null;
+let TABLE_FIXED = false;
 let cat = 'start';
 let filter = 'all';
 const cart = [];      // {key,id,name,size,price,qty}
@@ -709,7 +712,7 @@ const L = o => o[lang] || o.en || o.no;
   try{
     const p = new URLSearchParams(location.search);
     const v = parseInt(p.get('table') || p.get('bord') || p.get('masa'), 10);
-    if(v > 0 && v <= 99) table = v;
+    if(v > 0 && v <= 99){ table = v; TABLE_FIXED = true; }
   }catch(e){}
 })();
 
@@ -763,7 +766,7 @@ function renderStatic(){
   document.documentElement.lang = lang;
   $('#tagline').innerHTML = t('tagline');
   $('#tableLbl').textContent = t('table');
-  $('#tableNum').textContent = table;
+  $('#tableNum').textContent = TABLE_FIXED ? table : '–';
   $('#legTitle').textContent = t('legTitle');
   $('#legBody').innerHTML = t('legBody');
   $('#footNote').innerHTML = t('foot');
@@ -850,6 +853,14 @@ function msgSheet(title, body){
 }
 
 /* ---------- orders ---------- */
+/* Uten bordnummer fra QR-koden sendes ingenting. En bestilling uten bord er
+   ubrukelig for servitoren, og a gjette ville vaere verre enn a gjore ingenting. */
+function requireTable(){
+  if(TABLE_FIXED && table) return true;
+  msgSheet(t('noTable'), t('noTableBody'));
+  return false;
+}
+
 function pushOrder(type){
   const now = new Date();
   const w = zoneOf(table);
@@ -967,6 +978,7 @@ document.addEventListener('click', e => {
   else if(el.hasAttribute('data-close')){ closeSheet(); }
   else if(el.hasAttribute('data-send')){
     if(!cart.length) return;
+    if(!requireTable()) return;
     const no = pushOrder('order');
     cart.length = 0; renderCart(); sentSheet(no);
   }
@@ -991,11 +1003,13 @@ $('#moreLang').onclick = () => $('#langNote').classList.toggle('on');
 $('#openCart').onclick = cartSheet;
 
 function callWaiter(){
+  if(!requireTable()) return;
   const w = zoneOf(table);
   pushOrder('waiter');
   msgSheet(t('called'), (w ? `<b style="color:var(--sun)">${w.name}</b> · ` : '') + t('calledBody'));
 }
-$('#svcBill').onclick   = () => { pushOrder('bill'); msgSheet(t('billed'), t('billedBody')); };
+$('#svcBill').onclick   = () => { if(!requireTable()) return;
+  pushOrder('bill'); msgSheet(t('billed'), t('billedBody')); };
 function bellPress(e){
   const b = e.currentTarget;
   b.classList.add('ping');
@@ -1038,17 +1052,8 @@ function switchView(v){
   if(v === 'qr' && !$('#qrGrid').children.length) genQR();
 }
 
-/* table picker (demo only) */
-(function(){
-  const sel = $('#tablePick');
-  for(let i=1;i<=30;i++){
-    const o = document.createElement('option');
-    o.value = i; o.textContent = 'Bord ' + i;
-    if(i === table) o.selected = true;
-    sel.appendChild(o);
-  }
-  sel.onchange = () => { table = +sel.value; $('#tableNum').textContent = table; };
-})();
+/* Ingen bordvelger i gjestevisningen. Nummeret kommer utelukkende fra
+   QR-koden pa bordet — en ekstra, omstillbar verdi ville vaert en feilkilde. */
 
 /* clock */
 setInterval(() => {
@@ -1061,7 +1066,7 @@ setInterval(() => {
    ============================================================ */
 T.tr = {
   tagline:'Cruise limanında deniz ürünleri &amp; ızgara · 1993\u2019ten beri',
-  table:'Masa', menu:'Menü',
+  table:'Masa', noTable:'Masa numarası yok', noTableBody:'Lütfen masanızdaki QR kodu okutun. Sipariş ancak o zaman doğru masaya iletilir.', menu:'Menü',
   all:'Tümü', veg:'Vejetaryen', gf:'Glutensiz',
   add:'Ekle', cart:'Siparişi gör', order:'Siparişi gönder',
   yourOrder:'Siparişiniz', tableIs:'Masa', empty:'Henüz seçim yapılmadı.',
@@ -1082,7 +1087,7 @@ T.tr = {
 };
 T.zh = {
   tagline:'邮轮码头旁的海鲜与炭烤 · 始于1993年',
-  table:'桌号', menu:'菜单',
+  table:'桌号', noTable:'缺少桌号', noTableBody:'请扫描您桌上的二维码。只有这样订单才能送到正确的桌子。', menu:'菜单',
   all:'全部', veg:'素食', gf:'无麸质',
   add:'加入', cart:'查看订单', order:'提交订单',
   yourOrder:'您的订单', tableIs:'桌号', empty:'尚未选择菜品。',
