@@ -8,6 +8,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700&family=Karla:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!-- Firebase: anonym gjestesesjon, App Check og Realtime Database.
+     Laster ikke disse, faller siden tilbake til kun-denne-enheten. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <style>
 :root{
   --ink:#08222B;
@@ -478,7 +484,7 @@ const ICONS = {
 const T = {
   no:{
     tagline:'Sjømat &amp; grill ved cruisekaia · siden 1993',
-    table:'Bord', myOrders:'Mine bestillinger', histEmpty:'Ingen bestilling ved dette bordet enna.', grandTotal:'Totalt sa langt', stNew:'Mottatt', stAcc:'Bekreftet', stRdy:'Klar', stSrv:'Servert', dGuest:'Gjest', dWaiter:'Servitør', dQr:'QR', wTitle:'Servitørpanel', wSub:'Live bestillinger', wFoot:'Hver servitør ser kun sine bord. Tilkalling gir lyd + vibrasjon, og ringer på nytt hvert 45. sekund til den er kvittert ut.', wAllTables:'Alle bord', wZone:'Sone', wSoundOn:'Lyd på', wSoundOff:'Slå på lyd', wLoggedIn:'Du er logget inn som <b>{name}</b> og får varsel kun for bord {from}–{to}. Andre servitører varsles ikke.', wHeadView:'Visning for hovmester / kjøkken: alle 30 bord. I drift logger hver servitør seg inn på sin egen sone.', wEmpty:'Ingen aktive bestillinger.', wEmptyHint:'Legg inn en bestilling eller trykk «Tilkall servitør» i gjestevisningen.', wCalling:'Tilkaller servitør', wBillReq:'Ber om regningen', wHandled:'Håndtert', wAccept:'Ta imot', wReady:'Klar fra kjøkken', wServedBtn:'Servert', wRemove:'Fjern', qrTitle:'QR-koder · 30 bord', qrSub:'Hver kode åpner menyen med sitt eget bordnummer. Skriv ut, laminer, sett på bordet.', qrBase:'Base-URL', qrCount:'Antall bord', qrGen:'Lag QR-koder', qrPrint:'Skriv ut ark', qrScan:'Skann for meny & bestilling', qrHintEmpty:'Skriv inn nettadressen der denne menyen ligger. Uten gyldig adresse peker QR-kodene ingen steder.', noTable:'Bordnummer mangler', noTableBody:'Skann QR-koden pa bordet ditt. Forst da kan bestillingen knyttes til riktig bord.', menu:'Meny',
+    table:'Bord', myOrders:'Mine bestillinger', histEmpty:'Ingen bestilling ved dette bordet enna.', grandTotal:'Totalt sa langt', stNew:'Mottatt', stAcc:'Bekreftet', stRdy:'Klar', stSrv:'Servert', dGuest:'Gjest', dWaiter:'Servitør', dQr:'QR', wTitle:'Servitørpanel', wSub:'Live bestillinger', wFoot:'Hver servitør ser kun sine bord. Tilkalling gir lyd + vibrasjon, og ringer på nytt hvert 45. sekund til den er kvittert ut.', wAllTables:'Alle bord', wZone:'Sone', wSoundOn:'Lyd på', wSoundOff:'Slå på lyd', wLoggedIn:'Du er logget inn som <b>{name}</b> og får varsel kun for bord {from}–{to}. Andre servitører varsles ikke.', wHeadView:'Visning for hovmester / kjøkken: alle 30 bord. I drift logger hver servitør seg inn på sin egen sone.', wEmpty:'Ingen aktive bestillinger.', wEmptyHint:'Legg inn en bestilling eller trykk «Tilkall servitør» i gjestevisningen.', wCalling:'Tilkaller servitør', wBillReq:'Ber om regningen', wHandled:'Håndtert', wAccept:'Ta imot', wReady:'Klar fra kjøkken', wServedBtn:'Servert', wRemove:'Fjern', qrTitle:'QR-koder · 30 bord', qrSub:'Hver kode åpner menyen med sitt eget bordnummer. Skriv ut, laminer, sett på bordet.', qrBase:'Base-URL', qrCount:'Antall bord', qrGen:'Lag QR-koder', qrPrint:'Skriv ut ark', qrScan:'Skann for meny & bestilling', wConnCloud:'Tilkoblet – alle enheter', wConnOffline:'Ingen forbindelse til serveren', wConnLocal:'Bare denne enheten – bestillinger fra andre telefoner kommer ikke hit.', sendFail:'Kunne ikke sendes', sendFailBody:'Ingen forbindelse til serveren. Si det til servitoeren, eller proev igjen om et oeyeblikk.', qrHintEmpty:'Skriv inn nettadressen der denne menyen ligger. Uten gyldig adresse peker QR-kodene ingen steder.', noTable:'Bordnummer mangler', noTableBody:'Skann QR-koden pa bordet ditt. Forst da kan bestillingen knyttes til riktig bord.', menu:'Meny',
     all:'Alle', veg:'Vegetar', gf:'Glutenfri',
     add:'Legg til', cart:'Se bestilling', order:'Send bestilling',
     yourOrder:'Din bestilling', tableIs:'Bord', empty:'Ingen retter valgt ennå.',
@@ -499,7 +505,7 @@ const T = {
   },
   en:{
     tagline:'Seafood &amp; grill at the cruise quay · since 1993',
-    table:'Table', myOrders:'Your orders', histEmpty:'No orders at this table yet.', grandTotal:'Total so far', stNew:'Received', stAcc:'Accepted', stRdy:'Ready', stSrv:'Served', dGuest:'Guest', dWaiter:'Waiter', dQr:'QR', wTitle:'Waiter panel', wSub:'Live orders', wFoot:'Each waiter only sees their own tables. A call gives sound + vibration and rings again every 45 seconds until acknowledged.', wAllTables:'All tables', wZone:'Zone', wSoundOn:'Sound on', wSoundOff:'Turn on sound', wLoggedIn:'You are signed in as <b>{name}</b> and are alerted only for tables {from}–{to}. Other waiters are not notified.', wHeadView:'View for the head waiter / kitchen: all 30 tables. In service each waiter signs in to their own zone.', wEmpty:'No active orders.', wEmptyHint:'Place an order or press “Call the waiter” in the guest view.', wCalling:'Calling the waiter', wBillReq:'Asking for the bill', wHandled:'Handled', wAccept:'Accept', wReady:'Ready from kitchen', wServedBtn:'Served', wRemove:'Remove', qrTitle:'QR codes · 30 tables', qrSub:'Each code opens the menu with its own table number. Print, laminate, place on the table.', qrBase:'Base URL', qrCount:'Number of tables', qrGen:'Create QR codes', qrPrint:'Print sheet', qrScan:'Scan for menu & order', qrHintEmpty:'Enter the web address where this menu is hosted. Without a valid address the QR codes lead nowhere.', noTable:'Table number missing', noTableBody:'Please scan the QR code on your table. Only then can the order be assigned to the right table.', menu:'Menu',
+    table:'Table', myOrders:'Your orders', histEmpty:'No orders at this table yet.', grandTotal:'Total so far', stNew:'Received', stAcc:'Accepted', stRdy:'Ready', stSrv:'Served', dGuest:'Guest', dWaiter:'Waiter', dQr:'QR', wTitle:'Waiter panel', wSub:'Live orders', wFoot:'Each waiter only sees their own tables. A call gives sound + vibration and rings again every 45 seconds until acknowledged.', wAllTables:'All tables', wZone:'Zone', wSoundOn:'Sound on', wSoundOff:'Turn on sound', wLoggedIn:'You are signed in as <b>{name}</b> and are alerted only for tables {from}–{to}. Other waiters are not notified.', wHeadView:'View for the head waiter / kitchen: all 30 tables. In service each waiter signs in to their own zone.', wEmpty:'No active orders.', wEmptyHint:'Place an order or press “Call the waiter” in the guest view.', wCalling:'Calling the waiter', wBillReq:'Asking for the bill', wHandled:'Handled', wAccept:'Accept', wReady:'Ready from kitchen', wServedBtn:'Served', wRemove:'Remove', qrTitle:'QR codes · 30 tables', qrSub:'Each code opens the menu with its own table number. Print, laminate, place on the table.', qrBase:'Base URL', qrCount:'Number of tables', qrGen:'Create QR codes', qrPrint:'Print sheet', qrScan:'Scan for menu & order', wConnCloud:'Connected – all devices', wConnOffline:'No connection to the server', wConnLocal:'This device only – orders from other phones will not arrive here.', sendFail:'Could not be sent', sendFailBody:'No connection to the server. Please tell the waiter, or try again in a moment.', qrHintEmpty:'Enter the web address where this menu is hosted. Without a valid address the QR codes lead nowhere.', noTable:'Table number missing', noTableBody:'Please scan the QR code on your table. Only then can the order be assigned to the right table.', menu:'Menu',
     all:'All', veg:'Vegetarian', gf:'Gluten free',
     add:'Add', cart:'View order', order:'Send order',
     yourOrder:'Your order', tableIs:'Table', empty:'Nothing selected yet.',
@@ -520,7 +526,7 @@ const T = {
   },
   de:{
     tagline:'Fisch &amp; Grill am Kreuzfahrtkai · seit 1993',
-    table:'Tisch', myOrders:'Ihre Bestellungen', histEmpty:'Noch keine Bestellung an diesem Tisch.', grandTotal:'Summe bisher', stNew:'Eingegangen', stAcc:'Angenommen', stRdy:'Fertig', stSrv:'Serviert', dGuest:'Gast', dWaiter:'Service', dQr:'QR', wTitle:'Servicepanel', wSub:'Live-Bestellungen', wFoot:'Jede Station sieht nur ihre Tische. Ein Ruf löst Ton und Vibration aus und wiederholt sich alle 45 Sekunden, bis er quittiert ist.', wAllTables:'Alle Tische', wZone:'Zone', wSoundOn:'Ton an', wSoundOff:'Ton einschalten', wLoggedIn:'Angemeldet als <b>{name}</b> – Sie werden nur für die Tische {from}–{to} benachrichtigt. Andere Stationen nicht.', wHeadView:'Ansicht für Restaurantleitung und Küche: alle 30 Tische. Im Betrieb meldet sich jede Station in ihrer eigenen Zone an.', wEmpty:'Keine offenen Bestellungen.', wEmptyHint:'In der Gastansicht bestellen oder den Serviceruf auslösen.', wCalling:'Ruft den Service', wBillReq:'Bittet um die Rechnung', wHandled:'Erledigt', wAccept:'Annehmen', wReady:'Fertig aus der Küche', wServedBtn:'Serviert', wRemove:'Entfernen', qrTitle:'QR-Codes · 30 Tische', qrSub:'Jeder Code öffnet die Karte mit seiner eigenen Tischnummer. Ausdrucken, laminieren, auf den Tisch stellen.', qrBase:'Basis-URL', qrCount:'Anzahl Tische', qrGen:'QR-Codes erzeugen', qrPrint:'Blatt drucken', qrScan:'Scannen für Karte & Bestellung', qrHintEmpty:'Bitte die Web-Adresse eintragen, unter der diese Karte online liegt. Ohne gültige Adresse führen die QR-Codes ins Leere.', noTable:'Tischnummer fehlt', noTableBody:'Bitte scannen Sie den QR-Code an Ihrem Tisch. Erst dann kann die Bestellung dem richtigen Tisch zugeordnet werden.', menu:'Speisekarte',
+    table:'Tisch', myOrders:'Ihre Bestellungen', histEmpty:'Noch keine Bestellung an diesem Tisch.', grandTotal:'Summe bisher', stNew:'Eingegangen', stAcc:'Angenommen', stRdy:'Fertig', stSrv:'Serviert', dGuest:'Gast', dWaiter:'Service', dQr:'QR', wTitle:'Servicepanel', wSub:'Live-Bestellungen', wFoot:'Jede Station sieht nur ihre Tische. Ein Ruf löst Ton und Vibration aus und wiederholt sich alle 45 Sekunden, bis er quittiert ist.', wAllTables:'Alle Tische', wZone:'Zone', wSoundOn:'Ton an', wSoundOff:'Ton einschalten', wLoggedIn:'Angemeldet als <b>{name}</b> – Sie werden nur für die Tische {from}–{to} benachrichtigt. Andere Stationen nicht.', wHeadView:'Ansicht für Restaurantleitung und Küche: alle 30 Tische. Im Betrieb meldet sich jede Station in ihrer eigenen Zone an.', wEmpty:'Keine offenen Bestellungen.', wEmptyHint:'In der Gastansicht bestellen oder den Serviceruf auslösen.', wCalling:'Ruft den Service', wBillReq:'Bittet um die Rechnung', wHandled:'Erledigt', wAccept:'Annehmen', wReady:'Fertig aus der Küche', wServedBtn:'Serviert', wRemove:'Entfernen', qrTitle:'QR-Codes · 30 Tische', qrSub:'Jeder Code öffnet die Karte mit seiner eigenen Tischnummer. Ausdrucken, laminieren, auf den Tisch stellen.', qrBase:'Basis-URL', qrCount:'Anzahl Tische', qrGen:'QR-Codes erzeugen', qrPrint:'Blatt drucken', qrScan:'Scannen für Karte & Bestellung', wConnCloud:'Verbunden – alle Geräte', wConnOffline:'Keine Verbindung zum Server', wConnLocal:'Nur dieses Gerät – Bestellungen von anderen Handys kommen hier nicht an.', sendFail:'Konnte nicht gesendet werden', sendFailBody:'Keine Verbindung zum Server. Bitte sagen Sie es dem Service oder versuchen Sie es gleich noch einmal.', qrHintEmpty:'Bitte die Web-Adresse eintragen, unter der diese Karte online liegt. Ohne gültige Adresse führen die QR-Codes ins Leere.', noTable:'Tischnummer fehlt', noTableBody:'Bitte scannen Sie den QR-Code an Ihrem Tisch. Erst dann kann die Bestellung dem richtigen Tisch zugeordnet werden.', menu:'Speisekarte',
     all:'Alle', veg:'Vegetarisch', gf:'Glutenfrei',
     add:'Hinzufügen', cart:'Bestellung ansehen', order:'Bestellung senden',
     yourOrder:'Ihre Bestellung', tableIs:'Tisch', empty:'Noch nichts ausgewählt.',
@@ -912,8 +918,11 @@ function requireTable(){
 function pushOrder(type){
   const now = new Date();
   const w = zoneOf(table);
+  const stamp = Date.now();
   const o = {
-    no: ++ticketSeq, table, type,
+    /* Egen id: paa flere enheter kan lopenummer kollidere. */
+    id: stamp.toString(36) + Math.random().toString(36).slice(2,6),
+    no: String(stamp).slice(-4), table, type,
     waiter: w ? w.id : null, wname: w ? w.name : '—', zone: w ? w.zone : '—',
     ts: Date.now(), rang: Date.now(),
     items: type === 'order' ? cart.map(c => ({n:L(c.name), s:c.size?L(c.size):'', q:c.qty, p:c.price})) : [],
@@ -922,12 +931,12 @@ function pushOrder(type){
     status: 'new',
     time: now.toTimeString().slice(0,5)
   };
-  orders.unshift(o);
   if(activeWaiter === 'all' || activeWaiter === o.waiter){
     chime(type === 'order' ? 'order' : type === 'bill' ? 'bill' : 'waiter');
   }
+  const sent = SYNC.save(o);
   afterChange();
-  return o.no;
+  return { no: o.no, sent };
 }
 function mine(o){ return activeWaiter === 'all' || o.waiter === activeWaiter; }
 /* ============================================================
@@ -937,42 +946,128 @@ function mine(o){ return activeWaiter === 'all' || o.waiter === activeWaiter; }
    Egen noekkel — churrascaria-demoen ligger paa samme domene og
    bruker chs_orders_v1.
    ============================================================ */
-const STORE = (function(){
-  const KEY = 'fjord_orders_v1';
-  const KEEP = 7*24*3600*1000;          // sju servicedager
-  let bc = null, onRemote = () => {};
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBcGSMD9MCmSml8epSDbCnkykyk1wW-w6E",
+  authDomain: "djozmen-53d67.firebaseapp.com",
+  databaseURL: "https://djozmen-53d67-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "djozmen-53d67",
+  storageBucket: "djozmen-53d67.firebasestorage.app",
+  messagingSenderId: "1097752024636",
+  appId: "1:1097752024636:web:1c022d20fba91a2d6e5539"
+};
+const RECAPTCHA_SITE_KEY = "6Lc0VWwtAAAAAH_TPLUbDocEpUwQ7v6ryqNpB_B1";
+const CLOUD_NODE = 'qrmenu/fjordside/orders';
 
-  function read(){
+/* ============================================================
+   SYNKRONISERING
+   localStorage er offline-hurtigbuffer. Firebase gjoer at telefonen
+   til gjesten og servitoerens nettbrett ser samme bestillinger.
+   Uten Firebase (skript blokkert / ingen nett) virker siden fortsatt,
+   men bare paa denne enheten — og state() sier det aerlig.
+   ============================================================ */
+const SYNC = (function(){
+  const KEY = 'fjord_orders_v1';
+  const KEEP = 7*24*3600*1000;                 // sju servicedager
+  let MAP = {}, bc = null, notify = () => {}, live = false, ref = null;
+  const pending = new Set();                   // skrevet lokalt, ikke bekreftet
+
+  const fresh = () => Date.now() - KEEP;
+
+  function stash(){
+    try{ localStorage.setItem(KEY, JSON.stringify({map:MAP})); }catch(e){}
+  }
+  function readLocal(){
     try{
       const d = JSON.parse(localStorage.getItem(KEY) || 'null');
-      if(!d || !Array.isArray(d.orders)) return null;
-      const cutoff = Date.now() - KEEP;
-      d.orders = d.orders.filter(o => o && o.ts > cutoff);
-      return d;
-    }catch(e){ return null; }
+      if(!d) return {};
+      if(d.map) return d.map;
+      if(Array.isArray(d.orders)){            // gammelt format
+        const m = {}; d.orders.forEach(o => { if(o && o.id) m[o.id] = o; });
+        return m;
+      }
+      return {};
+    }catch(e){ return {}; }
   }
-  function save(){
-    try{ localStorage.setItem(KEY, JSON.stringify({orders, seq:ticketSeq})); }catch(e){}
+  function rebuild(){
+    const cutoff = fresh();
+    orders.length = 0;
+    Object.values(MAP)
+      .filter(o => o && o.ts > cutoff)
+      .sort((a,b) => b.ts - a.ts)
+      .forEach(o => orders.push(o));
+  }
+  function localChanged(){
+    stash();
     if(bc) try{ bc.postMessage('changed'); }catch(e){}
   }
-  function pull(){
-    const d = read(); if(!d) return;
-    orders.length = 0; d.orders.forEach(o => orders.push(o));
-    if(typeof d.seq === 'number' && d.seq > ticketSeq) ticketSeq = d.seq;
+
+  function save(o){
+    MAP[o.id] = o; rebuild(); localChanged();
+    if(!ref) return Promise.resolve(false);
+    pending.add(o.id);
+    return ref.child(o.id).set(o)
+      .then(() => { pending.delete(o.id); return true; })
+      .catch(e => { console.warn('Skriving feilet:', e && (e.code||e.message)); return false; });
   }
+  function remove(id){
+    delete MAP[id]; rebuild(); localChanged();
+    if(!ref) return Promise.resolve(false);
+    return ref.child(id).remove().then(() => true).catch(() => false);
+  }
+
+  async function connect(){
+    firebase.initializeApp(FIREBASE_CONFIG);
+    if(firebase.appCheck && RECAPTCHA_SITE_KEY){
+      try{ firebase.appCheck().activate(RECAPTCHA_SITE_KEY, true); }
+      catch(e){ console.warn('App Check ikke aktiv:', e && e.message); }
+    }
+    /* Minne-lagring: gjester trenger ingen varig sesjon, og enkelte
+       telefoner (privat modus paa iOS) blokkerer IndexedDB — da ville
+       innloggingen feilet og bestillingen aldri naadd serveren. */
+    try{ await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE); }catch(e){}
+    await firebase.auth().signInAnonymously();
+
+    const db = firebase.database();
+    ref = db.ref(CLOUD_NODE);
+    db.ref('.info/connected').on('value', s2 => { live = !!s2.val(); notify(); });
+
+    ref.on('value', snap => {
+      const remote = snap.val() || {};
+      const keep = {};
+      pending.forEach(id => { if(MAP[id]) keep[id] = MAP[id]; });
+      MAP = Object.assign({}, remote, keep);
+      rebuild(); stash(); notify();
+    }, err => {
+      console.warn('Lesing feilet:', err && (err.code||err.message));
+      live = false; notify();
+    });
+
+    /* Rydding: bestillinger eldre enn sju servicedager slettes. */
+    ref.orderByChild('ts').endAt(fresh()).once('value')
+      .then(sn => { let n=0; sn.forEach(c => { ref.child(c.key).remove(); n++; });
+        if(n) console.log('Ryddet ' + n + ' gamle bestillinger.'); })
+      .catch(() => {});
+  }
+
   function init(cb){
-    onRemote = cb || (()=>{});
-    pull();
-    try{ bc = new BroadcastChannel('fjord_orders'); bc.onmessage = () => { pull(); onRemote(); }; }catch(e){}
-    window.addEventListener('storage', e => { if(e.key === KEY){ pull(); onRemote(); } });
+    notify = cb || (() => {});
+    MAP = readLocal(); rebuild();
+    try{ bc = new BroadcastChannel('fjord_orders'); bc.onmessage = () => { MAP = readLocal(); rebuild(); notify(); }; }catch(e){}
+    window.addEventListener('storage', e => { if(e.key === KEY){ MAP = readLocal(); rebuild(); notify(); } });
+    notify();
+    if(!window.firebase){ console.warn('Firebase SDK mangler — kun denne enheten.'); return; }
+    connect().catch(e => { console.error('Skysynk feilet:', e); live = false; notify(); });
   }
-  return { init, save, pull };
+
+  return { init, save, remove, cloud: () => !!ref,
+           state: () => (window.firebase ? (live ? 'cloud' : 'cloud-offline') : 'local') };
 })();
 
-/* Ett sted for «noe endret seg» — tegn om og lagre. */
+/* Ett sted for «noe endret seg» — tegn om. */
 function afterChange(){
-  renderOrders(); badge(); renderMyOrdersBtn(); STORE.save();
+  renderOrders(); badge(); renderMyOrdersBtn();
 }
+
 
 function badge(){
   const n = orders.filter(o => o.status === 'new' && mine(o)).length;
@@ -991,9 +1086,13 @@ function renderWaiterSel(){
     return `<button class="wchip${activeWaiter===w.id?' on':''}" data-w="${w.id}">${w.name}<b>${rng}</b>${n?` <span style="color:var(--alert)">●${n}</span>`:''}</button>`;
   }).join('') + `<button class="sound${soundOn?' on':''}" id="soundBtn">${soundOn?t('wSoundOn'):t('wSoundOff')}</button>`;
   const w = WAITERS.find(x => x.id === activeWaiter);
-  $('#waiterNote').innerHTML = w
+  const st = SYNC.state();
+  const conn = st === 'cloud' ? `<b style="color:var(--ok)">● ${t('wConnCloud')}</b>`
+             : st === 'cloud-offline' ? `<b style="color:var(--alert)">● ${t('wConnOffline')}</b>`
+             : `<b style="color:var(--alert)">● ${t('wConnLocal')}</b>`;
+  $('#waiterNote').innerHTML = (w
     ? t('wLoggedIn').replace('{name}', w.name).replace('{from}', w.from).replace('{to}', w.to)
-    : t('wHeadView');
+    : t('wHeadView')) + '<br>' + conn;
 }
 function renderOrders(){
   renderWaiterSel();
@@ -1012,7 +1111,7 @@ function renderOrders(){
         <span class="o-time">${o.time}</span></div>
         <div class="o-items" style="color:var(--alert)">${txt}</div>
         <div class="o-foot"><span class="o-total"></span>
-          <button class="sbtn act" data-done="${o.no}">${t('wHandled')}</button></div>
+          <button class="sbtn act" data-done="${o.id}">${t('wHandled')}</button></div>
       </div>`;
     }
     const next = {new:'accepted', accepted:'ready', ready:'served'}[o.status];
@@ -1025,8 +1124,8 @@ function renderOrders(){
       <div class="o-items">${o.items.map(i=>`<div><span>${i.q}×</span>${i.n}${i.s?` <em style="color:var(--muted);font-style:normal">(${i.s})</em>`:''}</div>`).join('')}</div>
       ${o.note?`<div class="o-note">${o.note.replace(/</g,'&lt;')}</div>`:''}
       <div class="o-foot"><span class="o-total">${kr(o.total)}</span>
-        ${next?`<button class="sbtn act" data-next="${o.no}">${nextLbl}</button>`:''}
-        <button class="sbtn" data-done="${o.no}">${t('wRemove')}</button></div>
+        ${next?`<button class="sbtn act" data-next="${o.id}">${nextLbl}</button>`:''}
+        <button class="sbtn" data-done="${o.id}">${t('wRemove')}</button></div>
     </div>`;
   }).join('');
 }
@@ -1125,8 +1224,11 @@ document.addEventListener('click', e => {
   else if(el.hasAttribute('data-send')){
     if(!cart.length) return;
     if(!requireTable()) return;
-    const no = pushOrder('order');
-    cart.length = 0; renderCart(); sentSheet(no);
+    const r = pushOrder('order');
+    cart.length = 0; renderCart();
+    /* Vent paa serverens bekreftelse foer vi sier «sendt». Ellers ser
+       gjesten en kvittering for noe som aldri kom fram. */
+    r.sent.then(ok => { if(ok) sentSheet(r.no); else msgSheet(t('sendFail'), t('sendFailBody'), '!'); });
   }
   else if(el.dataset.inc || el.dataset.dec){
     const key = el.dataset.inc || el.dataset.dec;
@@ -1135,13 +1237,12 @@ document.addEventListener('click', e => {
     renderCart(); cartSheet();
   }
   else if(el.dataset.next){
-    const o = orders.find(x => x.no == el.dataset.next);
+    const o = orders.find(x => x.id === el.dataset.next);
     o.status = {new:'accepted', accepted:'ready', ready:'served'}[o.status];
-    afterChange();
+    SYNC.save(o); afterChange();
   }
   else if(el.dataset.done){
-    const i = orders.findIndex(x => x.no == el.dataset.done);
-    orders.splice(i,1); afterChange();
+    SYNC.remove(el.dataset.done); afterChange();
   }
 });
 
@@ -1152,11 +1253,15 @@ $('#histBtn').onclick  = historySheet;
 function callWaiter(){
   if(!requireTable()) return;
   const w = zoneOf(table);
-  pushOrder('waiter');
-  msgSheet(t('called'), (w ? `<b style="color:var(--sun)">${w.name}</b> · ` : '') + t('calledBody'));
+  const r = pushOrder('waiter');
+  r.sent.then(ok => ok
+    ? msgSheet(t('called'), (w ? `<b style="color:var(--sun)">${w.name}</b> · ` : '') + t('calledBody'))
+    : msgSheet(t('sendFail'), t('sendFailBody'), '!'));
 }
 $('#svcBill').onclick   = () => { if(!requireTable()) return;
-  pushOrder('bill'); msgSheet(t('billed'), t('billedBody')); };
+  pushOrder('bill').sent.then(ok => ok
+    ? msgSheet(t('billed'), t('billedBody'))
+    : msgSheet(t('sendFail'), t('sendFailBody'), '!')); };
 function bellPress(e){
   const b = e.currentTarget;
   b.classList.add('ping');
@@ -1238,7 +1343,7 @@ setInterval(() => {
    ============================================================ */
 T.tr = {
   tagline:'Cruise limanında deniz ürünleri &amp; ızgara · 1993\u2019ten beri',
-  table:'Masa', myOrders:'Siparişleriniz', histEmpty:'Bu masada henüz sipariş yok.', grandTotal:'Şu ana kadar toplam', stNew:'Alındı', stAcc:'Onaylandı', stRdy:'Hazır', stSrv:'Servis edildi', dGuest:'Misafir', dWaiter:'Garson', dQr:'QR', wTitle:'Garson paneli', wSub:'Canlı siparişler', wFoot:'Her garson yalnızca kendi masalarını görür. Çağrı ses ve titreşim verir, onaylanana kadar 45 saniyede bir tekrarlar.', wAllTables:'Tüm masalar', wZone:'Bölge', wSoundOn:'Ses açık', wSoundOff:'Sesi aç', wLoggedIn:'<b>{name}</b> olarak giriş yaptınız; yalnızca {from}–{to} masaları için bildirim alırsınız. Diğer garsonlara bildirim gitmez.', wHeadView:'Restoran müdürü ve mutfak görünümü: 30 masanın tamamı. Serviste her garson kendi bölgesine giriş yapar.', wEmpty:'Açık sipariş yok.', wEmptyHint:'Misafir görünümünden sipariş verin veya “Garson çağır”a basın.', wCalling:'Garson çağırıyor', wBillReq:'Hesap istiyor', wHandled:'İlgilenildi', wAccept:'Onayla', wReady:'Mutfaktan hazır', wServedBtn:'Servis edildi', wRemove:'Kaldır', qrTitle:'QR kodları · 30 masa', qrSub:'Her kod menüyü kendi masa numarasıyla açar. Yazdırın, laminatlayın, masaya koyun.', qrBase:'Temel adres', qrCount:'Masa sayısı', qrGen:'QR kodları oluştur', qrPrint:'Sayfayı yazdır', qrScan:'Menü ve sipariş için okutun', qrHintEmpty:'Bu menünün yayında olduğu web adresini yazın. Geçerli adres olmadan QR kodları hiçbir yere gitmez.', noTable:'Masa numarası yok', noTableBody:'Lütfen masanızdaki QR kodu okutun. Sipariş ancak o zaman doğru masaya iletilir.', menu:'Menü',
+  table:'Masa', myOrders:'Siparişleriniz', histEmpty:'Bu masada henüz sipariş yok.', grandTotal:'Şu ana kadar toplam', stNew:'Alındı', stAcc:'Onaylandı', stRdy:'Hazır', stSrv:'Servis edildi', dGuest:'Misafir', dWaiter:'Garson', dQr:'QR', wTitle:'Garson paneli', wSub:'Canlı siparişler', wFoot:'Her garson yalnızca kendi masalarını görür. Çağrı ses ve titreşim verir, onaylanana kadar 45 saniyede bir tekrarlar.', wAllTables:'Tüm masalar', wZone:'Bölge', wSoundOn:'Ses açık', wSoundOff:'Sesi aç', wLoggedIn:'<b>{name}</b> olarak giriş yaptınız; yalnızca {from}–{to} masaları için bildirim alırsınız. Diğer garsonlara bildirim gitmez.', wHeadView:'Restoran müdürü ve mutfak görünümü: 30 masanın tamamı. Serviste her garson kendi bölgesine giriş yapar.', wEmpty:'Açık sipariş yok.', wEmptyHint:'Misafir görünümünden sipariş verin veya “Garson çağır”a basın.', wCalling:'Garson çağırıyor', wBillReq:'Hesap istiyor', wHandled:'İlgilenildi', wAccept:'Onayla', wReady:'Mutfaktan hazır', wServedBtn:'Servis edildi', wRemove:'Kaldır', qrTitle:'QR kodları · 30 masa', qrSub:'Her kod menüyü kendi masa numarasıyla açar. Yazdırın, laminatlayın, masaya koyun.', qrBase:'Temel adres', qrCount:'Masa sayısı', qrGen:'QR kodları oluştur', qrPrint:'Sayfayı yazdır', qrScan:'Menü ve sipariş için okutun', wConnCloud:'Bağlı – tüm cihazlar', wConnOffline:'Sunucuya bağlantı yok', wConnLocal:'Yalnızca bu cihaz – diğer telefonlardan gelen siparişler buraya ulaşmaz.', sendFail:'Gönderilemedi', sendFailBody:'Sunucuya bağlantı yok. Lütfen garsona söyleyin veya birazdan tekrar deneyin.', qrHintEmpty:'Bu menünün yayında olduğu web adresini yazın. Geçerli adres olmadan QR kodları hiçbir yere gitmez.', noTable:'Masa numarası yok', noTableBody:'Lütfen masanızdaki QR kodu okutun. Sipariş ancak o zaman doğru masaya iletilir.', menu:'Menü',
   all:'Tümü', veg:'Vejetaryen', gf:'Glutensiz',
   add:'Ekle', cart:'Siparişi gör', order:'Siparişi gönder',
   yourOrder:'Siparişiniz', tableIs:'Masa', empty:'Henüz seçim yapılmadı.',
@@ -1259,7 +1364,7 @@ T.tr = {
 };
 T.zh = {
   tagline:'邮轮码头旁的海鲜与炭烤 · 始于1993年',
-  table:'桌号', myOrders:'您的订单', histEmpty:'此桌尚无订单。', grandTotal:'目前合计', stNew:'已收到', stAcc:'已确认', stRdy:'已就绪', stSrv:'已上菜', dGuest:'客人', dWaiter:'服务员', dQr:'二维码', wTitle:'服务员面板', wSub:'实时订单', wFoot:'每位服务员只看到自己的桌子。呼叫会有声音和震动，并每 45 秒重复一次，直到确认。', wAllTables:'所有桌子', wZone:'区域', wSoundOn:'声音已开', wSoundOff:'开启声音', wLoggedIn:'您以 <b>{name}</b> 身份登录，仅接收 {from}–{to} 桌的提醒。其他服务员不会收到通知。', wHeadView:'主管与厨房视图：全部 30 张桌子。运营时每位服务员登录自己的区域。', wEmpty:'暂无进行中的订单。', wEmptyHint:'在客人视图下点单，或按“呼叫服务员”。', wCalling:'正在呼叫服务员', wBillReq:'请求结账', wHandled:'已处理', wAccept:'接单', wReady:'厨房已备好', wServedBtn:'已上菜', wRemove:'移除', qrTitle:'二维码 · 30 张桌子', qrSub:'每个码都会以自己的桌号打开菜单。打印、覆膜、放在桌上。', qrBase:'基础网址', qrCount:'桌子数量', qrGen:'生成二维码', qrPrint:'打印页面', qrScan:'扫码查看菜单并下单', qrHintEmpty:'请输入此菜单所在的网址。没有有效网址，二维码将无法打开页面。', noTable:'缺少桌号', noTableBody:'请扫描您桌上的二维码。只有这样订单才能送到正确的桌子。', menu:'菜单',
+  table:'桌号', myOrders:'您的订单', histEmpty:'此桌尚无订单。', grandTotal:'目前合计', stNew:'已收到', stAcc:'已确认', stRdy:'已就绪', stSrv:'已上菜', dGuest:'客人', dWaiter:'服务员', dQr:'二维码', wTitle:'服务员面板', wSub:'实时订单', wFoot:'每位服务员只看到自己的桌子。呼叫会有声音和震动，并每 45 秒重复一次，直到确认。', wAllTables:'所有桌子', wZone:'区域', wSoundOn:'声音已开', wSoundOff:'开启声音', wLoggedIn:'您以 <b>{name}</b> 身份登录，仅接收 {from}–{to} 桌的提醒。其他服务员不会收到通知。', wHeadView:'主管与厨房视图：全部 30 张桌子。运营时每位服务员登录自己的区域。', wEmpty:'暂无进行中的订单。', wEmptyHint:'在客人视图下点单，或按“呼叫服务员”。', wCalling:'正在呼叫服务员', wBillReq:'请求结账', wHandled:'已处理', wAccept:'接单', wReady:'厨房已备好', wServedBtn:'已上菜', wRemove:'移除', qrTitle:'二维码 · 30 张桌子', qrSub:'每个码都会以自己的桌号打开菜单。打印、覆膜、放在桌上。', qrBase:'基础网址', qrCount:'桌子数量', qrGen:'生成二维码', qrPrint:'打印页面', qrScan:'扫码查看菜单并下单', wConnCloud:'已连接 – 所有设备', wConnOffline:'无法连接服务器', wConnLocal:'仅本设备 – 其他手机的订单不会到这里。', sendFail:'发送失败', sendFailBody:'无法连接服务器。请告知服务员，或稍后再试。', qrHintEmpty:'请输入此菜单所在的网址。没有有效网址，二维码将无法打开页面。', noTable:'缺少桌号', noTableBody:'请扫描您桌上的二维码。只有这样订单才能送到正确的桌子。', menu:'菜单',
   all:'全部', veg:'素食', gf:'无麸质',
   add:'加入', cart:'查看订单', order:'提交订单',
   yourOrder:'您的订单', tableIs:'桌号', empty:'尚未选择菜品。',
@@ -1348,7 +1453,7 @@ const SHOW_BAR = DEMO_MODE || !TABLE_FIXED || START_VIEW !== 'guest';
 if(SHOW_BAR){ $('#demobar').hidden = false; document.body.classList.add('has-bar'); }
 if(START_VIEW !== 'guest') switchView(START_VIEW === 'service' ? 'waiter' : 'qr');
 
-STORE.init(() => { renderOrders(); badge(); renderMyOrdersBtn(); });
+SYNC.init(() => { renderOrders(); badge(); renderMyOrdersBtn(); });
 renderAll();
 renderOrders();
 renderMyOrdersBtn();
