@@ -1339,12 +1339,14 @@ MENU.forEach(m => {
   if(a.sizes && m.sizes) m.sizes.forEach((s,i) => a.sizes[i] && Object.assign(s.lbl, a.sizes[i]));
 });
 
-/* Roller: gjest (standard) · ?view=service · ?view=qr · ?demo=1 viser linjen */
-if(DEMO_MODE){ $('#demobar').hidden = false; document.body.classList.add('has-bar'); }
-if(START_VIEW !== 'guest'){
-  $('#demobar').hidden = false; document.body.classList.add('has-bar');
-  switchView(START_VIEW === 'service' ? 'waiter' : 'qr');
-}
+/* Naar skal demo-linjen vises?
+   ?table=N  -> gjesten har skannet QR-koden. Bare gjestevisningen, ingen linje.
+   ingen ?table -> arbeidsvisning (Servitoer, QR, bordvelger tilgjengelig).
+   ?demo=1   -> linjen vises alltid, ogsaa med bordnummer — for presentasjon.
+   ?view=... -> aapner direkte i service- eller QR-visningen. */
+const SHOW_BAR = DEMO_MODE || !TABLE_FIXED || START_VIEW !== 'guest';
+if(SHOW_BAR){ $('#demobar').hidden = false; document.body.classList.add('has-bar'); }
+if(START_VIEW !== 'guest') switchView(START_VIEW === 'service' ? 'waiter' : 'qr');
 
 STORE.init(() => { renderOrders(); badge(); renderMyOrdersBtn(); });
 renderAll();
