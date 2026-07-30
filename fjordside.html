@@ -53,8 +53,8 @@ button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:n
   position:absolute;left:50%;top:96px;width:150px;height:150px;margin-left:-75px;border-radius:50%;
   background:radial-gradient(circle at 50% 50%,rgba(240,180,92,.55),rgba(240,180,92,.10) 62%,transparent 70%);
   filter:blur(1px);
-}
-.hero svg.waves{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:88px;display:block}
+;pointer-events:none}
+.hero svg.waves{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:88px;display:block;pointer-events:none}
 .hero .wv{animation:drift 22s linear infinite}
 .hero .wv2{animation-duration:34s;animation-direction:reverse}
 @keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -447,6 +447,7 @@ textarea::placeholder{color:#6C858C}
     <button class="dbtn on" data-view="guest" id="dbGuest">Gjest</button>
     <button class="dbtn" data-view="waiter" id="dbWaiter"><span id="dbWaiterLbl">Servitør</span><span class="badge" id="ordBadge" style="display:none">0</span></button>
     <button class="dbtn" data-view="qr" id="dbQr">QR</button>
+    <select class="tsel" id="demoTable" aria-label="Bord"></select>
   </div>
 </div>
 
@@ -811,6 +812,7 @@ function renderStatic(){
   $('#genQr').textContent       = t('qrGen');
   $('#qrPrintBtn').textContent  = t('qrPrint');
   urlHint();
+  if(window.__fillDemoTable) window.__fillDemoTable();
   renderOrders();
   $('#cartLabel').textContent = t('cart');
   $$('.lang').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
@@ -1149,8 +1151,28 @@ if($('#baseUrl') && !$('#baseUrl').value) $('#baseUrl').value = selfURL();
 urlHint();
 $('#baseUrl').addEventListener('input', urlHint);
 
-/* Ingen bordvelger i gjestevisningen. Nummeret kommer utelukkende fra
-   QR-koden pa bordet — en ekstra, omstillbar verdi ville vaert en feilkilde. */
+/* Gjestevisningen har ingen bordvelger — nummeret kommer fra QR-koden.
+   Demo-linjen nederst har den likevel: den er et presentasjonsverktoey og er
+   usynlig for gjester. Slik kan bordet byttes under en presentasjon uten a
+   skrive URL-en pa nytt. */
+(function(){
+  const dsel = $('#demoTable');
+  if(!dsel) return;
+  const fill = () => {
+    const keep = dsel.value;
+    dsel.innerHTML = `<option value="">${t('table')} –</option>` +
+      Array.from({length:30}, (_,i)=>`<option value="${i+1}">${t('table')} ${i+1}</option>`).join('');
+    dsel.value = keep || (table ? String(table) : '');
+  };
+  fill();
+  window.__fillDemoTable = fill;
+  dsel.onchange = () => {
+    const v = parseInt(dsel.value, 10);
+    if(v > 0 && v <= 99){ table = v; TABLE_FIXED = true; }
+    else { table = null; TABLE_FIXED = false; }
+    renderAll(); renderOrders();
+  };
+})();
 
 /* clock */
 setInterval(() => {
