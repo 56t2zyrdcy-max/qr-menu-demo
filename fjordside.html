@@ -917,10 +917,54 @@ function pushOrder(type){
   if(activeWaiter === 'all' || activeWaiter === o.waiter){
     chime(type === 'order' ? 'order' : type === 'bill' ? 'bill' : 'waiter');
   }
-  renderOrders(); badge(); renderMyOrdersBtn();
+  afterChange();
   return o.no;
 }
 function mine(o){ return activeWaiter === 'all' || o.waiter === activeWaiter; }
+/* ============================================================
+   KALICILIK
+   Bestillinger lagres i localStorage, slik at historikken taaler
+   en side-oppdatering og deles mellom faner paa samme enhet.
+   Egen noekkel — churrascaria-demoen ligger paa samme domene og
+   bruker chs_orders_v1.
+   ============================================================ */
+const STORE = (function(){
+  const KEY = 'fjord_orders_v1';
+  const KEEP = 7*24*3600*1000;          // sju servicedager
+  let bc = null, onRemote = () => {};
+
+  function read(){
+    try{
+      const d = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if(!d || !Array.isArray(d.orders)) return null;
+      const cutoff = Date.now() - KEEP;
+      d.orders = d.orders.filter(o => o && o.ts > cutoff);
+      return d;
+    }catch(e){ return null; }
+  }
+  function save(){
+    try{ localStorage.setItem(KEY, JSON.stringify({orders, seq:ticketSeq})); }catch(e){}
+    if(bc) try{ bc.postMessage('changed'); }catch(e){}
+  }
+  function pull(){
+    const d = read(); if(!d) return;
+    orders.length = 0; d.orders.forEach(o => orders.push(o));
+    if(typeof d.seq === 'number' && d.seq > ticketSeq) ticketSeq = d.seq;
+  }
+  function init(cb){
+    onRemote = cb || (()=>{});
+    pull();
+    try{ bc = new BroadcastChannel('fjord_orders'); bc.onmessage = () => { pull(); onRemote(); }; }catch(e){}
+    window.addEventListener('storage', e => { if(e.key === KEY){ pull(); onRemote(); } });
+  }
+  return { init, save, pull };
+})();
+
+/* Ett sted for «noe endret seg» — tegn om og lagre. */
+function afterChange(){
+  renderOrders(); badge(); renderMyOrdersBtn(); STORE.save();
+}
+
 function badge(){
   const n = orders.filter(o => o.status === 'new' && mine(o)).length;
   const b = $('#ordBadge');
@@ -1084,11 +1128,11 @@ document.addEventListener('click', e => {
   else if(el.dataset.next){
     const o = orders.find(x => x.no == el.dataset.next);
     o.status = {new:'accepted', accepted:'ready', ready:'served'}[o.status];
-    renderOrders(); badge(); renderMyOrdersBtn();
+    afterChange();
   }
   else if(el.dataset.done){
     const i = orders.findIndex(x => x.no == el.dataset.done);
-    orders.splice(i,1); renderOrders(); badge(); renderMyOrdersBtn();
+    orders.splice(i,1); afterChange();
   }
 });
 
@@ -1286,8 +1330,11 @@ MENU.forEach(m => {
   if(a.sizes && m.sizes) m.sizes.forEach((s,i) => a.sizes[i] && Object.assign(s.lbl, a.sizes[i]));
 });
 
+STORE.init(() => { renderOrders(); badge(); renderMyOrdersBtn(); });
 renderAll();
 renderOrders();
+renderMyOrdersBtn();
+badge();
 </script>
 </body>
 </html>
