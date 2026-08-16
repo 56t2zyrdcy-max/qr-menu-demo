@@ -214,6 +214,11 @@ body.nobar .demobar{display:none!important}
 body.nobar .cartbar{bottom:0}
 body.nobar .mine{bottom:0}
 body.nobar.hasmine .cartbar{bottom:64px}
+.subs{display:flex;gap:6px;padding:0 14px 10px;overflow-x:auto;scrollbar-width:none}
+.subs::-webkit-scrollbar{display:none}
+.sub{flex:none;background:transparent;border:1px solid #2E2921;color:#9A8F80;
+ border-radius:20px;padding:7px 13px;font:600 11.5px/1 inherit;cursor:pointer;white-space:nowrap}
+.sub.on{background:#E8A33D;border-color:#E8A33D;color:#16130F;font-weight:800}
 .callhead{display:flex;align-items:baseline;gap:9px}
 .dbtn{position:relative}
 .dbadge{display:inline-block;min-width:16px;margin-left:6px;background:#C64B3C;color:#fff;
@@ -1100,7 +1105,7 @@ render();
        histEmpty:"Nothing served yet.",retain:"Orders stay in the list for {h} hours.",
        openOrders:"not served",today:"Today",yday:"Yesterday",mine:"Your order",
        statSent:"sent to the kitchen",statServed:"served",
-       roleW:"Waiter",roleA:"Manager",items:"items",item:"item",myOrders:"My order",openNow:"open orders",callsNow:"calls",busy:"tables in use",topItems:"Best sellers",perHour:"By hour",printDay:"Print the day",mineNone:"No order at this table yet."},
+       roleW:"Waiter",roleA:"Manager",items:"items",item:"item",myOrders:"My order",mainFood:"FOOD",mainDrink:"DRINKS",subBeer:"Beer",subWine:"Wine & bar",subSoft:"Non-alcoholic",openNow:"open orders",callsNow:"calls",busy:"tables in use",topItems:"Best sellers",perHour:"By hour",printDay:"Print the day",mineNone:"No order at this table yet."},
    no:{calls:"Tilkalling",callsSub:"Bord som venter på noen. Kvitter når du har vært der.",
        callsEmpty:"Ingen tilkalling nå.",ackBtn:"Kvitter",wantsWaiter:"ber om servitør",
        wantsBill:"ber om regningen",kasse:"KASSE",kTitle:"Kasse",kSub:"Alt som er sendt fra bordene i dag.",
@@ -1109,7 +1114,7 @@ render();
        histEmpty:"Ingenting servert ennå.",retain:"Bestillingene blir liggende i {h} timer.",
        openOrders:"ikke servert",today:"I dag",yday:"I går",mine:"Din bestilling",
        statSent:"sendt til kjøkkenet",statServed:"servert",
-       roleW:"Servitør",roleA:"Sjef",items:"varer",item:"vare",myOrders:"Min bestilling",openNow:"åpne bestillinger",callsNow:"tilkallinger",busy:"bord i bruk",topItems:"Mest solgt",perHour:"Per time",printDay:"Skriv ut dagen",mineNone:"Ingen bestilling ved dette bordet ennå."},
+       roleW:"Servitør",roleA:"Sjef",items:"varer",item:"vare",myOrders:"Min bestilling",mainFood:"MAT",mainDrink:"DRIKKE",subBeer:"Øl",subWine:"Vin & bar",subSoft:"Alkoholfritt",openNow:"åpne bestillinger",callsNow:"tilkallinger",busy:"bord i bruk",topItems:"Mest solgt",perHour:"Per time",printDay:"Skriv ut dagen",mineNone:"Ingen bestilling ved dette bordet ennå."},
    de:{calls:"Rufe",callsSub:"Tische, die warten. Quittieren Sie, sobald Sie dort waren.",
        callsEmpty:"Gerade keine Rufe.",ackBtn:"Quittieren",wantsWaiter:"ruft den Service",
        wantsBill:"bittet um die Rechnung",kasse:"KASSE",kTitle:"Kasse",kSub:"Alles, was heute von den Tischen kam.",
@@ -1118,7 +1123,7 @@ render();
        histEmpty:"Noch nichts serviert.",retain:"Bestellungen bleiben {h} Stunden in der Liste.",
        openOrders:"nicht serviert",today:"Heute",yday:"Gestern",mine:"Ihre Bestellung",
        statSent:"an die Küche gesendet",statServed:"serviert",
-       roleW:"Service",roleA:"Leitung",items:"Artikel",item:"Artikel",myOrders:"Meine Bestellung",openNow:"offene Bestellungen",callsNow:"Rufe",busy:"Tische in Benutzung",topItems:"Meistverkauft",perHour:"Pro Stunde",printDay:"Tag drucken",mineNone:"Noch keine Bestellung an diesem Tisch."},
+       roleW:"Service",roleA:"Leitung",items:"Artikel",item:"Artikel",myOrders:"Meine Bestellung",mainFood:"SPEISEN",mainDrink:"GETRÄNKE",subBeer:"Bier",subWine:"Wein & Bar",subSoft:"Alkoholfrei",openNow:"offene Bestellungen",callsNow:"Rufe",busy:"Tische in Benutzung",topItems:"Meistverkauft",perHour:"Pro Stunde",printDay:"Tag drucken",mineNone:"Noch keine Bestellung an diesem Tisch."},
    tr:{calls:"Çağrılar",callsSub:"Sizi bekleyen masalar. Gidince İlgilendim'e basın.",
        callsEmpty:"Şu an çağrı yok.",ackBtn:"İlgilendim",wantsWaiter:"garson istiyor",
        wantsBill:"hesap istiyor",kasse:"KASA",kTitle:"Kasa",kSub:"Bugün masalardan gelen her şey.",
@@ -1127,7 +1132,7 @@ render();
        histEmpty:"Henüz servis edilen yok.",retain:"Siparişler listede {h} saat kalır.",
        openOrders:"servis edilmedi",today:"Bugün",yday:"Dün",mine:"Siparişiniz",
        statSent:"mutfağa gönderildi",statServed:"servis edildi",
-       roleW:"Garson",roleA:"Yönetici",items:"ürün",item:"ürün",myOrders:"Siparişim",openNow:"açık sipariş",callsNow:"çağrı",busy:"dolu masa",topItems:"En çok satan",perHour:"Saat bazında",printDay:"Günü yazdır",mineNone:"Bu masada henüz sipariş yok."}
+       roleW:"Garson",roleA:"Yönetici",items:"ürün",item:"ürün",myOrders:"Siparişim",mainFood:"YEMEK",mainDrink:"İÇECEK",subBeer:"Bira",subWine:"Şarap & bar",subSoft:"Alkolsüz",openNow:"açık sipariş",callsNow:"çağrı",busy:"dolu masa",topItems:"En çok satan",perHour:"Saat bazında",printDay:"Günü yazdır",mineNone:"Bu masada henüz sipariş yok."}
   };
   for(var lg in WORDS){ if(UI[lg]) for(var k in WORDS[lg]) UI[lg][k] = WORDS[lg][k]; }
 
@@ -1416,6 +1421,38 @@ render();
       '<h2 style="margin-top:24px">'+t().svcTitle+'</h2><div style="margin-top:10px">'+lines+"</div>"+
       '<button class="btn ghost noprint" id="kPrint" style="margin-top:18px">'+t().printDay+"</button></div>";
     var pb=document.querySelector("#kPrint"); if(pb) pb.onclick=function(){window.print();};
+  };
+
+  /* ---------- to hovedfaner, underfaner først inne i drikke ----------
+     Øl, vin og alkoholfritt sto side om side med maten øverst. Nå står det
+     bare MAT og DRIKKE der, og de tre drikkekartene dukker opp under —
+     først når gjesten faktisk har gått inn på drikke. */
+  var DRINKS=["beer","wine","noalc"];
+  var subsBox=document.createElement("div");
+  subsBox.className="subs"; subsBox.id="subs";
+  var blocksEl=document.querySelector("#blocks");
+  blocksEl.parentNode.insertBefore(subsBox, blocksEl.nextSibling);
+
+  window.renderBlocks=function(){
+    var onDrink=DRINKS.indexOf(block)>=0;
+    blocksEl.innerHTML=
+      '<div class="blk '+(onDrink?"":"on")+'" data-b="food">'+t().mainFood+"</div>"+
+      '<div class="blk '+(onDrink?"on":"")+'" data-b="__drink">'+t().mainDrink+"</div>";
+    [].forEach.call(document.querySelectorAll(".blk"),function(el){
+      el.onclick=function(){
+        block = el.dataset.b==="__drink" ? "beer" : "food";
+        window.scrollTo({top:0}); render();
+      };
+    });
+    /* underfanene */
+    if(!onDrink){ subsBox.innerHTML=""; subsBox.style.display="none"; return; }
+    subsBox.style.display="";
+    var subs=[["beer",t().subBeer],["wine",t().subWine],["noalc",t().subSoft]];
+    subsBox.innerHTML=subs.map(function(p){
+      return '<button class="sub '+(block===p[0]?"on":"")+'" data-s="'+p[0]+'">'+p[1]+"</button>";}).join("");
+    [].forEach.call(document.querySelectorAll("[data-s]"),function(b){
+      b.onclick=function(){ block=b.dataset.s; window.scrollTo({top:0}); render(); };
+    });
   };
 
   /* ---------- rollelinje ---------- */
