@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Churrascaria · Kasse</title>
+<!-- =====================================================================
+     KASSE / YÖNETİCİ / TILL — Churrascaria Steakhouse
+     Leser den samme databasen som menyen: qrmenu/churrascaria/orders.
+     Ingenting skrives herfra. Dette er en ren leseskjerm for driften:
+     omsetning i dag, per bord, mest solgt, per time og hele dagslista.
+     Menyfila er ikke rørt — denne siden ligger ved siden av den.
+     ===================================================================== -->
+<style>
+:root{
+  --paper:#F4EFE6; --ink:#16130F; --ash:#8A7F70; --rule:#DDD3C4; --rule2:#C9BCA8;
+  --red:#A8341F; --green:#2E6B4F; --card:#FBF8F2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:15px/1.55 Georgia,'Times New Roman',serif;-webkit-font-smoothing:antialiased}
+#app{max-width:760px;margin:0 auto;padding:22px 18px 90px}
+.mono{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace}
+header{border-bottom:1px solid var(--rule2);padding-bottom:14px;margin-bottom:18px}
+h1{font-size:27px;font-weight:400;letter-spacing:.06em;margin:0}
+.sub{font:11px/1.5 ui-monospace,Menlo,monospace;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--ash);margin-top:6px}
+.live{display:inline-flex;align-items:center;gap:6px;margin-left:10px}
+.dot{width:7px;height:7px;border-radius:50%;background:#B9433055}
+.dot.on{background:var(--green);box-shadow:0 0 0 3px rgba(46,107,79,.18)}
+.langs{display:flex;gap:6px;margin:14px 0 0;flex-wrap:wrap}
+.lg{border:1px solid var(--rule2);background:transparent;color:var(--ash);
+  font:600 10px/1 ui-monospace,Menlo,monospace;letter-spacing:.18em;text-transform:uppercase;
+  padding:8px 12px;cursor:pointer}
+.lg.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+h2{font-size:13px;font-weight:400;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ash);margin:30px 0 10px;font-family:ui-monospace,Menlo,monospace}
+.big{border:1px solid var(--rule2);background:var(--card);padding:20px 20px;
+  display:flex;align-items:baseline;justify-content:space-between;gap:14px}
+.big span{font:11px/1 ui-monospace,Menlo,monospace;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--ash)}
+.big b{font-size:31px;font-weight:400}
+.tri{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.tri div{border:1px solid var(--rule);background:var(--card);padding:14px 10px;text-align:center}
+.tri b{display:block;font-size:19px;font-weight:400}
+.tri span{display:block;font:9.5px/1.3 ui-monospace,Menlo,monospace;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ash);margin-top:5px}
+.tri .warn b{color:var(--red)}
+.bar{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dotted var(--rule)}
+.bar .t{width:82px;flex:none;font:11px/1 ui-monospace,Menlo,monospace;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ash)}
+.bar .b{flex:1;height:8px;background:#E7DFD2;overflow:hidden}
+.bar .f{height:100%;background:var(--red)}
+.bar .v{width:92px;text-align:right;flex:none;font-size:14px;white-space:nowrap}
+.row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;
+  border-bottom:1px dotted var(--rule);font-size:14px}
+.row .l{color:#3A342C}
+.row .l i{font-style:normal;color:var(--ash);font-size:12px}
+.row b{font-weight:400;white-space:nowrap}
+.row .open{color:var(--red);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.empty{color:var(--ash);font-size:13px;font-style:italic;padding:14px 0}
+.btn{display:inline-block;margin-top:22px;border:1px solid var(--ink);background:transparent;
+  color:var(--ink);font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.2em;
+  text-transform:uppercase;padding:13px 20px;cursor:pointer}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.foot{margin-top:26px;padding-top:12px;border-top:1px solid var(--rule);
+  font:11px/1.6 ui-monospace,Menlo,monospace;color:var(--ash)}
+.foot a{color:var(--ash)}
+@media print{
+  .langs,.btn,.live{display:none!important}
+  body{background:#fff}
+  #app{max-width:none;padding:0}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>Churrascaria Steakhouse</h1>
+    <div class="sub" id="sub">Kasse<span class="live"><span class="dot" id="dot"></span><span id="livetxt">…</span></span></div>
+    <div class="langs" id="langs"></div>
+  </header>
+  <div id="body"></div>
+  <div class="foot" id="foot"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+/* Samme prosjekt og samme node som menyen. Nøklene er offentlige
+   klientnøkler — de hører hjemme i kildekoden. */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBcGSMD9MCmSml8epSDbCnkykyk1wW-w6E",
+  authDomain: "djozmen-53d67.firebaseapp.com",
+  databaseURL: "https://djozmen-53d67-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "djozmen-53d67",
+  storageBucket: "djozmen-53d67.firebasestorage.app",
+  messagingSenderId: "1097752024636",
+  appId: "1:1097752024636:web:1c022d20fba91a2d6e5539"
+};
+const RECAPTCHA_SITE_KEY = "6Lc0VWwtAAAAAH_TPLUbDocEpUwQ7v6ryqNpB_B1";
+const NODE = "qrmenu/churrascaria/orders";
+
+const T = {
+ de:{name:"Deutsch", title:"Kasse", today:"Umsatz heute", orders:"Bestellungen",
+     avg:"Ø pro Bestellung", tables:"Tische", openO:"offene Bestellungen",
+     calls:"Service-Rufe", busy:"Tische in Benutzung", perTable:"Pro Tisch",
+     top:"Meistverkauft", perHour:"Pro Stunde", day:"Tagesliste", table:"Tisch",
+     empty:"Heute noch nichts erfasst.", print:"Tag drucken", open:"offen",
+     conn:"Verbunden", disc:"Keine Verbindung", call:"Service gerufen",
+     foot:"Liest dieselbe Datenbank wie die Karte. Von hier wird nichts geändert."},
+ tr:{name:"Türkçe", title:"Kasa", today:"Bugünkü ciro", orders:"sipariş",
+     avg:"Sipariş başına ort.", tables:"masa", openO:"açık sipariş",
+     calls:"servis çağrısı", busy:"dolu masa", perTable:"Masa bazında",
+     top:"En çok satan", perHour:"Saat bazında", day:"Gün dökümü", table:"Masa",
+     empty:"Bugün kayıt yok.", print:"Günü yazdır", open:"açık",
+     conn:"Bağlı", disc:"Bağlantı yok", call:"Garson çağrıldı",
+     foot:"Menüyle aynı veritabanını okur. Buradan hiçbir şey değiştirilmez."},
+ en:{name:"English", title:"Till", today:"Revenue today", orders:"orders",
+     avg:"Average per order", tables:"tables", openO:"open orders",
+     calls:"service calls", busy:"tables in use", perTable:"By table",
+     top:"Best sellers", perHour:"By hour", day:"Day list", table:"Table",
+     empty:"Nothing registered today.", print:"Print the day", open:"open",
+     conn:"Connected", disc:"No connection", call:"Service called",
+     foot:"Reads the same database as the menu. Nothing is changed from here."}
+};
+let lang = (new URLSearchParams(location.search).get("lang") || "de").toLowerCase();
+if(!T[lang]) lang = "de";
+const t = () => T[lang];
+
+let MAP = {}, live = false;
+const $ = s => document.querySelector(s);
+const money = n => (Math.round(n*100)/100).toLocaleString(lang==="tr"?"tr-TR":"de-DE",
+  {minimumFractionDigits:2, maximumFractionDigits:2}) + " €";
+const hhmm = ts => { const d=new Date(ts);
+  return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); };
+
+function bar(label, value, max, txt){
+  const w = max ? Math.round(value/max*100) : 0;
+  return `<div class="bar"><span class="t">${label}</span>
+    <span class="b"><span class="f" style="width:${w}%"></span></span>
+    <span class="v">${txt}</span></div>`;
+}
+
+function renderLangs(){
+  $("#langs").innerHTML = Object.keys(T).map(c=>
+    `<button class="lg ${c===lang?"on":""}" data-l="${c}">${T[c].name}</button>`).join("");
+  document.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{
+    lang=b.dataset.l; document.documentElement.lang=lang; renderLangs(); render(); });
+}
+
+function render(){
+  $("#sub").innerHTML = t().title +
+    `<span class="live"><span class="dot${live?" on":""}"></span>${live?t().conn:t().disc}</span>`;
+  $("#foot").textContent = t().foot;
+
+  const all = Object.values(MAP);
+  const d0 = new Date(); d0.setHours(0,0,0,0);
+  const today = all.filter(o => (o.ts||0) >= d0.getTime()).sort((a,b)=>b.ts-a.ts);
+  const orders = today.filter(o => o.type !== "waiter");
+  const calls  = today.filter(o => o.type === "waiter");
+
+  const sum = orders.reduce((a,o)=>a+(+o.total||0),0);
+  const avg = orders.length ? sum/orders.length : 0;
+  const openO = orders.filter(o => o.status && o.status !== "done" && !o.closed).length;
+  const openC = calls .filter(o => o.status && o.status !== "done" && !o.closed).length;
+
+  const byT = {};
+  orders.forEach(o=>{ byT[o.table] = (byT[o.table]||0) + (+o.total||0); });
+  const tKeys = Object.keys(byT).sort((a,b)=>byT[b]-byT[a]);
+  const tMax  = tKeys.length ? byT[tKeys[0]] : 0;
+  const tRows = tKeys.map(k=>bar(t().table+" "+k, byT[k], tMax, money(byT[k]))).join("");
+
+  const byN = {};
+  orders.forEach(o=>(o.items||[]).forEach(l=>{ byN[l.n] = (byN[l.n]||0) + (+l.q||0); }));
+  const nKeys = Object.keys(byN).sort((a,b)=>byN[b]-byN[a]).slice(0,8);
+  const nRows = nKeys.map(k=>
+    `<div class="row"><span class="l">${k}</span><b>${byN[k]} ×</b></div>`).join("");
+
+  const byH = {};
+  orders.forEach(o=>{ const h=new Date(o.ts).getHours(); byH[h]=(byH[h]||0)+(+o.total||0); });
+  const hKeys = Object.keys(byH).map(Number).sort((a,b)=>a-b);
+  const hMax  = hKeys.reduce((m,h)=>Math.max(m,byH[h]),0);
+  const hRows = hKeys.map(h=>bar(String(h).padStart(2,"0")+":00", byH[h], hMax, money(byH[h]))).join("");
+
+  const dayRows = today.map(o=>{
+    const isCall = o.type === "waiter";
+    const what = isCall ? `<i>${t().call}</i>`
+      : (o.items||[]).map(l=>`${l.q} × ${l.n}`).join(", ");
+    const openTag = (o.status && o.status !== "done" && !o.closed)
+      ? ` <span class="open">${t().open}</span>` : "";
+    return `<div class="row"><span class="l">#${o.no||""} · ${t().table} ${o.table} ·
+      <i>${o.time||hhmm(o.ts)}</i>${openTag}<br>${what}</span>
+      <b>${isCall ? "—" : money(+o.total||0)}</b></div>`;
+  }).join("");
+
+  const none = `<div class="empty">${t().empty}</div>`;
+  $("#body").innerHTML = `
+    <div class="tri">
+      <div class="${openO?"warn":""}"><b>${openO}</b><span>${t().openO}</span></div>
+      <div class="${openC?"warn":""}"><b>${openC}</b><span>${t().calls}</span></div>
+      <div><b>${tKeys.length}</b><span>${t().busy}</span></div>
+    </div>
+    <div class="big" style="margin-top:10px"><span>${t().today}</span><b>${money(sum)}</b></div>
+    <div class="tri">
+      <div><b>${orders.length}</b><span>${t().orders}</span></div>
+      <div><b>${money(avg)}</b><span>${t().avg}</span></div>
+      <div><b>${tKeys.length}</b><span>${t().tables}</span></div>
+    </div>
+    <h2>${t().perTable}</h2>${tRows || none}
+    <h2>${t().top}</h2>${nRows || none}
+    <h2>${t().perHour}</h2>${hRows || none}
+    <h2>${t().day}</h2>${dayRows || none}
+    <button class="btn" id="print">${t().print}</button>`;
+  const p = $("#print"); if(p) p.onclick = () => window.print();
+}
+
+(async function start(){
+  document.documentElement.lang = lang;
+  renderLangs(); render();
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    try{ firebase.appCheck().activate(RECAPTCHA_SITE_KEY, true); }
+    catch(e){ console.warn("App Check:", e && e.message); }
+    await firebase.auth().signInAnonymously();
+    const db = firebase.database();
+    db.ref(".info/connected").on("value", s => { live = !!s.val(); render(); });
+    db.ref(NODE).on("value", snap => { MAP = snap.val() || {}; render(); });
+  }catch(e){
+    console.error(e);
+    live = false; render();
+  }
+})();
+</script>
+</body>
+</html>
