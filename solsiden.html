@@ -304,8 +304,17 @@ const FILTERS = [
 ];
 
 let lang="no", block="food", filters=new Set(), query="", cart={}, showAlt=false;
-let view="guest", table=11, orders=[], orderNo=0, nTables=12,
-    baseUrl="https://solsiden.no/meny";
+let view="guest", table=11, orders=[], orderNo=0, nTables=12;
+
+/* QR-adressen er siden selv. Da virker kodene der menyen faktisk ligger —
+   på GitHub Pages i dag, på solsiden.no den dagen dere flytter den. */
+let baseUrl = (function(){
+  try{
+    if(location.protocol === "http:" || location.protocol === "https:")
+      return location.origin + location.pathname;
+  }catch(e){}
+  return "https://56t2zyrdcy-max.github.io/qr-menu-demo/solsiden.html";
+})();
 
 /* ---------------------------------------------------------------------------
    BESTILLINGSHISTORIKK
@@ -533,7 +542,7 @@ function renderService(){
     renderService(); renderMine();
   });
 }
-const qrLink=i=>baseUrl+"?bord="+i;
+const qrLink=i=>baseUrl+(baseUrl.includes("?")?"&":"?")+"bord="+i+"&lang="+lang;
 function renderQR(){
   $("#list").innerHTML = `<div class="pane">
     <h2>${t().qrTitle} · ${nTables} ${t().tblWord}</h2><p class="ps">${t().qrSub}</p>
@@ -560,6 +569,8 @@ function drawQR(){
     c.appendChild(n); c.appendChild(s); g.appendChild(c);
     new QRCode(h,{text:qrLink(i),width:110,height:110,colorDark:"#07141A",colorLight:"#FFFFFF",
                   correctLevel:QRCode.CorrectLevel.M});
+    c.style.cursor="pointer"; c.title=qrLink(i);
+    c.onclick=()=>window.open(qrLink(i),"_blank","noopener");
   }
 }
 function addItem(id, n, p){
