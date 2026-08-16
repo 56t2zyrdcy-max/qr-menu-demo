@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>SOLSIDEN · QR-meny</title>
+<style>
+:root{--bg:#07141A;--card:#0E2029;--card2:#132A34;--line:#1E3B47;
+      --tx:#EEF4F4;--dim:#9DB2B8;--dim2:#6A838C;
+      --brass:#D8B45A;--deep:#0A1B22;--red:#C4553F;--green:#2F6B57;--blue:#3E7690}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#040D11;color:var(--tx);
+ font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+#app{width:100%;max-width:480px;min-width:0;margin:0 auto;background:var(--bg);
+ min-height:100vh;position:relative;padding-bottom:170px;box-shadow:0 0 60px rgba(0,0,0,.6)}
+@media(min-width:900px){#app{border-left:1px solid #10242D;border-right:1px solid #10242D}}
+
+.top{position:sticky;top:0;z-index:40;background:rgba(7,20,26,.97);backdrop-filter:blur(12px);
+ border-bottom:1px solid var(--line)}
+.row1{display:flex;align-items:center;justify-content:space-between;padding:13px 14px 9px;gap:8px}
+.brand{font-family:Georgia,"Times New Roman",serif;font-size:21px;font-weight:400;
+ letter-spacing:5px;line-height:1}
+.brand small{display:block;font-family:inherit;font-size:8px;letter-spacing:2.6px;
+ color:var(--dim2);margin-top:5px;font-style:italic}
+.table-pill{background:var(--card2);border:1px solid var(--line);border-radius:20px;
+ padding:5px 11px;font-size:11px;font-weight:700;color:var(--dim);white-space:nowrap}
+
+.langs{display:flex;gap:5px;padding:0 14px 9px;overflow-x:auto;scrollbar-width:none;min-width:0}
+.langs::-webkit-scrollbar{display:none}
+.lg{font-size:10px;font-weight:800;letter-spacing:1px;padding:6px 11px;border-radius:6px;
+ border:1px solid var(--line);color:var(--dim2);background:transparent;cursor:pointer;
+ white-space:nowrap;font-family:inherit;transition:.15s}
+.lg.on{background:var(--brass);color:#07141A;border-color:var(--brass)}
+.lg.alt{border-style:dashed}
+
+.blocks{display:flex;gap:5px;padding:2px 14px 10px;overflow-x:auto;scrollbar-width:none;min-width:0}
+.blocks::-webkit-scrollbar{display:none}
+.blk{flex:1;min-width:82px;text-align:center;font-size:10.5px;font-weight:800;letter-spacing:.4px;
+ padding:9px 6px;border-radius:7px;background:var(--card2);color:var(--dim);cursor:pointer;transition:.15s}
+.blk.on{background:var(--tx);color:#07141A}
+
+.tools{padding:0 14px 10px}
+.search{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:9px;
+ padding:10px 12px;color:var(--tx);font-size:14px;font-family:inherit}
+.search::placeholder{color:var(--dim2)}
+.filters{display:flex;gap:6px;margin-top:9px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.filters::-webkit-scrollbar{display:none}
+.flt{font-size:11px;font-weight:700;padding:6px 11px;border-radius:20px;border:1px solid var(--line);
+ color:var(--dim);background:transparent;cursor:pointer;white-space:nowrap;font-family:inherit;transition:.15s}
+.flt.on{background:var(--green);border-color:var(--green);color:#fff}
+
+.acts{display:flex;gap:8px;padding:12px 14px 2px}
+.act{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:12px 8px;
+ color:var(--tx);font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+.act:active{border-color:var(--brass);color:var(--brass)}
+
+.hero{margin:12px 14px 0;background:var(--deep);border:1px solid var(--line);border-radius:10px;padding:14px 15px}
+.hero b{color:var(--brass);font-family:Georgia,serif;font-size:15px;font-weight:400;letter-spacing:.3px}
+.hero p{color:var(--dim);font-size:12px;margin-top:6px;line-height:1.5}
+
+.sec{padding:20px 14px 4px}
+.sec h2{font-family:Georgia,serif;font-size:19px;font-weight:400;color:var(--brass);letter-spacing:.4px}
+.hairline{height:1px;background:var(--line);margin:10px 14px 0}
+
+.item{display:flex;gap:11px;padding:13px 14px;border-bottom:1px solid #0C1D24;align-items:flex-start}
+.thumb{width:64px;height:64px;border-radius:8px;flex:none;position:relative;overflow:hidden;
+ background:linear-gradient(140deg,#16323C,#0E2029)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+ font-size:7px;letter-spacing:1.2px;color:#4A6570}
+.thumb .illu{position:absolute;left:0;right:0;bottom:0;padding:2px 3px;font-size:6.5px;
+ letter-spacing:.3px;text-align:center;line-height:1.2;background:rgba(0,0,0,.6);color:#fff}
+.ib{flex:1;min-width:0}
+.iname{font-size:15px;font-weight:700;line-height:1.25}
+.idesc{font-size:12.5px;color:var(--dim);margin-top:4px;line-height:1.4}
+.ialt{font-size:11px;color:var(--dim2);margin-top:3px;line-height:1.3}
+.ialt b{color:#5A737C;font-size:8.5px;letter-spacing:.8px;margin-right:3px}
+.ialg{font-size:10px;color:#587079;margin-top:6px}
+.iright{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:none}
+.price{font-family:Georgia,serif;font-size:15px;color:var(--brass);white-space:nowrap}
+.add{width:31px;height:31px;border-radius:50%;border:1px solid var(--brass);background:transparent;
+ color:var(--brass);font-size:19px;line-height:0;cursor:pointer;font-family:inherit;
+ display:flex;align-items:center;justify-content:center;padding-bottom:2px}
+.add:active{background:var(--brass);color:#07141A}
+.qty{display:flex;align-items:center;gap:9px}
+.qty button{width:26px;height:26px;border-radius:50%;border:0;background:var(--card2);color:var(--tx);
+ font-size:16px;line-height:0;cursor:pointer;font-family:inherit}
+.qty b{font-size:14px;min-width:14px;text-align:center}
+.units{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.unit{font-size:10.5px;font-weight:700;padding:5px 9px;border-radius:6px;border:1px solid var(--line);
+ background:transparent;color:var(--dim);cursor:pointer;font-family:inherit}
+.unit:active{border-color:var(--brass);color:var(--brass)}
+
+.legendbox{margin:16px 14px 0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.legendbox h4{font-family:Georgia,serif;font-weight:400;color:var(--brass);font-size:14px;margin-bottom:8px}
+.legendbox .lg2{display:flex;flex-wrap:wrap;gap:5px}
+.lchip{font-size:10px;color:var(--dim);border:1px solid var(--line);border-radius:20px;padding:4px 9px}
+.lchip i{color:var(--brass);font-style:normal;font-weight:800;margin-right:4px}
+.legendbox p{color:var(--dim2);font-size:10.5px;margin-top:9px;line-height:1.45}
+
+.cartbar{position:fixed;bottom:54px;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
+ background:var(--brass);color:#07141A;padding:14px 16px;display:none;
+ align-items:center;justify-content:space-between;cursor:pointer;z-index:60}
+.cartbar.show{display:flex}
+.cartbar .cl{font-weight:800;font-size:14px}
+.cartbar .cr{font-family:Georgia,serif;font-size:16px}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:90;display:none}
+.sheet-bg.open{display:block}
+.sheet,.drawer{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;
+ background:var(--card);border-radius:16px 16px 0 0;z-index:95;padding:16px 16px 24px;
+ display:none;max-height:82vh;overflow:auto;border-top:1px solid var(--line)}
+.sheet.open,.drawer.open{display:block}
+.sheet h3,.drawer h3{font-family:Georgia,serif;font-weight:400;font-size:17px;margin-bottom:4px}
+.sheet p.sh{color:var(--dim);font-size:12.5px;margin-bottom:12px}
+.langrow{display:flex;align-items:center;justify-content:space-between;padding:12px;
+ background:var(--card2);border-radius:9px;margin-bottom:7px;cursor:pointer;border:1px solid transparent}
+.langrow.on{border-color:var(--brass)}
+.langrow b{font-size:14.5px;font-weight:600}
+.langrow span{color:var(--dim2);font-size:11.5px;display:block;margin-top:1px}
+.langrow .ck{color:var(--brass);font-weight:800}
+.soon{background:#152C22;border:1px dashed #2C5343;border-radius:9px;padding:12px;margin-top:10px}
+.soon b{color:var(--brass);font-size:13px}
+.soon p{color:var(--dim);font-size:11.5px;margin-top:4px;line-height:1.45}
+.crow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;
+ border-bottom:1px solid var(--line)}
+.crow .cn{font-size:13.5px;font-weight:700}
+.crow .cp{font-family:Georgia,serif;color:var(--brass);font-size:14px;white-space:nowrap}
+.total{display:flex;justify-content:space-between;padding:14px 0 4px;font-size:17px;font-weight:800}
+.total span:last-child{font-family:Georgia,serif;color:var(--brass)}
+.btn{width:100%;background:var(--brass);color:#07141A;border:0;border-radius:10px;padding:14px;
+ font-size:15px;font-weight:800;cursor:pointer;margin-top:12px;font-family:inherit}
+.btn.ghost{background:transparent;color:var(--dim);border:1px solid var(--line);margin-top:8px}
+.empty{color:var(--dim2);text-align:center;padding:26px 0;font-size:13.5px}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:var(--green);
+ color:#fff;padding:12px 20px;border-radius:24px;font-size:13.5px;font-weight:700;z-index:120;
+ opacity:0;pointer-events:none;transition:.25s}
+.toast.show{opacity:1}
+.fnote{padding:22px 16px 30px;color:#43585F;font-size:10.5px;line-height:1.55;
+ border-top:1px solid var(--line);margin-top:20px}
+.fnote b{color:var(--dim2)}
+
+.demobar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
+ background:#03090C;border-top:1px solid var(--line);display:flex;align-items:center;gap:5px;
+ padding:7px 10px;z-index:80}
+.dbtn{flex:1;text-align:center;font-size:10px;font-weight:800;letter-spacing:.7px;padding:9px 3px;
+ border-radius:6px;background:transparent;color:var(--dim2);border:0;cursor:pointer;font-family:inherit}
+.dbtn.on{background:var(--card2);color:var(--tx)}
+.dsel{background:var(--card2);border:1px solid var(--line);color:var(--tx);border-radius:6px;
+ padding:8px 6px;font-size:11px;font-family:inherit;flex:none}
+.pane{padding:18px 14px 10px}
+.pane h2{font-family:Georgia,serif;font-weight:400;font-size:21px;color:var(--brass)}
+.pane p.ps{color:var(--dim);font-size:12.5px;margin-top:6px;line-height:1.45}
+.fld{margin-top:12px}
+.fld label{display:block;font-size:9.5px;font-weight:800;letter-spacing:1.2px;color:var(--brass);margin-bottom:5px}
+.fld input{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:8px;
+ padding:11px 12px;color:var(--tx);font-size:12.5px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.hint{font-size:10.5px;color:var(--dim2);margin-top:6px;word-break:break-all}
+.hint b{color:var(--dim)}
+.qrgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
+.qrcard{background:#fff;border-radius:8px;padding:12px 8px 10px;text-align:center;color:#07141A}
+.qrcard .qc{display:flex;justify-content:center}
+.qrcard .qn{font-family:Georgia,serif;font-size:24px;margin-top:6px;letter-spacing:2px}
+.qrcard .qs{font-size:8px;color:#63747A;line-height:1.35;margin-top:2px}
+.ord{background:var(--card2);border-radius:10px;padding:12px 13px;margin-bottom:9px;border-left:3px solid var(--brass)}
+.ord.done{opacity:.45;border-left-color:var(--green)}
+.ordh{display:flex;justify-content:space-between;align-items:baseline}
+.ordh b{font-size:14px}
+.ordh span{font-size:10.5px;color:var(--dim2)}
+.ordl{font-size:12px;color:var(--dim);margin-top:6px;line-height:1.5}
+.ordf{display:flex;justify-content:space-between;align-items:center;margin-top:9px}
+.ordf .op{font-family:Georgia,serif;color:var(--brass);font-size:14px}
+.ordf button{background:transparent;border:1px solid var(--line);color:var(--dim);border-radius:6px;
+ padding:6px 11px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+@media print{
+ body{background:#fff}
+ .top,.demobar,.cartbar,#hero,.acts,.fld,.hint,.btn,.fnote,.pane p.ps,.pane h2,.noprint{display:none!important}
+ #app{max-width:none;box-shadow:none;background:#fff;padding:0}
+ .qrgrid{grid-template-columns:repeat(3,1fr);gap:8mm}
+ .qrcard{border:1px solid #ddd;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div id="app">
+ <div class="top">
+  <div class="row1">
+   <div class="brand">SOLSIDEN<small>Akershusstranda 13 · Oslo</small></div>
+   <div class="table-pill" id="tablePill">Bord 11</div>
+  </div>
+  <div class="langs" id="langs"></div>
+  <div class="blocks" id="blocks"></div>
+  <div class="tools">
+   <input class="search" id="search" placeholder="Søk…">
+   <div class="filters" id="filters"></div>
+  </div>
+ </div>
+ <div id="hero"></div>
+ <div id="list"></div>
+ <div class="fnote" id="fnote"></div>
+</div>
+<div class="demobar" id="demobar"></div>
+<div class="cartbar" id="cartbar"><span class="cl" id="cartL"></span><span class="cr" id="cartR"></span></div>
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet"></div>
+<div class="drawer" id="drawer"></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const DATA = {"LANGS": [["no", "Norsk"], ["en", "English"], ["de", "Deutsch"], ["tr", "Türkçe"], ["zh", "中文"]], "UI": {"no": {"search": "Søk…", "all": "Alt", "blocks": ["MAT", "SKALLDYR", "VIN", "SMÅTT"], "cart": "Din bestilling", "items": "varer", "item": "vare", "total": "Totalt", "send": "Send bestillingen", "close": "Tilbake til menyen", "empty": "Ingenting lagt til ennå.", "sent": "Bestillingen er sendt", "lang": "Språk", "langsub": "Hele menyen bytter språk — ikke bare knappene.", "allerg": "Allergener", "added": "lagt til", "table": "Bord", "callw": "Tilkall servitør", "bill": "Be om regningen", "called": "Servitøren er varslet", "billed": "Regningen er på vei", "guest": "GJEST", "waiter": "SERVITØR", "qrv": "QR-KODER", "tblWord": "bord", "qrTitle": "QR-koder", "qrSub": "Hver kode åpner menyen med sitt eget bordnummer. Skriv ut, laminer, sett på bordet.", "baseUrl": "Menyadresse", "tables": "Antall bord", "gen": "Lag QR-koder", "printS": "Skriv ut ark", "scan": "Skann for meny og bestilling", "svcTitle": "Bestillinger inn", "svcSub": "Alt gjestene sender fra bordene havner her.", "svcEmpty": "Ingen bestillinger ennå.", "served": "Marker som servert", "srvDone": "Servert", "offline": "QR-kodene krever nettforbindelse.", "legend": "Allergener forklart", "noshell": "Uten skalldyr", "nofish": "Uten fisk", "veg": "Vegetar", "nogluten": "Uten gluten", "pieces": "stk", "filterNote": "Filtrene skjuler retter som inneholder det du velger bort."}, "en": {"search": "Search…", "all": "All", "blocks": ["FOOD", "SHELLFISH", "WINE", "SMALL PLATES"], "cart": "Your order", "items": "items", "item": "item", "total": "Total", "send": "Send the order", "close": "Back to the menu", "empty": "Nothing added yet.", "sent": "The order has been sent", "lang": "Language", "langsub": "The whole menu changes language — not just the buttons.", "allerg": "Allergens", "added": "added", "table": "Table", "callw": "Call the waiter", "bill": "Ask for the bill", "called": "The waiter has been notified", "billed": "The bill is on its way", "guest": "GUEST", "waiter": "WAITER", "qrv": "QR CODES", "tblWord": "tables", "qrTitle": "QR codes", "qrSub": "Every code opens the menu with its own table number. Print, laminate, put it on the table.", "baseUrl": "Menu address", "tables": "Number of tables", "gen": "Generate QR codes", "printS": "Print sheet", "scan": "Scan for menu & order", "svcTitle": "Incoming orders", "svcSub": "Everything guests send from the tables lands here.", "svcEmpty": "No orders yet.", "served": "Mark as served", "srvDone": "Served", "offline": "QR codes need an internet connection.", "legend": "Allergens explained", "noshell": "No shellfish", "nofish": "No fish", "veg": "Vegetarian", "nogluten": "No gluten", "pieces": "pcs", "filterNote": "The filters hide every dish containing what you rule out."}, "de": {"search": "Suchen…", "all": "Alle", "blocks": ["SPEISEN", "MEERESFRÜCHTE", "WEIN", "KLEINIGKEITEN"], "cart": "Ihre Bestellung", "items": "Artikel", "item": "Artikel", "total": "Gesamt", "send": "Bestellung senden", "close": "Zurück zur Karte", "empty": "Noch nichts hinzugefügt.", "sent": "Die Bestellung wurde gesendet", "lang": "Sprache", "langsub": "Die ganze Karte wechselt die Sprache — nicht nur die Buttons.", "allerg": "Allergene", "added": "hinzugefügt", "table": "Tisch", "callw": "Service rufen", "bill": "Rechnung bitte", "called": "Der Service wurde benachrichtigt", "billed": "Die Rechnung kommt", "guest": "GAST", "waiter": "SERVICE", "qrv": "QR-CODES", "tblWord": "Tische", "qrTitle": "QR-Codes", "qrSub": "Jeder Code öffnet die Karte mit seiner eigenen Tischnummer. Ausdrucken, laminieren, auf den Tisch stellen.", "baseUrl": "Adresse der Karte", "tables": "Anzahl Tische", "gen": "QR-Codes erzeugen", "printS": "Bogen drucken", "scan": "Scannen für Karte & Bestellung", "svcTitle": "Eingehende Bestellungen", "svcSub": "Alles, was die Gäste an den Tischen senden, landet hier.", "svcEmpty": "Noch keine Bestellungen.", "served": "Als serviert markieren", "srvDone": "Serviert", "offline": "Für QR-Codes wird eine Internetverbindung benötigt.", "legend": "Allergene erklärt", "noshell": "Ohne Krustentiere", "nofish": "Ohne Fisch", "veg": "Vegetarisch", "nogluten": "Ohne Gluten", "pieces": "Stk.", "filterNote": "Die Filter blenden jedes Gericht aus, das das Ausgeschlossene enthält."}, "tr": {"search": "Ara…", "all": "Hepsi", "blocks": ["YEMEK", "DENİZ ÜRÜNLERİ", "ŞARAP", "KÜÇÜK TABAKLAR"], "cart": "Siparişiniz", "items": "ürün", "item": "ürün", "total": "Toplam", "send": "Siparişi gönder", "close": "Menüye dön", "empty": "Henüz bir şey eklenmedi.", "sent": "Sipariş gönderildi", "lang": "Dil", "langsub": "Menünün tamamı dil değiştiriyor — sadece butonlar değil.", "allerg": "Alerjenler", "added": "eklendi", "table": "Masa", "callw": "Garson çağır", "bill": "Hesap iste", "called": "Garsona haber verildi", "billed": "Hesap hazırlanıyor", "guest": "MİSAFİR", "waiter": "GARSON", "qrv": "QR KODLAR", "tblWord": "masa", "qrTitle": "QR kodlar", "qrSub": "Her kod menüyü kendi masa numarasıyla açar. Yazdırın, laminasyon yapın, masaya koyun.", "baseUrl": "Menü adresi", "tables": "Masa sayısı", "gen": "QR kodları oluştur", "printS": "Sayfayı yazdır", "scan": "Menü ve sipariş için okutun", "svcTitle": "Gelen siparişler", "svcSub": "Masalardan gönderilen her sipariş buraya düşer.", "svcEmpty": "Henüz sipariş yok.", "served": "Servis edildi", "srvDone": "Servis edildi", "offline": "QR kodlar için internet bağlantısı gerekir.", "legend": "Alerjenler açıklaması", "noshell": "Kabuklu deniz ürünsüz", "nofish": "Balıksız", "veg": "Vejetaryen", "nogluten": "Glutensiz", "pieces": "adet", "filterNote": "Filtreler, seçtiğiniz maddeyi içeren tüm yemekleri gizler."}, "zh": {"search": "搜索…", "all": "全部", "blocks": ["主菜", "海鲜", "葡萄酒", "小食"], "cart": "您的订单", "items": "项", "item": "项", "total": "合计", "send": "发送订单", "close": "返回菜单", "empty": "尚未添加任何内容。", "sent": "订单已发送", "lang": "语言", "langsub": "整份菜单都会切换语言——不只是按钮。", "allerg": "过敏原", "added": "已加入", "table": "桌号", "callw": "呼叫服务员", "bill": "请求结账", "called": "已通知服务员", "billed": "账单即将送到", "guest": "客人", "waiter": "服务员", "qrv": "二维码", "tblWord": "张桌", "qrTitle": "二维码", "qrSub": "每个二维码打开的菜单都带有自己的桌号。打印、过塑，放在桌上。", "baseUrl": "菜单网址", "tables": "桌数", "gen": "生成二维码", "printS": "打印页面", "scan": "扫码查看菜单并点单", "svcTitle": "收到的订单", "svcSub": "客人从餐桌发送的所有订单都会显示在这里。", "svcEmpty": "暂无订单。", "served": "标记为已上菜", "srvDone": "已上菜", "offline": "生成二维码需要联网。", "legend": "过敏原说明", "noshell": "不含甲壳类", "nofish": "不含鱼", "veg": "素食", "nogluten": "不含麸质", "pieces": "只", "filterNote": "筛选会隐藏所有含有您排除成分的菜品。"}}, "ALG": {"b": ["Bløtdyr", "Molluscs", "Weichtiere", "Yumuşakçalar", "软体动物"], "e": ["Egg", "Egg", "Ei", "Yumurta", "蛋"], "f": ["Fisk", "Fish", "Fisch", "Balık", "鱼"], "g": ["Gluten", "Gluten", "Gluten", "Gluten", "麸质"], "ha": ["Hasselnøtter", "Hazelnuts", "Haselnüsse", "Fındık", "榛子"], "ma": ["Mandler", "Almonds", "Mandeln", "Badem", "杏仁"], "m": ["Melk", "Milk", "Milch", "Süt", "奶"], "n": ["Nøtter", "Nuts", "Nüsse", "Kuruyemiş", "坚果"], "se": ["Selleri", "Celery", "Sellerie", "Kereviz", "芹菜"], "s": ["Sennep", "Mustard", "Senf", "Hardal", "芥末"], "ses": ["Sesamfrø", "Sesame", "Sesam", "Susam", "芝麻"], "sk": ["Skalldyr", "Crustaceans", "Krustentiere", "Kabuklu deniz ürünleri", "甲壳类"], "so": ["Soya", "Soy", "Soja", "Soya", "大豆"], "su": ["Sulfitt", "Sulphites", "Sulfite", "Sülfit", "亚硫酸盐"]}, "SEC": {"dagens": ["Dagens", "Today's menu", "Tageskarte", "Günün menüsü", "今日菜单"], "ostr": ["Østers", "Oysters", "Austern", "İstiridye", "生蚝"], "skall": ["Skalldyr", "Shellfish", "Meeresfrüchte", "Deniz ürünleri", "海鲜"], "smatt": ["Til bordet", "For the table", "Für den Tisch", "Sofraya", "佐餐小食"], "glass": ["Vin på glass", "Wine by the glass", "Wein glasweise", "Kadeh şarap", "杯装葡萄酒"], "bobler": ["Bobler", "Sparkling & Champagne", "Schaumwein & Champagner", "Köpüklü & Şampanya", "气泡酒与香槟"], "flaske": ["Vin på flaske · utvalg", "Bottles · a selection", "Flaschen · Auswahl", "Şişe · seçki", "整瓶精选"], "sot": ["Dessertvin, portvin og sherry", "Dessert, port & sherry", "Dessertwein, Port & Sherry", "Tatlı şarap, porto ve şeri", "甜酒、波特与雪莉"]}, "HERO": {"food": [["Menyen på ditt språk", "Norsk, engelsk, tysk, tyrkisk og kinesisk. Hele menyen bytter — retter, kategorier og allergener. Flere språk kan legges til når som helst, ett tekstfelt per rett."], ["The menu in your language", "Norwegian, English, German, Turkish and Chinese. The whole menu changes — dishes, categories and allergens. More languages can be added at any time, one text field per dish."], ["Die Karte in Ihrer Sprache", "Norwegisch, Englisch, Deutsch, Türkisch und Chinesisch. Die ganze Karte wechselt — Gerichte, Kategorien und Allergene. Weitere Sprachen jederzeit ergänzbar."], ["Menü sizin dilinizde", "Norveççe, İngilizce, Almanca, Türkçe ve Çince. Menünün tamamı değişiyor — yemekler, kategoriler ve alerjenler. Yeni dil eklemek her zaman mümkün."], ["菜单，用您的语言", "挪威语、英语、德语、土耳其语和中文。整份菜单都会切换——菜品、分类和过敏原。随时可以增加语言。"]], "shell": [["Fra fjorden og fra Frankrike", "Tre østerssorter, hummer, snøkrabbe og dagens blåskjell. Alt merket med allergener, og filteret over lar gjesten ta bort skalldyr eller fisk med ett trykk."], ["From the fjord and from France", "Three kinds of oyster, lobster, snow crab and mussels of the day. Everything is labelled, and the filter above lets a guest rule out shellfish or fish with one tap."], ["Aus dem Fjord und aus Frankreich", "Drei Austernsorten, Hummer, Schneekrabbe und Miesmuscheln des Tages. Alles gekennzeichnet — und der Filter oben schließt Krustentiere oder Fisch mit einem Tipp aus."], ["Fiyorttan ve Fransa'dan", "Üç çeşit istiridye, ıstakoz, kar yengeci ve günün midyesi. Hepsi etiketli; üstteki filtreyle misafir kabuklu deniz ürünlerini tek dokunuşla eleyebiliyor."], ["来自峡湾，也来自法国", "三种生蚝、龙虾、雪蟹与今日青口。全部标注过敏原，顶部筛选可一键排除甲壳类或鱼类。"]], "wine": [["250 flasker, én skjerm", "Hele vinkartet ligger i kjelleren. Her ligger alt som selges på glass, pluss et utvalg flasker. Be servitøren om det fulle kartet."], ["250 bottles, one screen", "The full list lives in the cellar. Here is everything served by the glass, plus a selection of bottles. Ask your waiter for the complete list."], ["250 Flaschen, ein Bildschirm", "Die vollständige Karte liegt im Keller. Hier steht alles, was glasweise ausgeschenkt wird, dazu eine Auswahl an Flaschen."], ["250 şişe, tek ekran", "Tam liste mahzende. Burada kadehle satılan her şey ve seçilmiş şişeler var. Tam listeyi garsondan isteyin."], ["250 款酒，一屏之内", "完整酒单在酒窖。此处列出所有杯装酒，以及精选整瓶。完整酒单请向服务员索取。"]], "small": [["Mens dere bestemmer dere", "Brød, oliven og nøtter til bordet.", "", ""], ["While you decide", "Bread, olives and nuts for the table."], ["Während Sie wählen", "Brot, Oliven und Nüsse für den Tisch."], ["Siz karar verirken", "Sofraya ekmek, zeytin ve kuruyemiş."], ["在您点单之前", "面包、橄榄与坚果，佐餐上桌。"]]}, "MENU": [{"id": "d3", "blk": "food", "sec": "dagens", "price": 795, "alg": [], "n": {"no": "Dagens 3-retter", "en": "Three-course menu of the day", "de": "Drei-Gänge-Menü des Tages", "tr": "Günün 3 kap menüsü", "zh": "今日三道式套餐"}, "d": {"no": "Kjøkkenets meny, satt sammen av dagens råvarer. Spør servitøren om innholdet i dag.", "en": "The kitchen's menu, built from what came in today. Ask your waiter what is on it tonight.", "de": "Das Menü der Küche aus den Zutaten des Tages. Fragen Sie den Service nach dem heutigen Inhalt.", "tr": "Mutfağın günün malzemeleriyle kurduğu menü. Bugün ne olduğunu garsona sorun.", "zh": "主厨以当日食材搭配的套餐。今日内容请询问服务员。"}}, {"id": "df", "blk": "food", "sec": "dagens", "price": 275, "alg": ["f"], "n": {"no": "Dagens forrett", "en": "Today's starter", "de": "Vorspeise des Tages", "tr": "Günün başlangıç tabağı", "zh": "今日前菜"}, "d": {"no": "Kokkens valg fra dagens fiskemarked.", "en": "The chef's pick from today's fish market.", "de": "Die Wahl des Küchenchefs vom heutigen Fischmarkt.", "tr": "Şefin bugünkü balık halinden seçtiği tabak.", "zh": "主厨从今日鱼市精选。"}}, {"id": "dfi", "blk": "food", "sec": "dagens", "price": 445, "alg": ["f"], "n": {"no": "Dagens fisk fra grillen", "en": "Fish of the day from the grill", "de": "Fisch des Tages vom Grill", "tr": "Izgaradan günün balığı", "zh": "今日炭烤鲜鱼"}, "d": {"no": "Hel eller filetert, avhengig av fangsten. Serveres med dagens tilbehør.", "en": "Whole or filleted, depending on the catch. Served with the accompaniment of the day.", "de": "Ganz oder filetiert, je nach Fang. Mit der Beilage des Tages.", "tr": "Avın durumuna göre bütün ya da fileto. Günün garnitürüyle.", "zh": "视当日渔获整条或去骨，配今日时蔬。"}}, {"id": "dd", "blk": "food", "sec": "dagens", "price": 215, "alg": ["e", "m", "g"], "n": {"no": "Dagens dessert", "en": "Today's dessert", "de": "Dessert des Tages", "tr": "Günün tatlısı", "zh": "今日甜点"}, "d": {"no": "Spør servitøren.", "en": "Ask your waiter.", "de": "Fragen Sie den Service.", "tr": "Garsona sorun.", "zh": "请询问服务员。"}}, {"id": "o1", "blk": "shell", "sec": "ostr", "price": 55, "alg": ["b", "su"], "unit": [[1, 55], [6, 295], [12, 575]], "n": {"no": "Østers Fine de Claire", "en": "Oysters Fine de Claire", "de": "Austern Fine de Claire", "tr": "İstiridye Fine de Claire", "zh": "Fine de Claire 生蚝"}, "d": {"no": "Naturell. Frankrike. 1 stk 55 · 6 stk 295 · 12 stk 575.", "en": "Natural. France. 1 pc 55 · 6 pcs 295 · 12 pcs 575.", "de": "Natur. Frankreich. 1 Stk. 55 · 6 Stk. 295 · 12 Stk. 575.", "tr": "Natürel. Fransa. 1 adet 55 · 6 adet 295 · 12 adet 575.", "zh": "原味。法国。1 只 55 · 6 只 295 · 12 只 575。"}}, {"id": "o2", "blk": "shell", "sec": "ostr", "price": 75, "alg": ["b", "su"], "unit": [[1, 75], [6, 435], [12, 865]], "n": {"no": "Østers Chebooktook", "en": "Oysters Chebooktook", "de": "Austern Chebooktook", "tr": "İstiridye Chebooktook", "zh": "Chebooktook 生蚝"}, "d": {"no": "Naturell. Canada. 1 stk 75 · 6 stk 435 · 12 stk 865.", "en": "Natural. Canada. 1 pc 75 · 6 pcs 435 · 12 pcs 865.", "de": "Natur. Kanada. 1 Stk. 75 · 6 Stk. 435 · 12 Stk. 865.", "tr": "Natürel. Kanada. 1 adet 75 · 6 adet 435 · 12 adet 865.", "zh": "原味。加拿大。1 只 75 · 6 只 435 · 12 只 865。"}}, {"id": "o3", "blk": "shell", "sec": "ostr", "price": 85, "alg": ["b", "su"], "unit": [[1, 85], [6, 480], [12, 950]], "n": {"no": "Østers Gillardeau", "en": "Oysters Gillardeau", "de": "Austern Gillardeau", "tr": "İstiridye Gillardeau", "zh": "Gillardeau 生蚝"}, "d": {"no": "Naturell. Frankrike. Husets favoritt. 1 stk 85 · 6 stk 480 · 12 stk 950.", "en": "Natural. France. The house favourite. 1 pc 85 · 6 pcs 480 · 12 pcs 950.", "de": "Natur. Frankreich. Der Favorit des Hauses. 1 Stk. 85 · 6 Stk. 480 · 12 Stk. 950.", "tr": "Natürel. Fransa. Evin favorisi. 1 adet 85 · 6 adet 480 · 12 adet 950.", "zh": "原味。法国。餐厅首选。1 只 85 · 6 只 480 · 12 只 950。"}}, {"id": "pl", "blk": "shell", "sec": "skall", "price": 1395, "alg": ["sk", "b", "ses", "e", "s"], "n": {"no": "Plateau de Fruits de Mer", "en": "Plateau de Fruits de Mer", "de": "Plateau de Fruits de Mer", "tr": "Plateau de Fruits de Mer", "zh": "海鲜拼盘 Plateau de Fruits de Mer"}, "d": {"no": "Solsidens spesialitet. Hummer, reker, kamskjell, taskekrabbeklør, blåskjell, sjøkreps når vi får tak i levende, og snøkrabbe. Pris per person, minimum 2 personer.", "en": "The house speciality. Lobster, shrimp, scallops, crab claws, mussels, Norwegian crayfish when we can get it live, and snow crab. Price per person, minimum 2 people.", "de": "Die Spezialität des Hauses. Hummer, Garnelen, Jakobsmuscheln, Krebsscheren, Miesmuscheln, Kaisergranat wenn lebend verfügbar, und Schneekrabbe. Preis pro Person, ab 2 Personen.", "tr": "Evin spesiyali. Istakoz, karides, deniz tarağı, yengeç kıskacı, midye, canlı bulabildiğimizde Norveç kerevidi ve kar yengeci. Kişi başı fiyat, en az 2 kişi.", "zh": "本店招牌。龙虾、虾、扇贝、蟹钳、青口、可得活货时的挪威海螯虾，以及雪蟹。每位价格，最少两位起。"}}, {"id": "st", "blk": "shell", "sec": "skall", "price": 995, "alg": ["sk", "e", "s", "su"], "n": {"no": "Skalldyrtallerken", "en": "Seafood platter", "de": "Meeresfrüchteteller", "tr": "Deniz ürünleri tabağı", "zh": "海鲜拼盘"}, "d": {"no": "½ hummer, taskekrabbeklør og reker. 500 gram.", "en": "½ lobster, Norwegian crab claws and shrimp. 500 grams.", "de": "½ Hummer, Krebsscheren und Garnelen. 500 Gramm.", "tr": "½ ıstakoz, yengeç kıskacı ve karides. 500 gram.", "zh": "半只龙虾、蟹钳与虾。500 克。"}}, {"id": "hu", "blk": "shell", "sec": "skall", "price": 585, "alg": ["sk", "e", "s", "su"], "n": {"no": "½ hummer naturell", "en": "½ steamed lobster", "de": "½ Hummer natur", "tr": "½ ıstakoz · buharda", "zh": "半只清蒸龙虾"}, "d": {"no": "Dampet, servert med aioli og salat.", "en": "Steamed, served with aioli and salad.", "de": "Gedämpft, mit Aioli und Salat.", "tr": "Buharda pişmiş; aioli ve salata ile.", "zh": "清蒸，配蒜香蛋黄酱与沙拉。"}}, {"id": "re", "blk": "shell", "sec": "skall", "price": 355, "alg": ["sk", "e", "s", "su"], "n": {"no": "Reker 500 gram", "en": "Shrimp 500 grams", "de": "Garnelen 500 Gramm", "tr": "Karides 500 gram", "zh": "鲜虾 500 克"}, "d": {"no": "Med skall på. Serveres med majones, brød og sitron.", "en": "Shell on. Served with mayonnaise, bread and lemon.", "de": "Mit Schale. Mit Mayonnaise, Brot und Zitrone.", "tr": "Kabuklu. Mayonez, ekmek ve limonla.", "zh": "带壳。配蛋黄酱、面包与柠檬。"}}, {"id": "bl", "blk": "shell", "sec": "skall", "price": 255, "alg": ["b", "su"], "n": {"no": "Dagens blåskjell", "en": "Mussels of the day", "de": "Miesmuscheln des Tages", "tr": "Günün midyesi", "zh": "今日青口"}, "d": {"no": "Kokt i dagens kraft. Spør servitøren om garnityret.", "en": "Cooked in today's broth. Ask your waiter about the garnish.", "de": "In der Brühe des Tages gegart. Fragen Sie den Service nach der Garnitur.", "tr": "Günün suyunda pişirilir. Garnitürü garsona sorun.", "zh": "以今日高汤烹制。配菜请询问服务员。"}}, {"id": "br", "blk": "small", "sec": "smatt", "price": 65, "alg": ["g", "e", "s", "su"], "n": {"no": "Brød med aioli", "en": "Bread with aioli", "de": "Brot mit Aioli", "tr": "Ekmek ve aioli", "zh": "面包配蒜香蛋黄酱"}, "d": {"no": "Nybakt, med husets aioli.", "en": "Freshly baked, with the house aioli.", "de": "Frisch gebacken, mit der Aioli des Hauses.", "tr": "Taze pişmiş; evin aiolisiyle.", "zh": "现烤，配本店蒜香蛋黄酱。"}}, {"id": "ol", "blk": "small", "sec": "smatt", "price": 65, "alg": [], "n": {"no": "Oliven", "en": "Olives", "de": "Oliven", "tr": "Zeytin", "zh": "橄榄"}, "d": {"no": "Marinerte.", "en": "Marinated.", "de": "Mariniert.", "tr": "Marine edilmiş.", "zh": "腌渍。"}}, {"id": "no", "blk": "small", "sec": "smatt", "price": 65, "alg": ["n", "ha", "ma"], "n": {"no": "Nøtter", "en": "Nuts", "de": "Nüsse", "tr": "Kuruyemiş", "zh": "坚果"}, "d": {"no": "Ristede og saltede.", "en": "Roasted and salted.", "de": "Geröstet und gesalzen.", "tr": "Kavrulmuş ve tuzlanmış.", "zh": "烘烤加盐。"}}, {"id": "b1", "blk": "wine", "sec": "bobler", "price": 150, "alg": ["su"], "n": {"no": "Crémant de Bourgogne Blanc de Noirs", "en": "Crémant de Bourgogne Blanc de Noirs", "de": "Crémant de Bourgogne Blanc de Noirs", "tr": "Crémant de Bourgogne Blanc de Noirs", "zh": "Crémant de Bourgogne Blanc de Noirs"}, "d": {"no": "Paul Delane, Burgund, Frankrike. Glass 15 cl. Flaske 895.", "en": "Paul Delane, Burgundy, France. 15 cl glass. Bottle 895.", "de": "Paul Delane, Burgund, Frankreich. Glas 15 cl. Flasche 895.", "tr": "Paul Delane, Burgonya, Fransa. 15 cl kadeh. Şişe 895.", "zh": "Paul Delane，勃艮第，法国。15 毫升杯装。整瓶 895。"}}, {"id": "b2", "blk": "wine", "sec": "bobler", "price": 200, "alg": ["su"], "n": {"no": "Franciacorta Alma Grand Cuvée Extra Brut", "en": "Franciacorta Alma Grand Cuvée Extra Brut", "de": "Franciacorta Alma Grand Cuvée Extra Brut", "tr": "Franciacorta Alma Grand Cuvée Extra Brut", "zh": "Franciacorta Alma Grand Cuvée Extra Brut"}, "d": {"no": "Bellavista, Lombardia, Italia. Glass 15 cl. Flaske 1195.", "en": "Bellavista, Lombardy, Italy. 15 cl glass. Bottle 1195.", "de": "Bellavista, Lombardei, Italien. Glas 15 cl. Flasche 1195.", "tr": "Bellavista, Lombardiya, İtalya. 15 cl kadeh. Şişe 1195.", "zh": "Bellavista，伦巴第，意大利。15 毫升杯装。整瓶 1195。"}}, {"id": "b3", "blk": "wine", "sec": "bobler", "price": 250, "alg": ["su"], "n": {"no": "Champagne Pierre Péters Grand Cru Blanc de Blancs", "en": "Champagne Pierre Péters Grand Cru Blanc de Blancs", "de": "Champagne Pierre Péters Grand Cru Blanc de Blancs", "tr": "Champagne Pierre Péters Grand Cru Blanc de Blancs", "zh": "Champagne Pierre Péters Grand Cru Blanc de Blancs"}, "d": {"no": "Cuvée de Réserve, Champagne, Frankrike. Glass 15 cl. Flaske 1495.", "en": "Cuvée de Réserve, Champagne, France. 15 cl glass. Bottle 1495.", "de": "Cuvée de Réserve, Champagne, Frankreich. Glas 15 cl. Flasche 1495.", "tr": "Cuvée de Réserve, Champagne, Fransa. 15 cl kadeh. Şişe 1495.", "zh": "Cuvée de Réserve，香槟区，法国。15 毫升杯装。整瓶 1495。"}}, {"id": "b5", "blk": "wine", "sec": "bobler", "price": 1695, "alg": ["su"], "n": {"no": "Taittinger Brut Réserve", "en": "Taittinger Brut Réserve", "de": "Taittinger Brut Réserve", "tr": "Taittinger Brut Réserve", "zh": "Taittinger Brut Réserve"}, "d": {"no": "Champagne, Frankrike. Flaske 75 cl.", "en": "Champagne, France. 75 cl bottle.", "de": "Champagne, Frankreich. Flasche 75 cl.", "tr": "Champagne, Fransa. 75 cl şişe.", "zh": "香槟区，法国。750 毫升瓶装。"}}, {"id": "b7", "blk": "wine", "sec": "bobler", "price": 4995, "alg": ["su"], "n": {"no": "Dom Pérignon Vintage 2015", "en": "Dom Pérignon Vintage 2015", "de": "Dom Pérignon Vintage 2015", "tr": "Dom Pérignon Vintage 2015", "zh": "Dom Pérignon Vintage 2015"}, "d": {"no": "Champagne, Frankrike. Flaske 75 cl.", "en": "Champagne, France. 75 cl bottle.", "de": "Champagne, Frankreich. Flasche 75 cl.", "tr": "Champagne, Fransa. 75 cl şişe.", "zh": "香槟区，法国。750 毫升瓶装。"}}, {"id": "g1", "blk": "wine", "sec": "glass", "price": 180, "alg": ["su"], "n": {"no": "Riesling Trocken 2024", "en": "Riesling Trocken 2024", "de": "Riesling Trocken 2024", "tr": "Riesling Trocken 2024", "zh": "Riesling Trocken 2024"}, "d": {"no": "Schäfer-Fröhlich, Nahe, Tyskland. Tørr.", "en": "Schäfer-Fröhlich, Nahe, Germany. Dry.", "de": "Schäfer-Fröhlich, Nahe, Deutschland. Trocken.", "tr": "Schäfer-Fröhlich, Nahe, Almanya. Sek.", "zh": "Schäfer-Fröhlich，那赫，德国。干型。"}}, {"id": "g3", "blk": "wine", "sec": "glass", "price": 180, "alg": ["su"], "n": {"no": "Granit Alvarinho 2025 · husets hvitvin", "en": "Granit Alvarinho 2025 · husets hvitvin", "de": "Granit Alvarinho 2025 · husets hvitvin", "tr": "Granit Alvarinho 2025 · husets hvitvin", "zh": "Granit Alvarinho 2025 · husets hvitvin"}, "d": {"no": "Soalheiro, Monção & Melgaço, Portugal. Flaske 895.", "en": "Soalheiro, Monção & Melgaço, Portugal. House white. Bottle 895.", "de": "Soalheiro, Monção & Melgaço, Portugal. Hauswein. Flasche 895.", "tr": "Soalheiro, Monção & Melgaço, Portekiz. Evin beyazı. Şişe 895.", "zh": "Soalheiro，蒙桑与梅尔加索，葡萄牙。招牌白酒。整瓶 895。"}}, {"id": "g4", "blk": "wine", "sec": "glass", "price": 220, "alg": ["su"], "n": {"no": "Sancerre 2024", "en": "Sancerre 2024", "de": "Sancerre 2024", "tr": "Sancerre 2024", "zh": "Sancerre 2024"}, "d": {"no": "Paul Prieur & Fils, Loire, Frankrike. Sauvignon blanc.", "en": "Paul Prieur & Fils, Loire, France. Sauvignon blanc.", "de": "Paul Prieur & Fils, Loire, Frankreich. Sauvignon Blanc.", "tr": "Paul Prieur & Fils, Loire, Fransa. Sauvignon blanc.", "zh": "Paul Prieur & Fils，卢瓦尔，法国。长相思。"}}, {"id": "g5", "blk": "wine", "sec": "glass", "price": 220, "alg": ["su"], "n": {"no": "Chablis Cuvée Solsiden 2025", "en": "Chablis Cuvée Solsiden 2025", "de": "Chablis Cuvée Solsiden 2025", "tr": "Chablis Cuvée Solsiden 2025", "zh": "Chablis Cuvée Solsiden 2025"}, "d": {"no": "Nathalie & Gilles Fèvre, Chablis, Frankrike. Laget til huset. Flaske 1095.", "en": "Nathalie & Gilles Fèvre, Chablis, France. Made for this house. Bottle 1095.", "de": "Nathalie & Gilles Fèvre, Chablis, Frankreich. Für dieses Haus abgefüllt. Flasche 1095.", "tr": "Nathalie & Gilles Fèvre, Chablis, Fransa. Restorana özel. Şişe 1095.", "zh": "Nathalie & Gilles Fèvre，夏布利，法国。餐厅专属。整瓶 1095。"}}, {"id": "g7", "blk": "wine", "sec": "glass", "price": 240, "alg": ["su"], "n": {"no": "Mâcon-Milly-Lamartine 2023", "en": "Mâcon-Milly-Lamartine 2023", "de": "Mâcon-Milly-Lamartine 2023", "tr": "Mâcon-Milly-Lamartine 2023", "zh": "Mâcon-Milly-Lamartine 2023"}, "d": {"no": "Héritiers du Comte Lafon, Burgund, Frankrike. Chardonnay. Flaske 1195.", "en": "Héritiers du Comte Lafon, Burgundy, France. Chardonnay. Bottle 1195.", "de": "Héritiers du Comte Lafon, Burgund, Frankreich. Chardonnay. Flasche 1195.", "tr": "Héritiers du Comte Lafon, Burgonya, Fransa. Chardonnay. Şişe 1195.", "zh": "Héritiers du Comte Lafon，勃艮第，法国。霞多丽。整瓶 1195。"}}, {"id": "g8", "blk": "wine", "sec": "glass", "price": 180, "alg": ["su"], "n": {"no": "Miraval Rosé 2025", "en": "Miraval Rosé 2025", "de": "Miraval Rosé 2025", "tr": "Miraval Rosé 2025", "zh": "Miraval Rosé 2025"}, "d": {"no": "Côtes de Provence, Frankrike. Flaske 895.", "en": "Côtes de Provence, France. Bottle 895.", "de": "Côtes de Provence, Frankreich. Flasche 895.", "tr": "Côtes de Provence, Fransa. Şişe 895.", "zh": "普罗旺斯丘，法国。整瓶 895。"}}, {"id": "g9", "blk": "wine", "sec": "glass", "price": 230, "alg": ["su"], "n": {"no": "Bourgogne Pinot Noir 2022", "en": "Bourgogne Pinot Noir 2022", "de": "Bourgogne Pinot Noir 2022", "tr": "Bourgogne Pinot Noir 2022", "zh": "Bourgogne Pinot Noir 2022"}, "d": {"no": "Vincent & Sophie Morey, Burgund, Frankrike. Flaske 1145.", "en": "Vincent & Sophie Morey, Burgundy, France. Bottle 1145.", "de": "Vincent & Sophie Morey, Burgund, Frankreich. Flasche 1145.", "tr": "Vincent & Sophie Morey, Burgonya, Fransa. Şişe 1145.", "zh": "Vincent & Sophie Morey，勃艮第，法国。整瓶 1145。"}}, {"id": "f1", "blk": "wine", "sec": "flaske", "price": 895, "alg": ["su"], "n": {"no": "Muscadet Les Vignes du Bourg 2024", "en": "Muscadet Les Vignes du Bourg 2024", "de": "Muscadet Les Vignes du Bourg 2024", "tr": "Muscadet Les Vignes du Bourg 2024", "zh": "Muscadet Les Vignes du Bourg 2024"}, "d": {"no": "Domaine Julien Braud, Loire, Frankrike. Klassikeren til østers.", "en": "Domaine Julien Braud, Loire, France. The classic with oysters.", "de": "Domaine Julien Braud, Loire, Frankreich. Der Klassiker zu Austern.", "tr": "Domaine Julien Braud, Loire, Fransa. İstiridyenin klasik eşlikçisi.", "zh": "Domaine Julien Braud，卢瓦尔，法国。生蚝的经典搭配。"}}, {"id": "f3", "blk": "wine", "sec": "flaske", "price": 895, "alg": ["su"], "n": {"no": "Albariño Lagar de Costa 2024", "en": "Albariño Lagar de Costa 2024", "de": "Albariño Lagar de Costa 2024", "tr": "Albariño Lagar de Costa 2024", "zh": "Albariño Lagar de Costa 2024"}, "d": {"no": "Rías Baixas, Spania. Atlanterhavskysten.", "en": "Rías Baixas, Spain. From the Atlantic coast.", "de": "Rías Baixas, Spanien. Von der Atlantikküste.", "tr": "Rías Baixas, İspanya. Atlantik kıyısından.", "zh": "下海湾，西班牙。大西洋海岸。"}}, {"id": "f7", "blk": "wine", "sec": "flaske", "price": 1495, "alg": ["su"], "n": {"no": "Assyrtiko Wild Ferment 2025", "en": "Assyrtiko Wild Ferment 2025", "de": "Assyrtiko Wild Ferment 2025", "tr": "Assyrtiko Wild Ferment 2025", "zh": "Assyrtiko Wild Ferment 2025"}, "d": {"no": "Gaia Wines, Santorini, Hellas. Saltpreget og stram.", "en": "Gaia Wines, Santorini, Greece. Saline and taut.", "de": "Gaia Wines, Santorin, Griechenland. Salzig und straff.", "tr": "Gaia Wines, Santorini, Yunanistan. Tuzlu ve diri.", "zh": "Gaia 酒庄，圣托里尼，希腊。咸感明显，酒体紧致。"}}, {"id": "f8", "blk": "wine", "sec": "flaske", "price": 2495, "alg": ["su"], "n": {"no": "Chablis Grand Cru Valmur 2023", "en": "Chablis Grand Cru Valmur 2023", "de": "Chablis Grand Cru Valmur 2023", "tr": "Chablis Grand Cru Valmur 2023", "zh": "Chablis Grand Cru Valmur 2023"}, "d": {"no": "Jean-Claude et Romain Bessin, Chablis, Frankrike.", "en": "Jean-Claude et Romain Bessin, Chablis, France.", "de": "Jean-Claude et Romain Bessin, Chablis, Frankreich.", "tr": "Jean-Claude et Romain Bessin, Chablis, Fransa.", "zh": "Jean-Claude et Romain Bessin，夏布利，法国。"}}, {"id": "f5", "blk": "wine", "sec": "flaske", "price": 1195, "alg": ["su"], "n": {"no": "Barbaresco 2020", "en": "Barbaresco 2020", "de": "Barbaresco 2020", "tr": "Barbaresco 2020", "zh": "Barbaresco 2020"}, "d": {"no": "Produttori del Barbaresco, Piemonte, Italia. Nebbiolo.", "en": "Produttori del Barbaresco, Piedmont, Italy. Nebbiolo.", "de": "Produttori del Barbaresco, Piemont, Italien. Nebbiolo.", "tr": "Produttori del Barbaresco, Piemonte, İtalya. Nebbiolo.", "zh": "Produttori del Barbaresco，皮埃蒙特，意大利。内比奥罗。"}}, {"id": "f9", "blk": "wine", "sec": "flaske", "price": 2495, "alg": ["su"], "n": {"no": "Chambolle-Musigny 2024", "en": "Chambolle-Musigny 2024", "de": "Chambolle-Musigny 2024", "tr": "Chambolle-Musigny 2024", "zh": "Chambolle-Musigny 2024"}, "d": {"no": "Domaine Faiveley, Burgund, Frankrike.", "en": "Domaine Faiveley, Burgundy, France.", "de": "Domaine Faiveley, Burgund, Frankreich.", "tr": "Domaine Faiveley, Burgonya, Fransa.", "zh": "Faiveley 酒庄，勃艮第，法国。"}}, {"id": "s3", "blk": "wine", "sec": "sot", "price": 135, "alg": ["su"], "n": {"no": "Sauternes 2016", "en": "Sauternes 2016", "de": "Sauternes 2016", "tr": "Sauternes 2016", "zh": "Sauternes 2016"}, "d": {"no": "Château de Myrat, Bordeaux, Frankrike. Glass 5 cl. Flaske 37,5 cl · 995.", "en": "Château de Myrat, Bordeaux, France. 5 cl glass. 37.5 cl bottle · 995.", "de": "Château de Myrat, Bordeaux, Frankreich. Glas 5 cl. Flasche 37,5 cl · 995.", "tr": "Château de Myrat, Bordeaux, Fransa. 5 cl kadeh. 37,5 cl şişe · 995.", "zh": "Château de Myrat，波尔多，法国。50 毫升杯装。375 毫升瓶 · 995。"}}, {"id": "s5", "blk": "wine", "sec": "sot", "price": 95, "alg": ["su"], "n": {"no": "Tawny Port 10 år", "en": "Tawny Port 10 år", "de": "Tawny Port 10 år", "tr": "Tawny Port 10 år", "zh": "Tawny Port 10 år"}, "d": {"no": "Quinta do Vale Meão, Douro, Portugal. Glass 5 cl. Flaske 1395.", "en": "Quinta do Vale Meão, Douro, Portugal. 5 cl glass. Bottle 1395.", "de": "Quinta do Vale Meão, Douro, Portugal. Glas 5 cl. Flasche 1395.", "tr": "Quinta do Vale Meão, Douro, Portekiz. 5 cl kadeh. Şişe 1395.", "zh": "Quinta do Vale Meão，杜罗，葡萄牙。50 毫升杯装。整瓶 1395。"}}, {"id": "s6", "blk": "wine", "sec": "sot", "price": 95, "alg": ["su"], "n": {"no": "Manzanilla Pasada", "en": "Manzanilla Pasada", "de": "Manzanilla Pasada", "tr": "Manzanilla Pasada", "zh": "Manzanilla Pasada"}, "d": {"no": "Emilio Lustau, Sanlúcar, Spania. Tørr sherry — prøv den til østers. Glass 5 cl. Flaske 895.", "en": "Emilio Lustau, Sanlúcar, Spain. Dry sherry — try it with the oysters. 5 cl glass. Bottle 895.", "de": "Emilio Lustau, Sanlúcar, Spanien. Trockener Sherry — probieren Sie ihn zu den Austern. Glas 5 cl. Flasche 895.", "tr": "Emilio Lustau, Sanlúcar, İspanya. Sek şeri — istiridyeyle deneyin. 5 cl kadeh. Şişe 895.", "zh": "Emilio Lustau，桑卢卡尔，西班牙。干型雪莉——配生蚝极佳。50 毫升杯装。整瓶 895。"}}], "SECORDER": {"food": ["dagens"], "shell": ["ostr", "skall"], "wine": ["bobler", "glass", "flaske", "sot"], "small": ["smatt"]}, "L": ["no", "en", "de", "tr", "zh"]};
+
+/* ---------------------------------------------------------------------------
+   BILDER
+   Legg filene i mappen «bilder/» ved siden av denne filen og fjern //.
+   ILLUSTRASJON = true setter merket «Illustrasjonsfoto» på hvert bilde og
+   en linje under overskriften. Sett den til false når bildene er deres egne.
+
+   Hent bildene her, i denne rekkefølgen:
+     1. Deres egne — Instagram @solsiden_restaurant. Da: ILLUSTRASJON = false.
+     2. Gratis, kommersiell lisens: unsplash.com / pexels.com.
+   Ikke fra Pinterest eller Google Bilder: de tilhører andre, de brekker,
+   og en kjøkkensjef kjenner igjen et fremmed fat.
+--------------------------------------------------------------------------- */
+const ILLUSTRASJON = true;
+const IMG = {
+  // pl: "bilder/plateau.jpg",
+  // o1: "bilder/osters-fine-de-claire.jpg",
+  // o3: "bilder/osters-gillardeau.jpg",
+  // hu: "bilder/hummer.jpg",
+  // dfi:"bilder/dagens-fisk.jpg",
+  // st: "bilder/skalldyrtallerken.jpg",
+  // re: "bilder/reker.jpg",
+  // dd: "bilder/dagens-dessert.jpg",
+};
+const IMGTXT  = {no:"Illustrasjonsfoto",en:"Illustrative photo",de:"Symbolfoto",
+                 tr:"Örnek görseldir",zh:"示意图片"};
+const IMGNOTE = {
+  no:"Bildene er illustrasjonsfoto og viser ikke våre egne retter.",
+  en:"The photos are illustrative and do not show our own dishes.",
+  de:"Die Fotos sind Symbolbilder und zeigen nicht unsere eigenen Gerichte.",
+  tr:"Görseller örnektir; kendi tabaklarımızı göstermez.",
+  zh:"图片仅供参考，并非本店实际菜品。"};
+const {LANGS, UI, ALG, SEC, HERO, MENU, SECORDER, L} = DATA;
+const BLOCKS = ["food","shell","wine","small"];
+const HEROKEY = {food:"food", shell:"shell", wine:"wine", small:"small"};
+
+/* Filtrene fjerner allergener i stedet for å kreve merkelapper.
+   Det er den riktige logikken for en sjømatrestaurant. */
+const FILTERS = [
+  {k:"sk",  ui:"noshell",   excl:["sk"]},
+  {k:"f",   ui:"nofish",    excl:["f"]},
+  {k:"veg", ui:"veg",       excl:["f","sk","b"]},
+  {k:"g",   ui:"nogluten",  excl:["g"]}
+];
+
+let lang="no", block="food", filters=new Set(), query="", cart={}, showAlt=false;
+let view="guest", table=11, orders=[], orderNo=0, nTables=12,
+    baseUrl="https://solsiden.no/meny";
+
+const $=s=>document.querySelector(s);
+const t=()=>UI[lang];
+const money=n=>n.toLocaleString("nb-NO")+" kr";
+const nameOf=it=>it.n[lang]||it.n.no;
+const descOf=it=>it.d[lang]||it.d.no;
+
+function renderLangs(){
+  const other = lang!=="no" ? "NO" : "EN";
+  $("#langs").innerHTML =
+    LANGS.map(([c,n])=>`<button class="lg ${c===lang?"on":""}" data-lg="${c}">${n.toUpperCase()}</button>`).join("")
+    + `<button class="lg alt ${showAlt?"on":""}" data-more="1">+ ${t().lang.toUpperCase()}</button>`;
+  document.querySelectorAll("[data-lg]").forEach(e=>e.onclick=()=>{lang=e.dataset.lg;render()});
+  $("[data-more]").onclick=openSheet;
+}
+function renderBlocks(){
+  $("#blocks").innerHTML = BLOCKS.map((k,i)=>
+    `<div class="blk ${k===block?"on":""}" data-b="${k}">${t().blocks[i]}</div>`).join("");
+  document.querySelectorAll("[data-b]").forEach(e=>e.onclick=()=>{block=e.dataset.b;window.scrollTo({top:0});render()});
+}
+function renderFilters(){
+  $("#filters").innerHTML =
+    `<button class="flt ${filters.size===0?"on":""}" data-f="__all">${t().all}</button>` +
+    FILTERS.map(f=>`<button class="flt ${filters.has(f.k)?"on":""}" data-f="${f.k}">${t()[f.ui]}</button>`).join("");
+  document.querySelectorAll("[data-f]").forEach(e=>e.onclick=()=>{
+    const f=e.dataset.f;
+    if(f==="__all") filters.clear();
+    else filters.has(f)?filters.delete(f):filters.add(f);
+    render();
+  });
+}
+function excluded(it){
+  for(const key of filters){
+    const f = FILTERS.find(x=>x.k===key);
+    if(f && f.excl.some(a=>it.alg.includes(a))) return true;
+  }
+  return false;
+}
+function matches(it){
+  if(it.blk!==block) return false;
+  if(excluded(it)) return false;
+  if(query){
+    const hay=(nameOf(it)+" "+descOf(it)).toLowerCase();
+    if(!hay.includes(query.toLowerCase())) return false;
+  }
+  return true;
+}
+function renderHero(){
+  const h = HERO[HEROKEY[block]][L.indexOf(lang)];
+  $("#hero").innerHTML = `<div class="acts">
+      <button class="act" id="callW">${t().callw}</button>
+      <button class="act" id="askB">${t().bill}</button></div>
+    <div class="hero"><b>${h[0]}</b><p>${h[1]}</p></div>`;
+  $("#callW").onclick=()=>toast(t().called);
+  $("#askB").onclick=()=>toast(t().billed);
+}
+function algLine(it){
+  if(!it.alg.length) return "";
+  const names = it.alg.map(a=>ALG[a][L.indexOf(lang)]).join(", ");
+  return `<div class="ialg">${t().allerg}: ${names}</div>`;
+}
+function renderList(){
+  const shown = MENU.filter(matches);
+  let html="";
+  for(const s of SECORDER[block]){
+    const items = shown.filter(i=>i.sec===s);
+    if(!items.length) continue;
+    html += `<div class="sec"><h2>${SEC[s][L.indexOf(lang)]}</h2></div><div class="hairline"></div>`;
+    for(const it of items){
+      const q = cart[it.id]||0;
+      const other = lang!=="no" ? "no" : "en";
+      const alt = showAlt ? `<div class="ialt"><b>${other.toUpperCase()}</b> ${it.d[other]}</div>` : "";
+      const units = it.unit ? `<div class="units">${it.unit.map(([n,p])=>
+          `<button class="unit" data-u="${it.id}:${n}:${p}">${n} ${t().pieces} · ${p}</button>`).join("")}</div>` : "";
+      const src = IMG[it.id];
+      const thumb = src
+        ? `<div class="thumb"><img src="${src}" alt="" loading="lazy"
+             onerror="this.parentElement.innerHTML='<span class=\'ph\'>FOTO</span>'">
+             ${ILLUSTRASJON?`<span class="illu">${IMGTXT[lang]||IMGTXT.no}</span>`:""}</div>`
+        : `<div class="thumb"><span class="ph">FOTO</span></div>`;
+      html += `<div class="item">${thumb}<div class="ib">
+          <div class="iname">${nameOf(it)}</div>
+          <div class="idesc">${descOf(it)}</div>${alt}${algLine(it)}${units}
+        </div><div class="iright">
+          <div class="price">${money(it.price)}</div>
+          ${q?`<div class="qty"><button data-m="${it.id}">−</button><b>${q}</b><button data-a="${it.id}">+</button></div>`
+             :`<button class="add" data-a="${it.id}">+</button>`}
+        </div></div>`;
+    }
+  }
+  if(ILLUSTRASJON && Object.keys(IMG).length)
+    html = `<div style="padding:10px 14px 0;font-size:10.5px;color:var(--dim2)">${IMGNOTE[lang]||IMGNOTE.no}</div>` + html;
+  if(block==="food"||block==="shell") html += legendHTML();
+  if(!html) html = `<div class="empty" style="padding:50px 20px">—</div>`;
+  $("#list").innerHTML = html;
+  document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>addItem(b.dataset.a));
+  document.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>removeItem(b.dataset.m));
+  document.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>{
+    const [id,n,p] = b.dataset.u.split(":");
+    addItem(id, +n, +p);
+  });
+}
+function legendHTML(){
+  const chips = Object.entries(ALG).map(([k,v])=>
+    `<span class="lchip"><i>${k}</i>${v[L.indexOf(lang)]}</span>`).join("");
+  return `<div class="legendbox"><h4>${t().legend}</h4><div class="lg2">${chips}</div>
+    <p>${t().filterNote}</p></div>`;
+}
+function renderFoot(){
+  const src = {
+   no:"Meny og priser hentet fra solsiden.no, 13. august 2026. Demo — ikke et bestillingssystem i drift.",
+   en:"Menu and prices taken from solsiden.no, 13 August 2026. Demo — not a live ordering system.",
+   de:"Karte und Preise von solsiden.no, 13. August 2026. Demo — kein aktives Bestellsystem.",
+   tr:"Menü ve fiyatlar solsiden.no adresinden alındı, 13 Ağustos 2026. Demo — canlı sipariş sistemi değildir.",
+   zh:"菜单与价格取自 solsiden.no，2026 年 8 月 13 日。演示版本，非正式点餐系统。"}[lang];
+  $("#fnote").innerHTML = `<b>DEMO</b> · ${src}`;
+}
+function renderDemoBar(){
+  const tabs=[["guest",t().guest],["waiter",t().waiter],["qr",t().qrv]];
+  const opts=Array.from({length:nTables},(_,i)=>i+1)
+    .map(i=>`<option value="${i}" ${i===table?"selected":""}>${t().table} ${i}</option>`).join("");
+  $("#demobar").innerHTML =
+    `<span class="dbtn" style="flex:none;color:var(--red);border:1px solid var(--red);padding:5px 7px">DEMO</span>`
+    + tabs.map(([k,l])=>`<button class="dbtn ${view===k?"on":""}" data-v="${k}">${l}</button>`).join("")
+    + `<select class="dsel" id="tblSel">${opts}</select>`;
+  document.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{view=b.dataset.v;window.scrollTo({top:0});render()});
+  $("#tblSel").onchange=e=>{table=+e.target.value;render()};
+}
+function renderService(){
+  const list = orders.length ? orders.slice().reverse().map(o=>`
+    <div class="ord ${o.served?"done":""}">
+      <div class="ordh"><b>${t().table} ${o.table}</b><span>#${String(o.id).padStart(3,"0")} · ${o.at}</span></div>
+      <div class="ordl">${o.lines.map(l=>`${l.q} × ${l.name}`).join("<br>")}</div>
+      <div class="ordf"><span class="op">${money(o.total)}</span>
+        ${o.served?`<button disabled>${t().srvDone}</button>`:`<button data-srv="${o.id}">${t().served}</button>`}</div>
+    </div>`).join("") : `<div class="empty">${t().svcEmpty}</div>`;
+  $("#list").innerHTML = `<div class="pane"><h2>${t().svcTitle}</h2><p class="ps">${t().svcSub}</p>
+    <div style="margin-top:14px">${list}</div></div>`;
+  document.querySelectorAll("[data-srv]").forEach(b=>b.onclick=()=>{
+    const o=orders.find(x=>x.id===+b.dataset.srv); if(o)o.served=true; renderService();
+  });
+}
+const qrLink=i=>baseUrl+"?bord="+i;
+function renderQR(){
+  $("#list").innerHTML = `<div class="pane">
+    <h2>${t().qrTitle} · ${nTables} ${t().tblWord}</h2><p class="ps">${t().qrSub}</p>
+    <div class="fld"><label>${t().baseUrl}</label><input id="qUrl" value="${baseUrl}"></div>
+    <div class="hint">${t().table} 1 &rarr; <b>${qrLink(1)}</b></div>
+    <div class="fld"><label>${t().tables}</label><input id="qN" type="number" min="1" max="60" value="${nTables}"></div>
+    <button class="btn" id="qGen">${t().gen}</button>
+    <button class="btn ghost noprint" id="qPrint">${t().printS}</button>
+    <div class="qrgrid" id="qrgrid"></div></div>`;
+  $("#qUrl").onchange=e=>{baseUrl=e.target.value.trim();renderQR()};
+  $("#qN").onchange=e=>{nTables=Math.max(1,Math.min(60,+e.target.value||12));render()};
+  $("#qGen").onclick=drawQR;
+  $("#qPrint").onclick=()=>window.print();
+  drawQR();
+}
+function drawQR(){
+  const g=$("#qrgrid"); if(!g) return; g.innerHTML="";
+  if(typeof QRCode==="undefined"){g.innerHTML=`<div class="empty" style="grid-column:1/-1">${t().offline}</div>`;return}
+  for(let i=1;i<=nTables;i++){
+    const c=document.createElement("div"); c.className="qrcard";
+    const h=document.createElement("div"); h.className="qc"; c.appendChild(h);
+    const n=document.createElement("div"); n.className="qn"; n.textContent=String(i).padStart(2,"0");
+    const s=document.createElement("div"); s.className="qs"; s.innerHTML=t().scan+"<br>"+UI.no.scan;
+    c.appendChild(n); c.appendChild(s); g.appendChild(c);
+    new QRCode(h,{text:qrLink(i),width:110,height:110,colorDark:"#07141A",colorLight:"#FFFFFF",
+                  correctLevel:QRCode.CorrectLevel.M});
+  }
+}
+function addItem(id, n, p){
+  cart[id]=(cart[id]||0)+(n||1);
+  if(p) cart["__p_"+id]=p/(n||1);
+  const it=MENU.find(x=>x.id===id);
+  toast(nameOf(it)+" "+t().added); renderList(); renderCart();
+}
+function removeItem(id){ cart[id]=(cart[id]||0)-1; if(cart[id]<=0) delete cart[id]; renderList(); renderCart(); }
+const unitPrice=id=>cart["__p_"+id]||MENU.find(x=>x.id===id).price;
+const cartIds=()=>Object.keys(cart).filter(k=>!k.startsWith("__p_"));
+const cartCount=()=>cartIds().reduce((a,k)=>a+cart[k],0);
+const cartTotal=()=>cartIds().reduce((a,k)=>a+unitPrice(k)*cart[k],0);
+function renderCart(){
+  const c=cartCount(); const bar=$("#cartbar");
+  bar.classList.toggle("show", c>0 && view==="guest");
+  $("#cartL").textContent = c+" "+(c===1?t().item:t().items);
+  $("#cartR").textContent = money(cartTotal());
+}
+function openDrawer(){
+  const ids=cartIds();
+  const rows = ids.length ? ids.map(id=>{
+    const it=MENU.find(x=>x.id===id);
+    return `<div class="crow"><div><div class="cn">${nameOf(it)}</div>
+      <div class="qty" style="margin-top:6px"><button data-dm="${id}">−</button><b>${cart[id]}</b><button data-da="${id}">+</button></div>
+      </div><div class="cp">${money(unitPrice(id)*cart[id])}</div></div>`;
+  }).join("") : `<div class="empty">${t().empty}</div>`;
+  $("#drawer").innerHTML = `<h3>${t().cart}</h3>${rows}
+    <div class="total"><span>${t().total}</span><span>${money(cartTotal())}</span></div>
+    <button class="btn" id="sendBtn">${t().send}</button>
+    <button class="btn ghost" id="closeBtn">${t().close}</button>`;
+  $("#drawer").classList.add("open"); $("#sheetBg").classList.add("open");
+  document.querySelectorAll("[data-da]").forEach(b=>b.onclick=()=>{addItem(b.dataset.da);openDrawer()});
+  document.querySelectorAll("[data-dm]").forEach(b=>b.onclick=()=>{removeItem(b.dataset.dm);openDrawer()});
+  $("#closeBtn").onclick=closeAll;
+  $("#sendBtn").onclick=()=>{
+    if(!cartCount()) return;
+    const lines=cartIds().map(id=>({name:nameOf(MENU.find(x=>x.id===id)),q:cart[id]}));
+    orderNo++;
+    const d=new Date();
+    orders.push({id:orderNo,table,at:String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"),
+                 lines,total:cartTotal(),served:false});
+    cart={}; closeAll(); renderList(); renderCart(); toast(t().sent);
+  };
+}
+function openSheet(){
+  const rows = LANGS.map(([c,n])=>`<div class="langrow ${c===lang?"on":""}" data-l="${c}">
+      <div><b>${n}</b><span>${({no:"Norwegian",en:"English",de:"German",tr:"Turkish",zh:"Chinese"})[c]}</span></div>
+      ${c===lang?'<span class="ck">✓</span>':""}</div>`).join("");
+  const other = lang!=="no" ? "NO" : "EN";
+  const soon = {
+   no:["Flere språk når dere vil","Fransk, spansk, italiensk, japansk — et nytt språk er ett tekstfelt per rett. Priser, allergener og merking gjenbrukes automatisk."],
+   en:["More languages whenever you want","French, Spanish, Italian, Japanese — a new language is one text field per dish. Prices, allergens and labels are reused automatically."],
+   de:["Weitere Sprachen jederzeit","Französisch, Spanisch, Italienisch, Japanisch — eine neue Sprache ist ein Textfeld pro Gericht. Preise, Allergene und Kennzeichnung werden übernommen."],
+   tr:["İstediğiniz kadar dil","Fransızca, İspanyolca, İtalyanca, Japonca — yeni bir dil, yemek başına tek bir metin alanı. Fiyat, alerjen ve etiketler otomatik korunur."],
+   zh:["随时增加语言","法语、西班牙语、意大利语、日语——新增一种语言只需每道菜一个文本框。价格、过敏原与标注自动沿用。"]}[lang];
+  const altT = {no:["Vis originalen","Setter den engelske teksten under hver rett."],
+                en:["Show the original","Puts the Norwegian text under each dish."],
+                de:["Original anzeigen","Setzt den norwegischen Text unter jedes Gericht."],
+                tr:["Orijinali göster","Her yemeğin altına Norveççe metni koyar."],
+                zh:["显示原文","在每道菜下方显示挪威语原文。"]}[lang];
+  $("#sheet").innerHTML = `<h3>${t().lang}</h3><p class="sh">${t().langsub}</p>${rows}
+    <div class="langrow ${showAlt?"on":""}" data-alt="1">
+      <div><b>${altT[0]} (${other})</b><span>${altT[1]}</span></div>
+      ${showAlt?'<span class="ck">✓</span>':""}</div>
+    <div class="soon"><b>${soon[0]}</b><p>${soon[1]}</p></div>`;
+  $("#sheet").classList.add("open"); $("#sheetBg").classList.add("open");
+  document.querySelectorAll("[data-l]").forEach(e=>e.onclick=()=>{lang=e.dataset.l;closeAll();render()});
+  $("[data-alt]").onclick=()=>{showAlt=!showAlt;closeAll();render()};
+}
+function closeAll(){ $("#sheet").classList.remove("open"); $("#drawer").classList.remove("open");
+  $("#sheetBg").classList.remove("open"); }
+let tt; function toast(m){ const e=$("#toast"); e.textContent=m; e.classList.add("show");
+  clearTimeout(tt); tt=setTimeout(()=>e.classList.remove("show"),1600); }
+
+function render(){
+  document.documentElement.lang = lang;
+  $("#search").placeholder = t().search;
+  $("#tablePill").textContent = t().table+" "+table;
+  renderLangs(); renderDemoBar();
+  const guest = view==="guest";
+  $(".blocks").style.display = guest?"":"none";
+  $(".tools").style.display  = guest?"":"none";
+  $("#hero").style.display   = guest?"":"none";
+  $("#fnote").style.display  = guest?"":"none";
+  if(guest){ renderBlocks(); renderFilters(); renderHero(); renderList(); renderFoot(); }
+  else if(view==="waiter") renderService();
+  else renderQR();
+  renderCart();
+}
+$("#sheetBg").onclick=closeAll;
+$("#cartbar").onclick=openDrawer;
+$("#search").oninput=e=>{query=e.target.value;renderList()};
+
+const SP=new URLSearchParams(location.search);
+const qp=SP.get("lang"), qb=SP.get("blk"), qv=SP.get("view");
+const nav=(qp||navigator.language||"no").slice(0,2).toLowerCase();
+if(LANGS.some(([c])=>c===nav)) lang=nav;
+if(BLOCKS.includes(qb)) block=qb;
+if(["guest","waiter","qr"].includes(qv)) view=qv;
+const qt=parseInt(SP.get("bord")||SP.get("table")||"",10);
+if(qt>=1&&qt<=60) table=qt;
+render();
+</script>
+</body>
+</html>
