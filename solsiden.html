@@ -667,7 +667,7 @@ function renderService(){
       <div class="ordh"><b>${t().table} ${o.table}</b><span>#${String(o.id).padStart(3,"0")} · ${stamp(o.ts)}</span></div>
       <div class="ordl">${o.lines.map(l=>`${l.q} × ${l.name}`).join("<br>")}</div>
       <div class="ordf"><span class="op">${money(o.total)}</span>
-        ${o.served?`<button disabled>${t().srvDone}</button>`:`<button data-srv="${o.id}">${t().served}</button>`}</div>
+        ${o.served?`<button disabled>${t().srvDone}</button>`:`<button data-srv="${o.uid}">${t().served}</button>`}</div>
     </div>`;
   const newest = (a,b) => b.ts - a.ts;
   const active = orders.filter(o=>!o.served).sort(newest);
