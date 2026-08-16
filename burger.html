@@ -1273,7 +1273,7 @@ render();
   /* ---------- tilkalling ---------- */
   function ring(kind){
     var e={k:"call",u:uid(),table:table,ts:Date.now(),kind:kind};
-    apply(e); saveAll(); publish(e);
+    apply(e); saveAll(); publish(e); renderDemoBar();
   }
   var _hero=renderHero;
   window.renderHero=function(){
@@ -1320,7 +1320,7 @@ render();
              at:String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0"),
              lines:lines,total:cartTotal()};
       apply(e); saveAll(); publish(e);
-      cart={}; closeAll(); renderList(); renderCart(); renderMine(); toast(t().sent);
+      cart={}; closeAll(); renderList(); renderCart(); renderMine(); renderDemoBar(); toast(t().sent);
     };
   };
 

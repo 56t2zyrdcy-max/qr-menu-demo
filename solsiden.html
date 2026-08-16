@@ -593,7 +593,7 @@ function renderHero(){
 }
 function ring(kind){
   const e = {k:"call", u:uid(), table, ts:Date.now(), kind};
-  applyEvent(e); saveCalls(); publish(e); renderMine();
+  applyEvent(e); saveCalls(); publish(e); renderMine(); renderDemoBar();
 }
 function algLine(it){
   if(!it.alg.length) return "";
@@ -936,7 +936,7 @@ function openDrawer(){
     const e = {k:"order", u:uid(), id:orderNo, table, ts:Date.now(),
                lines, total:cartTotal()};
     applyEvent(e); saveOrders(); publish(e);
-    cart={}; closeAll(); renderList(); renderCart(); renderMine(); toast(t().sent);
+    cart={}; closeAll(); renderList(); renderCart(); renderMine(); renderDemoBar(); toast(t().sent);
   };
 }
 function openSheet(){
