@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Burger &amp; Beers — QR Menu Demo</title>
+<style>
+:root{
+  --bg:#0E0C0A; --card:#17140F; --card2:#1F1B15; --line:#2B251D;
+  --tx:#F4EFE6; --dim:#9C9184; --dim2:#6E655B;
+  --amber:#E8A33D; --red:#C64B3C; --green:#2E6B4F; --blue:#3A6B8C;
+  --brown:#8A5A2B; --purple:#6B4E8C;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:#080706; color:var(--tx);
+  font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif;
+}
+#app{
+  width:100%; max-width:480px; min-width:0; margin:0 auto; background:var(--bg);
+  min-height:100vh; position:relative; padding-bottom:170px; box-shadow:0 0 60px rgba(0,0,0,.6);
+}
+@media(min-width:900px){ #app{ border-left:1px solid #241E17; border-right:1px solid #241E17 } }
+
+/* ---------- top bar ---------- */
+.top{position:sticky;top:0;z-index:40;background:rgba(14,12,10,.96);backdrop-filter:blur(12px);
+     border-bottom:1px solid var(--line)}
+.row1{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px;gap:8px}
+.brand{font-family:Georgia,"Times New Roman",serif;font-size:19px;font-weight:700;letter-spacing:-.4px;line-height:1}
+.brand small{display:block;font-family:inherit;font-size:8.5px;letter-spacing:2.4px;color:var(--dim2);
+             font-weight:400;margin-top:3px}
+.topright{display:flex;align-items:center;gap:6px}
+.table-pill{background:var(--card2);border:1px solid var(--line);border-radius:20px;padding:5px 10px;
+            font-size:11px;font-weight:700;color:var(--dim);white-space:nowrap}
+.langbtn{display:flex;align-items:center;gap:5px;background:var(--amber);color:#0E0C0A;border:0;
+         border-radius:20px;padding:6px 11px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}
+.globe{width:12px;height:12px;border-radius:50%;border:1.6px solid #0E0C0A;position:relative;flex:none}
+.globe::after{content:"";position:absolute;left:50%;top:-1.6px;bottom:-1.6px;border-left:1.6px solid #0E0C0A}
+
+/* blocks */
+.langs{display:flex;gap:5px;padding:0 14px 9px;overflow-x:auto;scrollbar-width:none;min-width:0}
+.langs::-webkit-scrollbar{display:none}
+.lg{font-size:10.5px;font-weight:800;letter-spacing:1px;padding:6px 11px;border-radius:7px;
+    border:1px solid var(--line);color:var(--dim2);background:transparent;cursor:pointer;
+    white-space:nowrap;font-family:inherit;transition:.15s}
+.lg.on{background:var(--tx);color:#0E0C0A;border-color:var(--tx)}
+.lg.alt{border-style:dashed;color:var(--dim2)}
+.lg.alt.on{background:var(--card2);color:var(--amber);border-color:var(--amber);border-style:solid}
+.blocks{display:flex;gap:5px;padding:2px 14px 10px;overflow-x:auto;scrollbar-width:none;min-width:0}
+.blocks::-webkit-scrollbar{display:none}
+.blk{flex:1;min-width:78px;text-align:center;font-size:11px;font-weight:800;letter-spacing:.3px;
+     padding:9px 6px;border-radius:9px;background:var(--card2);color:var(--dim);cursor:pointer;
+     border:1px solid transparent;transition:.15s;white-space:nowrap}
+.blk.on{background:var(--tx);color:#0E0C0A}
+
+/* search + filters */
+.tools{padding:0 14px 10px}
+.search{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;
+        padding:10px 12px;color:var(--tx);font-size:14px;font-family:inherit}
+.search::placeholder{color:var(--dim2)}
+.filters{display:flex;gap:6px;margin-top:9px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.filters::-webkit-scrollbar{display:none}
+.flt{font-size:11px;font-weight:700;padding:6px 11px;border-radius:20px;border:1px solid var(--line);
+     color:var(--dim);background:transparent;cursor:pointer;white-space:nowrap;font-family:inherit;transition:.15s}
+.flt.on{background:var(--green);border-color:var(--green);color:#fff}
+
+/* ---------- language sheet ---------- */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90;display:none}
+.sheet-bg.open{display:block}
+.sheet{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;
+       background:var(--card);border-radius:18px 18px 0 0;z-index:91;padding:16px 16px 24px;
+       display:none;border-top:1px solid var(--line);max-height:80vh;overflow:auto}
+.sheet.open{display:block}
+.sheet h3{font-family:Georgia,serif;font-size:17px;margin-bottom:3px}
+.sheet p.sh{color:var(--dim);font-size:12.5px;margin-bottom:12px}
+.langrow{display:flex;align-items:center;justify-content:space-between;padding:12px 12px;
+         background:var(--card2);border-radius:10px;margin-bottom:7px;cursor:pointer;border:1px solid transparent}
+.langrow.on{border-color:var(--amber)}
+.langrow b{font-size:14.5px}
+.langrow span{color:var(--dim2);font-size:11.5px;display:block;margin-top:1px}
+.langrow .ck{color:var(--amber);font-weight:800}
+.soon{background:#241D14;border:1px dashed #453722;border-radius:10px;padding:12px;margin-top:10px}
+.soon b{color:var(--amber);font-size:13px}
+.soon p{color:var(--dim);font-size:11.5px;margin-top:4px;line-height:1.45}
+
+/* ---------- sections & items ---------- */
+.sec{padding:16px 14px 4px}
+.sec h2{font-family:Georgia,serif;font-size:19px;color:var(--amber);letter-spacing:-.2px}
+.sec .sh2{color:var(--dim2);font-size:10.5px;letter-spacing:1.4px;margin-top:2px;text-transform:uppercase}
+.hairline{height:1px;background:var(--line);margin:9px 14px 0}
+
+.item{display:flex;gap:11px;padding:12px 14px;border-bottom:1px solid #141109;align-items:flex-start}
+.thumb{width:60px;height:60px;border-radius:10px;flex:none;position:relative;overflow:hidden}
+.thumb::after{content:attr(data-ph);position:absolute;left:0;right:0;bottom:3px;text-align:center;
+              font-size:6.5px;letter-spacing:.6px;color:rgba(0,0,0,.4);font-weight:800}
+.thumb.photo{background:#FFFFFF;display:flex;align-items:center;justify-content:center;padding:4px}
+.thumb.photo::after{content:none}
+.thumb.photo img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.ib{flex:1;min-width:0}
+.iname{font-size:15px;font-weight:700;line-height:1.25}
+.idesc{font-size:12.5px;color:var(--dim);margin-top:3px;line-height:1.35}
+.ialt{font-size:11px;color:var(--dim2);margin-top:3px;line-height:1.3}
+.ialt b{color:#5C544B;font-size:8.5px;letter-spacing:.8px;margin-right:3px}
+.ialg{font-size:10px;color:#5C544B;margin-top:4px}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{font-size:8.5px;font-weight:800;letter-spacing:.4px;padding:3px 7px;border-radius:20px;color:#fff}
+.t-veg{background:var(--green)}.t-vgn{background:#1F5B3E}.t-fsh{background:var(--blue)}
+.t-nop{background:var(--brown)}.t-glf{background:var(--purple)}.t-spy{background:var(--red)}
+.t-loc{background:var(--amber);color:#0E0C0A}.t-new{background:var(--red)}.t-hus{background:#8C6A1F}
+.iright{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:none}
+.price{font-family:Georgia,serif;font-size:15px;font-weight:700;color:var(--amber);white-space:nowrap}
+.add{width:31px;height:31px;border-radius:50%;border:1.5px solid var(--amber);background:transparent;
+     color:var(--amber);font-size:19px;line-height:0;cursor:pointer;font-family:inherit;
+     display:flex;align-items:center;justify-content:center;padding-bottom:2px}
+.add:active{background:var(--amber);color:#0E0C0A}
+.qty{display:flex;align-items:center;gap:9px}
+.qty button{width:26px;height:26px;border-radius:50%;border:0;background:var(--card2);color:var(--tx);
+            font-size:16px;line-height:0;cursor:pointer;font-family:inherit}
+.qty b{font-size:14px;min-width:14px;text-align:center}
+
+/* hero banner */
+.hero{margin:12px 14px 0;background:#33291D;border-radius:12px;padding:13px 15px}
+.hero b{color:var(--amber);font-family:Georgia,serif;font-size:15px}
+.hero p{color:#D8CBB6;font-size:12px;margin-top:5px;line-height:1.45}
+
+/* ---------- cart ---------- */
+.cartbar{position:fixed;bottom:54px;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
+         background:var(--amber);color:#0E0C0A;padding:14px 16px;display:none;
+         align-items:center;justify-content:space-between;cursor:pointer;z-index:60}
+.cartbar.show{display:flex}
+.cartbar .cl{font-weight:800;font-size:14px}
+.cartbar .cr{font-family:Georgia,serif;font-weight:700;font-size:16px}
+.drawer{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;
+        background:var(--card);border-radius:18px 18px 0 0;z-index:95;padding:16px 16px 22px;
+        display:none;max-height:82vh;overflow:auto;border-top:1px solid var(--line)}
+.drawer.open{display:block}
+.drawer h3{font-family:Georgia,serif;font-size:18px;margin-bottom:12px}
+.crow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;
+      border-bottom:1px solid var(--line)}
+.crow .cn{font-size:13.5px;font-weight:700}
+.crow .cp{font-family:Georgia,serif;color:var(--amber);font-weight:700;font-size:14px;white-space:nowrap}
+.total{display:flex;justify-content:space-between;padding:14px 0 4px;font-size:17px;font-weight:800}
+.total span:last-child{font-family:Georgia,serif;color:var(--amber)}
+.btn{width:100%;background:var(--amber);color:#0E0C0A;border:0;border-radius:11px;padding:14px;
+     font-size:15px;font-weight:800;cursor:pointer;margin-top:12px;font-family:inherit}
+.btn.ghost{background:transparent;color:var(--dim);border:1px solid var(--line);margin-top:8px}
+.empty{color:var(--dim2);text-align:center;padding:26px 0;font-size:13.5px}
+
+/* toast */
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--green);
+       color:#fff;padding:12px 20px;border-radius:24px;font-size:13.5px;font-weight:700;z-index:120;
+       opacity:0;pointer-events:none;transition:.25s}
+.toast.show{opacity:1}
+
+/* footer note */
+.fnote{padding:22px 16px 30px;color:#4E473F;font-size:10.5px;line-height:1.5;border-top:1px solid var(--line);margin-top:18px}
+.fnote b{color:var(--dim2)}
+/* ---- demo bar / service / qr ---- */
+.demobar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
+  background:#070605;border-top:1px solid var(--line);display:flex;align-items:center;gap:5px;
+  padding:7px 10px;z-index:80}
+.dbtn{flex:1;text-align:center;font-size:10px;font-weight:800;letter-spacing:.7px;padding:9px 3px;
+  border-radius:7px;background:transparent;color:var(--dim2);border:0;cursor:pointer;font-family:inherit}
+.dbtn.on{background:var(--card2);color:var(--tx)}
+.dsel{background:var(--card2);border:1px solid var(--line);color:var(--tx);border-radius:7px;
+  padding:8px 6px;font-size:11px;font-family:inherit;flex:none}
+.acts{display:flex;gap:8px;padding:12px 14px 2px}
+.act{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:12px 8px;
+  color:var(--tx);font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+.act:active{border-color:var(--amber);color:var(--amber)}
+.pane{padding:16px 14px 10px}
+.pane h2{font-family:Georgia,serif;font-size:22px;color:var(--amber);letter-spacing:-.3px}
+.pane p.ps{color:var(--dim);font-size:12.5px;margin-top:5px;line-height:1.4}
+.fld{margin-top:12px}
+.fld label{display:block;font-size:9.5px;font-weight:800;letter-spacing:1.2px;color:var(--amber);margin-bottom:5px}
+.fld input{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:9px;
+  padding:11px 12px;color:var(--tx);font-size:12.5px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.hint{font-size:10.5px;color:var(--dim2);margin-top:6px;word-break:break-all}
+.hint b{color:var(--dim)}
+.qrgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
+.qrcard{background:#fff;border-radius:10px;padding:12px 8px 10px;text-align:center;color:#0E0C0A}
+.qrcard .qc{display:flex;justify-content:center}
+.qrcard .qn{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:26px;font-weight:700;margin-top:6px;letter-spacing:1px}
+.qrcard .qs{font-size:8px;color:#6E655B;line-height:1.35;margin-top:2px}
+.ord{background:var(--card2);border-radius:11px;padding:12px 13px;margin-bottom:9px;border-left:3px solid var(--amber)}
+.ord.done{opacity:.45;border-left-color:var(--green)}
+.ordh{display:flex;justify-content:space-between;align-items:baseline}
+.ordh b{font-size:14px}
+.ordh span{font-size:10.5px;color:var(--dim2)}
+.ordl{font-size:12px;color:var(--dim);margin-top:6px;line-height:1.5}
+.ordf{display:flex;justify-content:space-between;align-items:center;margin-top:9px}
+.ordf .op{font-family:Georgia,serif;color:var(--amber);font-weight:700;font-size:14px}
+.ordf button{background:transparent;border:1px solid var(--line);color:var(--dim);border-radius:7px;
+  padding:6px 11px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+@media print{
+  body{background:#fff}
+  .top,.demobar,.cartbar,.demo-badge,#hero,.acts,.fld,.hint,.btn,.fnote,.pane p.ps,.pane h2,.noprint{display:none!important}
+  #app{max-width:none;box-shadow:none;background:#fff;padding:0}
+  .qrgrid{grid-template-columns:repeat(3,1fr);gap:8mm}
+  .qrcard{border:1px solid #ddd;break-inside:avoid}
+}
+.demo-badge{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:100;background:var(--red);
+            color:#fff;font-size:9px;font-weight:800;letter-spacing:1.4px;padding:3px 12px;border-radius:0 0 8px 8px}
+</style>
+
+<style>
+/* ---- rollelinje, tilkalling, kasse, gjeststatus ---- */
+.rolepill{display:flex;align-items:center;gap:6px;flex:none;font-size:9.5px;letter-spacing:1px;
+ font-weight:800;color:var(--amber,#E8A33D);border:1px solid #3A3128;border-radius:5px;padding:5px 8px}
+.syncdot{width:6px;height:6px;border-radius:50%;background:#7A3B33;flex:none}
+.syncdot.on{background:#2E6B4F;box-shadow:0 0 0 3px rgba(46,107,79,.22)}
+body.nobar .demobar{display:none!important}
+body.nobar .cartbar{bottom:0}
+body.nobar .mine{bottom:0}
+body.nobar.hasmine .cartbar{bottom:64px}
+.callhead{display:flex;align-items:baseline;gap:9px}
+.histn{display:inline-block;min-width:20px;text-align:center;background:#2A2118;color:#E8A33D;
+ border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700}
+.histn.hot{background:#C64B3C;color:#fff}
+.call{display:flex;align-items:center;justify-content:space-between;gap:10px;
+ background:#241708;border:1px solid #7A4A22;border-radius:10px;padding:12px 13px;margin-bottom:9px}
+.call b{font-size:14px;color:#F0C98A;display:block}
+.call span{font-size:11.5px;color:#B9976A}
+.call button{background:#E8A33D;color:#16130F;border:0;border-radius:7px;
+ padding:9px 13px;font:700 12px/1 inherit;cursor:pointer;flex:none}
+.kbig{margin-top:16px;background:#1C1813;border:1px solid #2E2921;border-radius:12px;
+ padding:16px 17px;display:flex;align-items:baseline;justify-content:space-between}
+.kbig span{font-size:12px;color:#9A8F80}
+.kbig b{font-family:Georgia,serif;font-size:27px;color:#E8A33D;font-weight:400}
+.ktri{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:9px}
+.ktri div{background:#1C1813;border:1px solid #2E2921;border-radius:10px;padding:12px 10px;text-align:center}
+.ktri b{display:block;font-family:Georgia,serif;font-size:17px;color:#F4EFE6;font-weight:400}
+.ktri span{display:block;font-size:10px;color:#7E7466;margin-top:3px}
+.krow{display:flex;justify-content:space-between;gap:10px;padding:10px 2px;
+ border-bottom:1px solid #221E18;font-size:12.5px;color:#9A8F80}
+.krow b{color:#F4EFE6;font-family:Georgia,serif;font-size:14px;font-weight:400;white-space:nowrap}
+.retain{font-size:11px;color:#7E7466;margin-top:8px}
+.mine{position:fixed;bottom:54px;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
+ background:#1C1813;border-top:1px solid #E8A33D;padding:11px 16px;display:none;
+ align-items:center;justify-content:space-between;gap:10px;cursor:pointer;z-index:58}
+.mine.show{display:flex}
+.mine .mt{font-size:12.5px;font-weight:700;color:#E8A33D}
+.mine .ms{font-size:10.5px;color:#9A8F80;margin-top:2px}
+.mine .mr{font-family:Georgia,serif;font-size:14px;color:#F4EFE6;white-space:nowrap}
+.mine .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#E8A33D;
+ margin-right:5px;vertical-align:1px;animation:blip 1.6s ease-in-out infinite}
+.mine.done .dot{background:#2E6B4F;animation:none}
+@keyframes blip{0%,100%{opacity:1}50%{opacity:.25}}
+body.hasmine .cartbar{bottom:118px}
+/* ---- tilkallingsknapp med roterende ring ---- */
+.acts{align-items:center}
+.bell{position:relative;width:88px;height:88px;flex:none;background:none;border:0;padding:0;cursor:pointer}
+.bell .ring{position:absolute;inset:0;width:88px;height:88px;animation:spin 22s linear infinite}
+.bell .ring text{fill:#E8A33D;font:700 8.6px/1 Helvetica,Arial,sans-serif;letter-spacing:2.1px}
+.bell .disc{position:absolute;inset:13px;border-radius:50%;border:1px solid #6B5427;
+ background:#1C1813;display:flex;align-items:center;justify-content:center}
+.bell .disc svg{width:26px;height:26px;fill:none;stroke:#E8A33D;stroke-width:1.6;
+ stroke-linecap:round;stroke-linejoin:round}
+.bell.rang .disc svg{animation:swing .7s ease}
+.bell.rang::after{content:"";position:absolute;inset:6px;border-radius:50%;
+ border:1px solid #E8A33D;animation:pulse .8s ease-out}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes swing{0%,100%{transform:rotate(0)}20%{transform:rotate(15deg)}
+ 40%{transform:rotate(-13deg)}60%{transform:rotate(9deg)}80%{transform:rotate(-5deg)}}
+@keyframes pulse{from{transform:scale(1);opacity:.9}to{transform:scale(1.5);opacity:0}}
+@media(prefers-reduced-motion:reduce){.bell .ring{animation:none}.bell.rang .disc svg{animation:none}}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <div class="top">
+    <div class="row1">
+      <div class="brand">Burger &amp; Beers<small>STAVANGER</small></div>
+      <div class="topright">
+        <div class="table-pill" id="tablePill">Bord 11</div>
+      </div>
+    </div>
+    <div class="langs" id="langs"></div>
+    <div class="blocks" id="blocks"></div>
+    <div class="tools">
+      <input class="search" id="search" placeholder="Search...">
+      <div class="filters" id="filters"></div>
+    </div>
+  </div>
+
+  <div id="hero"></div>
+  <div id="list"></div>
+  <div class="fnote" id="fnote"></div>
+</div>
+
+<div class="demobar" id="demobar"></div>
+<div class="cartbar" id="cartbar">
+  <span class="cl" id="cartL">0</span>
+  <span class="cr" id="cartR">0 kr</span>
+</div>
+
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet"></div>
+<div class="drawer" id="drawer"></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+/* =====================================================================
+   LANGUAGES — adding one is a data entry job, nothing else changes.
+   ===================================================================== */
+const LANGS = [
+  {c:"en", name:"English",  nat:"English"},
+  {c:"no", name:"Norsk",    nat:"Norwegian"},
+  {c:"de", name:"Deutsch",  nat:"German"},
+  {c:"tr", name:"Türkçe",   nat:"Turkish"}
+];
+
+const UI = {
+  en:{altTitle:"Show the original",altSub:"Prints the Norwegian text under each dish. Useful when pointing at the menu.",
+      tblWord:"tables",guest:"GUEST",waiter:"WAITER",qrv:"QR CODES",qrTitle:"QR codes",qrSub:"Every code opens the menu with its own table number. Print, laminate, put it on the table.",baseUrl:"Menu address",tables:"Number of tables",gen:"Generate QR codes",printS:"Print sheet",scan:"Scan for menu & order",svcTitle:"Live orders",svcSub:"Everything guests send from the tables lands here.",svcEmpty:"No orders yet. Send one from the guest view.",served:"Mark as served",srvDone:"Served",callw:"Call the waiter",bill:"Ask for the bill",called:"The waiter has been notified",billed:"The bill is on its way",offline:"QR codes need an internet connection.",
+      search:"Search...",all:"All",veg:"Vegetarian",vgn:"Vegan",nop:"No pork",glf:"Gluten free",
+      spy:"Spicy",loc:"Local",blocks:["FOOD","BEER","WINE & BAR","NO ALCOHOL"],
+      cart:"Your order",items:"items",item:"item",total:"Total",send:"Send order to the kitchen",
+      close:"Keep browsing",empty:"Nothing added yet.",sent:"Order sent to the kitchen",
+      lang:"Language",langsub:"The whole menu changes — not just the buttons.",
+      allerg:"Allergens",added:"added",gfbun:"Gluten-free bun +25 kr",table:"Table"},
+  no:{altTitle:"Vis originalen",altSub:"Setter den engelske teksten under hver rett. Nyttig når gjesten peker i menyen.",
+      tblWord:"bord",guest:"GJEST",waiter:"SERVITØR",qrv:"QR-KODER",qrTitle:"QR-koder",qrSub:"Hver kode åpner menyen med sitt eget bordnummer. Skriv ut, laminer, sett på bordet.",baseUrl:"Menyadresse",tables:"Antall bord",gen:"Lag QR-koder",printS:"Skriv ut ark",scan:"Skann for meny og bestilling",svcTitle:"Bestillinger inn",svcSub:"Alt gjestene sender fra bordene havner her.",svcEmpty:"Ingen bestillinger ennå. Send en fra gjestevisningen.",served:"Marker som servert",srvDone:"Servert",callw:"Tilkall servitør",bill:"Be om regningen",called:"Servitøren er varslet",billed:"Regningen er på vei",offline:"QR-kodene krever nettforbindelse.",
+      search:"Søk...",all:"Alt",veg:"Vegetar",vgn:"Vegansk",nop:"Uten svinekjøtt",glf:"Glutenfri",
+      spy:"Sterk",loc:"Lokal",blocks:["MAT","ØL","VIN & BAR","ALKOHOLFRITT"],
+      cart:"Din bestilling",items:"varer",item:"vare",total:"Totalt",send:"Send bestillingen til kjøkkenet",
+      close:"Tilbake til menyen",empty:"Ingenting lagt til ennå.",sent:"Bestillingen er sendt til kjøkkenet",
+      lang:"Språk",langsub:"Hele menyen bytter språk — ikke bare knappene.",
+      allerg:"Allergener",added:"lagt til",gfbun:"Glutenfritt burgerbrød +25 kr",table:"Bord"},
+  de:{altTitle:"Original anzeigen",altSub:"Setzt den norwegischen Text unter jedes Gericht. Praktisch beim Zeigen auf der Karte.",
+      tblWord:"Tische",guest:"GAST",waiter:"SERVICE",qrv:"QR-CODES",qrTitle:"QR-Codes",qrSub:"Jeder Code öffnet die Karte mit seiner eigenen Tischnummer. Ausdrucken, laminieren, auf den Tisch stellen.",baseUrl:"Adresse der Karte",tables:"Anzahl Tische",gen:"QR-Codes erzeugen",printS:"Bogen drucken",scan:"Scannen für Karte & Bestellung",svcTitle:"Eingehende Bestellungen",svcSub:"Alles, was die Gäste an den Tischen senden, landet hier.",svcEmpty:"Noch keine Bestellungen. Senden Sie eine aus der Gastansicht.",served:"Als serviert markieren",srvDone:"Serviert",callw:"Service rufen",bill:"Rechnung bitte",called:"Der Service wurde benachrichtigt",billed:"Die Rechnung kommt",offline:"Für QR-Codes wird eine Internetverbindung benötigt.",
+      search:"Suchen...",all:"Alle",veg:"Vegetarisch",vgn:"Vegan",nop:"Ohne Schweinefleisch",glf:"Glutenfrei",
+      spy:"Scharf",loc:"Regional",blocks:["SPEISEN","BIER","WEIN & BAR","ALKOHOLFREI"],
+      cart:"Ihre Bestellung",items:"Artikel",item:"Artikel",total:"Gesamt",send:"Bestellung an die Küche senden",
+      close:"Weiter in der Karte",empty:"Noch nichts hinzugefügt.",sent:"Bestellung an die Küche gesendet",
+      lang:"Sprache",langsub:"Die ganze Karte wechselt die Sprache — nicht nur die Buttons.",
+      allerg:"Allergene",added:"hinzugefügt",gfbun:"Glutenfreies Burger-Brötchen +25 kr",table:"Tisch"},
+  tr:{altTitle:"Orijinali göster",altSub:"Her yemeğin altına Norveççe metni koyar. Menüyü göstererek sipariş verirken işe yarar.",
+      tblWord:"masa",guest:"MİSAFİR",waiter:"GARSON",qrv:"QR KODLAR",qrTitle:"QR kodlar",qrSub:"Her kod menüyü kendi masa numarasıyla açar. Yazdırın, laminasyon yapın, masaya koyun.",baseUrl:"Menü adresi",tables:"Masa sayısı",gen:"QR kodları oluştur",printS:"Sayfayı yazdır",scan:"Menü ve sipariş için okutun",svcTitle:"Gelen siparişler",svcSub:"Masalardan gönderilen her sipariş buraya düşer.",svcEmpty:"Henüz sipariş yok. Misafir görünümünden bir tane gönderin.",served:"Servis edildi olarak işaretle",srvDone:"Servis edildi",callw:"Garson çağır",bill:"Hesap iste",called:"Garsona haber verildi",billed:"Hesap hazırlanıyor",offline:"QR kodlar için internet bağlantısı gerekir.",
+      search:"Ara...",all:"Hepsi",veg:"Vejetaryen",vgn:"Vegan",nop:"Domuz etsiz",glf:"Glutensiz",
+      spy:"Acı",loc:"Yerel",blocks:["YEMEK","BİRA","ŞARAP & BAR","ALKOLSÜZ"],
+      cart:"Siparişiniz",items:"ürün",item:"ürün",total:"Toplam",send:"Siparişi mutfağa gönder",
+      close:"Menüye dön",empty:"Henüz bir şey eklenmedi.",sent:"Sipariş mutfağa gönderildi",
+      lang:"Dil",langsub:"Menünün tamamı değişiyor — sadece butonlar değil.",
+      allerg:"Alerjenler",added:"eklendi",gfbun:"Glutensiz burger ekmeği +25 kr",table:"Masa"}
+};
+
+const ALG = {
+  egg:{en:"Egg",no:"Egg",de:"Ei",tr:"Yumurta"},
+  milk:{en:"Milk",no:"Melk",de:"Milch",tr:"Süt"},
+  wheat:{en:"Wheat",no:"Hvete",de:"Weizen",tr:"Buğday"},
+  must:{en:"Mustard",no:"Sennep",de:"Senf",tr:"Hardal"},
+  sulf:{en:"Sulphites",no:"Sulfitter",de:"Sulfite",tr:"Sülfit"},
+  fish:{en:"Fish",no:"Fisk",de:"Fisch",tr:"Balık"},
+  sesa:{en:"Sesame",no:"Sesam",de:"Sesam",tr:"Susam"},
+  soy:{en:"Soy",no:"Soya",de:"Soja",tr:"Soya"},
+  nuts:{en:"Nuts",no:"Nøtter",de:"Nüsse",tr:"Kuruyemiş"},
+  barl:{en:"Barley",no:"Bygg",de:"Gerste",tr:"Arpa"},
+  oats:{en:"Oats",no:"Havre",de:"Hafer",tr:"Yulaf"},
+  cele:{en:"Celery",no:"Selleri",de:"Sellerie",tr:"Kereviz"}
+};
+
+const SEC = {
+  sig:{en:["Signature burgers","Six we stand behind"],no:["Signaturburgere","Seks vi står inne for"],
+       de:["Signature-Burger","Sechs, hinter denen wir stehen"],tr:["İmza burgerler","Arkasında durduğumuz altı burger"]},
+  grn:{en:["Green","Vegetarian & vegan"],no:["Grønt","Vegetar og vegansk"],
+       de:["Grün","Vegetarisch & vegan"],tr:["Yeşil","Vejetaryen ve vegan"]},
+  gri:{en:["From the grill & more","Chicken, fish, ribs, steak"],no:["Fra grillen","Kylling, fisk, ribs, biff"],
+       de:["Vom Grill","Hähnchen, Fisch, Ribs, Steak"],tr:["Izgaradan","Tavuk, balık, kaburga, biftek"]},
+  kid:{en:["For the kids",""],no:["For barna",""],de:["Für Kinder",""],tr:["Çocuklar için",""]},
+  set:{en:["Set menus","One line, one price"],no:["Faste menyer","Én linje, én pris"],
+       de:["Menüs","Eine Zeile, ein Preis"],tr:["Menü paketleri","Tek fiyat"]},
+  hus:{en:["Our house beer","Brewed only for us"],no:["Husets øl","Brygget kun for oss"],
+       de:["Unser Hausbier","Nur für uns gebraut"],tr:["Ev birası","Sadece bizim için üretiliyor"]},
+  loc:{en:["Local","Stavanger and the region"],no:["Lokalt","Stavanger og regionen"],
+       de:["Regional","Stavanger und Umgebung"],tr:["Yerel","Stavanger ve bölgesi"]},
+  tap:{en:["On tap",""],no:["På fat",""],de:["Vom Fass",""],tr:["Fıçıdan",""]},
+  int:{en:["International",""],no:["Internasjonalt",""],de:["International",""],tr:["Uluslararası",""]},
+  gfn:{en:["Gluten free & alcohol free",""],no:["Glutenfritt og alkoholfritt",""],
+       de:["Glutenfrei & alkoholfrei",""],tr:["Glutensiz ve alkolsüz",""]},
+  gla:{en:["Wine by the glass",""],no:["Vin på glass",""],de:["Wein glasweise",""],tr:["Kadeh şarap",""]},
+  coc:{en:["Cocktails",""],no:["Cocktailer",""],de:["Cocktails",""],tr:["Kokteyller",""]},
+  spi:{en:["Whisky & spirits",""],no:["Whisky og brennevin",""],de:["Whisky & Spirituosen",""],tr:["Viski ve sert içkiler",""]},
+  moc:{en:["Mocktails","Alcohol free, made to order"],no:["Alkoholfrie cocktailer","Laget på bestilling"],
+       de:["Mocktails","Alkoholfrei, frisch gemixt"],tr:["Mocktailler","Alkolsüz, taze hazırlanır"]},
+  sof:{en:["Soft drinks, coffee & tea",""],no:["Brus, kaffe og te",""],
+       de:["Softdrinks, Kaffee & Tee",""],tr:["Meşrubat, kahve ve çay",""]}
+};
+
+const HERO = {
+  food:{en:["Everything here is written in your language",
+            "Not just the buttons. Pick a language at the top and every dish, every category and every allergen follows. Adding another language is one text field per item — nothing else changes."],
+        no:["Alt her står på ditt språk",
+            "Ikke bare knappene. Velg språk øverst, og hver rett, hver kategori og hvert allergen følger med. Å legge til enda et språk er ett tekstfelt per vare — ingenting annet endres."],
+        de:["Alles hier steht in Ihrer Sprache",
+            "Nicht nur die Buttons. Wählen Sie oben eine Sprache — jedes Gericht, jede Kategorie und jedes Allergen wechselt mit. Eine weitere Sprache ist ein Textfeld pro Artikel, sonst ändert sich nichts."],
+        tr:["Buradaki her şey sizin dilinizde",
+            "Sadece butonlar değil. Üstten dili seçin; her yemek, her kategori ve her alerjen o dile geçer. Yeni bir dil eklemek, ürün başına tek bir metin alanı demek — başka hiçbir şey değişmiyor."]},
+  beer:{en:["Brewed where you are sitting",
+            "Six of these breweries are from Stavanger and the region. One of them brews a beer only for us. Everything marked LOCAL is made within an hour of this table."],
+        no:["Brygget der du sitter",
+            "Seks av bryggeriene her er fra Stavanger og regionen. Ett av dem brygger en øl kun for oss. Alt som er merket LOKAL, er laget innenfor en times reise fra dette bordet."],
+        de:["Gebraut, wo Sie sitzen",
+            "Sechs dieser Brauereien kommen aus Stavanger und der Region. Eine davon braut ein Bier nur für uns. Alles, was mit REGIONAL markiert ist, entsteht keine Stunde von diesem Tisch entfernt."],
+        tr:["Oturduğunuz yerde üretiliyor",
+            "Buradaki bira üreticilerinin altısı Stavanger ve çevresinden. Biri sadece bize özel bir bira üretiyor. YEREL etiketli her şey bu masaya bir saat mesafede üretiliyor."]},
+  wine:{en:["Ask the bar",
+            "The full list of over a hundred beers, wines and spirits is on the next screens. If you cannot decide, the Stavanger Beer Flight is four local glasses picked by the bar."],
+        no:["Spør i baren",
+            "Hele listen med over hundre øl, viner og brennevin finner du på de neste skjermene. Klarer du ikke å velge, er Stavanger Beer Flight fire lokale øl valgt av baren."],
+        de:["Fragen Sie an der Bar",
+            "Die vollständige Liste mit über hundert Bieren, Weinen und Spirituosen folgt auf den nächsten Seiten. Wenn Sie unschlüssig sind: Das Stavanger Beer Flight bringt vier regionale Biere, ausgewählt von der Bar."],
+        tr:["Bara sorun",
+            "Yüzden fazla bira, şarap ve sert içkinin tam listesi ilerleyen ekranlarda. Karar veremezseniz, Stavanger Beer Flight barın seçtiği dört yerel biradan oluşuyor."]},
+  noalc:{en:["Made properly, not poured from a bottle",
+             "Both mocktails are mixed fresh. Alcohol-free beer and cider are under BEER."],
+         no:["Laget ordentlig, ikke bare tappet fra flaske",
+             "Begge mocktailene mikses når du bestiller. Alkoholfritt øl og sider ligger under ØL."],
+         de:["Frisch gemixt, nicht aus der Flasche gegossen",
+             "Beide Mocktails werden frisch gemixt. Alkoholfreies Bier und Cider finden Sie unter BIER."],
+         tr:["Şişeden dökülmüyor, gerçekten hazırlanıyor",
+             "İki mocktail de anında hazırlanıyor. Alkolsüz bira ve elma şarabı BİRA bölümünde."]}
+};
+
+/* =====================================================================
+   MENU DATA
+   ===================================================================== */
+function d(en,no,de,tr){return{en,no,de,tr}}
+
+const MENU = [
+/* ---------------- FOOD ---------------- */
+{blk:"food",sec:"sig",id:"classic",n:"Classic",p:235,th:"a",alg:["egg","wheat","milk","must","sulf"],tg:[],
+ d:d("Beef burger with Kongsgård cheese, bacon and our own house dressing.",
+     "Storfeburger med Kongsgård-ost, bacon og vår egen hamburgerdressing.",
+     "Rinderburger mit Kongsgård-Käse, Bacon und unserem hausgemachten Dressing.",
+     "Dana burger; Kongsgård peyniri, bacon ve kendi ev sosumuz.")},
+
+{blk:"food",sec:"sig",id:"holy",n:"Holy Smoke",p:255,th:"b",alg:["egg","wheat","milk","must","sulf"],tg:[],
+ d:d("Smoked cheddar, bacon, crispy onion and smoked chipotle mayonnaise.",
+     "Røkt cheddar, bacon, sprøstekt løk og røkt chipotlemajones.",
+     "Geräucherter Cheddar, Bacon, Röstzwiebeln und geräucherte Chipotle-Mayo.",
+     "Füme cheddar, bacon, çıtır soğan ve füme chipotle mayonezi.")},
+
+{blk:"food",sec:"sig",id:"sacre",n:"Sacré Bleu!",p:255,th:"b",alg:["egg","wheat","milk","sulf"],tg:[],
+ d:d("Saint Agur blue cheese, caramelised onion, bacon and apple.",
+     "Saint Agur blåmuggost, karamellisert løk, bacon og eple.",
+     "Saint Agur Blauschimmelkäse, karamellisierte Zwiebeln, Bacon und Apfel.",
+     "Saint Agur mavi küflü peynir, karamelize soğan, bacon ve elma.")},
+
+{blk:"food",sec:"sig",id:"texican",n:"Texican",p:249,th:"a",alg:["egg","wheat","milk","must","sulf"],tg:["nop","spy"],
+ d:d("Cheddar, pico de gallo, guacamole, nacho chips, jalapeños and chipotle mayo.",
+     "Cheddar, pico de gallo, guacamole, nachochips, jalapeños og chipotlemajones.",
+     "Cheddar, Pico de Gallo, Guacamole, Nachos, Jalapeños und Chipotle-Mayo.",
+     "Cheddar, pico de gallo, guacamole, nacho cipsi, jalapeño ve chipotle mayonezi.")},
+
+{blk:"food",sec:"sig",id:"truffle",n:"Truffle-icious",p:255,th:"b",alg:["egg","wheat","milk","must","sulf"],tg:[],
+ d:d("Truffle and parmesan cream, bacon marmalade, mushrooms, rocket and pickled red onion.",
+     "Trøffel- og parmesankrem, baconmarmelade, sopp, ruccola og syltet rødløk.",
+     "Trüffel-Parmesan-Creme, Bacon-Marmelade, Pilze, Rucola und eingelegte rote Zwiebeln.",
+     "Trüf ve parmesan kreması, bacon marmelatı, mantar, roka ve kırmızı soğan turşusu.")},
+
+{blk:"food",sec:"sig",id:"relax",n:"Relax! Take it cheesy",p:259,th:"a",alg:["egg","wheat","milk","sulf"],tg:["spy"],
+ d:d("Double cheese, double bacon, onion rings, caramelised onion and jalapeño cheese sauce.",
+     "Dobbel ost, dobbel bacon, løkringer, karamellisert løk og ostesaus med jalapeño.",
+     "Doppelter Käse, doppelter Bacon, Zwiebelringe, karamellisierte Zwiebeln und Jalapeño-Käsesauce.",
+     "Çift peynir, çift bacon, soğan halkaları, karamelize soğan ve jalapeñolu peynir sosu.")},
+
+{blk:"food",sec:"grn",id:"green",n:"Green Machine",p:245,th:"g",alg:["wheat","must","sulf"],tg:["new","vgn","nop"],
+ d:d("Plant-based patty, caramelised onion, crispy onion and vegan dressing.",
+     "Plantebasert burgerbiff, karamellisert løk, sprøstekt løk og vegansk dressing.",
+     "Pflanzliches Patty, karamellisierte Zwiebeln, Röstzwiebeln und veganes Dressing.",
+     "Bitki bazlı köfte, karamelize soğan, çıtır soğan ve vegan sos.")},
+
+{blk:"food",sec:"grn",id:"halloumi",n:{en:"Halloumi & Pesto",no:"Halloumi og pesto",de:"Halloumi & Pesto",tr:"Hellim & Pesto"},p:239,th:"g",alg:["wheat","milk","nuts","sulf"],tg:["new","veg","nop"],
+ d:d("Grilled halloumi, rocket pesto, pickled red onion and cherry tomato.",
+     "Grillet halloumi, ruccolapesto, syltet rødløk og cherrytomat.",
+     "Gegrillter Halloumi, Rucola-Pesto, eingelegte rote Zwiebeln und Kirschtomaten.",
+     "Izgara hellim, roka pestosu, kırmızı soğan turşusu ve kiraz domates.")},
+
+{blk:"food",sec:"gri",id:"korean",n:{en:"Korean Fried Chicken Burger",no:"«Kor e’ an?» · koreansk kyllingburger",de:"Korean Fried Chicken Burger",tr:"Kore Usulü Çıtır Tavuk Burger"},p:255,th:"k",
+ alg:["egg","wheat","milk","must","sesa","soy","sulf","fish"],tg:["nop","spy"],
+ d:d("Crispy chicken thigh in Korean chilli glaze, kimchi, soy mayo and toasted sesame.",
+     "«Kor e’ an?» — sprøstekt kyllinglår i koreansk chiliglaze, kimchi, soyamajones og ristet sesam.",
+     "Knuspriges Hähnchenschenkelfilet in koreanischer Chili-Glasur, Kimchi, Soja-Mayo und geröstetem Sesam.",
+     "Kore usulü acı sosta çıtır tavuk budu, kimchi, soya mayonezi ve kavrulmuş susam.")},
+
+{blk:"food",sec:"gri",id:"fish",n:{en:"Crispy Fish Burger",no:"Sprø fiskeburger",de:"Knuspriger Fischburger",tr:"Çıtır Balık Burger"},p:249,th:"k",alg:["egg","wheat","milk","fish","must","sulf"],tg:["fsh","nop"],
+ d:d("Crispy fish, guacamole, lettuce, tomato, red onion and lemon mayo.",
+     "Sprø fiskeburger med guacamole, salat, tomat, rødløk og sitronmajones.",
+     "Knuspriger Fisch, Guacamole, Salat, Tomate, rote Zwiebeln und Zitronen-Mayo.",
+     "Çıtır balık, guacamole, marul, domates, kırmızı soğan ve limonlu mayonez.")},
+
+{blk:"food",sec:"gri",id:"chicksand",n:{en:"Chicken Sandwich",no:"Kyllingsandwich",de:"Hähnchen-Sandwich",tr:"Tavuklu Sandviç"},p:229,th:"k",alg:["egg","wheat","milk","must","sulf"],tg:[],
+ d:d("Sourdough with herb aioli, grilled chicken breast, bacon, parmesan and pickled red onion.",
+     "Surdeigsbrød med urteaioli, grillet kyllingbryst, bacon, parmesan og syltet rødløk.",
+     "Sauerteigbrot mit Kräuter-Aioli, gegrillter Hähnchenbrust, Bacon, Parmesan und eingelegten roten Zwiebeln.",
+     "Ekşi mayalı ekmek, otlu aioli, ızgara tavuk göğsü, bacon, parmesan ve kırmızı soğan turşusu.")},
+
+{blk:"food",sec:"gri",id:"ribs",n:{en:"Baby Back Spareribs · 350 g",no:"Baby back ribs · 350 g",de:"Baby Back Ribs · 350 g",tr:"Baby Back Kaburga · 350 g"},p:319,th:"b",alg:["milk","must","sulf"],tg:["spy"],
+ d:d("Tender ribs in our own chilli BBQ glaze, with creamed corn, coleslaw, fries and chilli mayo.",
+     "Møre ribs med vår egen chili-BBQ-glaze, maisstuing, coleslaw, pommes frites og chilimajones.",
+     "Zarte Ribs in unserer eigenen Chili-BBQ-Glasur mit Rahmmais, Krautsalat, Pommes und Chili-Mayo.",
+     "Kendi acılı BBQ sosumuzda yumuşacık kaburga; mısır kreması, lahana salatası (coleslaw), patates kızartması ve acılı mayonez.")},
+
+{blk:"food",sec:"gri",id:"nystrip",n:{en:"New York Strip · 200 g",no:"New York Strip · 200 g",de:"Rumpsteak · 200 g",tr:"Kontrfile · 200 g"},p:419,th:"b",alg:["egg","milk","cele","soy","sulf"],tg:["nop"],
+ d:d("Grilled sirloin with the fat cap, fries, cherry tomatoes, broccolini, pepper sauce and tarragon mayo.",
+     "Grillet ytrefilet av okse med fettrand, pommes frites, cherrytomater, brokkolini, peppersaus og estragonmajones.",
+     "Gegrilltes Rumpsteak mit Fettrand, Pommes, Kirschtomaten, Broccolini, Pfeffersauce und Estragon-Mayo.",
+     "Yağ tabakasıyla ızgara kontrfile; patates kızartması, kiraz domates, brokolini, karabiber sosu ve tarhun mayonezi.")},
+
+{blk:"food",sec:"gri",id:"caesar",n:{en:"Caesar Salad",no:"Cæsarsalat",de:"Caesar Salat",tr:"Sezar Salata"},p:259,th:"g",alg:["egg","wheat","milk","fish","must","sulf"],tg:["fsh"],
+ d:d("Bacon, chicken, croutons, pickled red onion, parmesan and caesar dressing.",
+     "Bacon, kylling, krutonger, syltet rødløk, parmesan og caesardressing.",
+     "Bacon, Hähnchen, Croûtons, eingelegte rote Zwiebeln, Parmesan und Caesar-Dressing.",
+     "Bacon, tavuk, kruton, kırmızı soğan turşusu, parmesan ve sezar sosu.")},
+
+{blk:"food",sec:"kid",id:"kids",n:{en:"Kids menu",no:"Barnemeny",de:"Kindermenü",tr:"Çocuk menüsü"},p:195,th:"a",alg:["egg","wheat","milk"],tg:["new"],
+ d:d("Choose mini burger, chicken nuggets or pasta. Juice and one scoop of vanilla ice cream included.",
+     "Velg miniburger, kyllingnuggets eller pasta. Juice og én kule vaniljeis følger med.",
+     "Mini-Burger, Chicken Nuggets oder Pasta zur Wahl. Saft und eine Kugel Vanilleeis inklusive.",
+     "Mini burger, tavuk nugget veya makarna arasından seçin. Meyve suyu ve bir top vanilyalı dondurma dahil.")},
+
+{blk:"food",sec:"set",id:"combo",n:{en:"Burger + Fries + Local Beer",no:"Burger + pommes frites + lokal øl",de:"Burger + Pommes + regionales Bier",tr:"Burger + Patates + Yerel Bira"},p:349,th:"a",alg:["egg","wheat","milk","barl"],tg:[],
+ d:d("Any signature burger, a portion of fries and a local beer of the day.",
+     "Valgfri signaturburger, en porsjon pommes frites og dagens lokale øl.",
+     "Signature-Burger nach Wahl, eine Portion Pommes und das regionale Bier des Tages.",
+     "Bir imza burger, bir porsiyon patates kızartması ve günün yerel birası.")},
+
+{blk:"food",sec:"set",id:"cruise",n:{en:"Cruise Lunch · 12:00–16:00",no:"Cruise-lunsj · 12:00–16:00",de:"Cruise-Lunch · 12:00–16:00",tr:"Cruise Öğle Menüsü · 12:00–16:00"},p:299,th:"a",alg:["egg","wheat","milk"],tg:[],
+ d:d("Burger or chicken sandwich with fries and a soft drink, served within 15 minutes.",
+     "Burger eller chicken sandwich med pommes frites og en brus, servert på et kvarter.",
+     "Burger oder Chicken Sandwich mit Pommes und einem Softdrink, in unter 15 Minuten serviert.",
+     "Burger veya tavuklu sandviç, patates kızartması ve meşrubat — 15 dakika içinde servis edilir.")},
+
+/* ---------------- BEER ---------------- */
+{blk:"beer",sec:"hus",id:"jatta_h",n:"Jåttå Hamburgerøl · 5,5 %",p:139,th:"y",alg:["wheat","oats"],tg:["hus","loc"],
+ d:d("Brown ale brewed in Stavanger especially for this house. Malty with oats and a fruity finish.",
+     "Brown ale brygget i Stavanger spesielt for oss. Fyldig og maltpreget, med havre og fruktig avslutning.",
+     "Brown Ale, in Stavanger eigens für uns gebraut. Malzig, mit Hafer und fruchtigem Abgang.",
+     "Stavanger'de sadece bizim için üretilen brown ale. Yulaflı, maltlı, meyvemsi bitiş.")},
+
+{blk:"beer",sec:"loc",id:"lucky",n:"Lervig Lucky Jack · 4,7 %",p:139,th:"y",alg:["barl"],tg:["loc"],
+ d:d("Unfiltered pale ale, tropical and floral.","Ufiltrert pale ale, tropisk og floral.",
+     "Ungefiltertes Pale Ale, tropisch und blumig.","Filtresiz pale ale; tropikal ve çiçeksi.")},
+{blk:"beer",sec:"loc",id:"party",n:"Lervig House Party · 4,0 %",p:139,th:"y",alg:["barl"],tg:["loc"],
+ d:d("Easy-drinking session ale.","Lett og drikkevennlig session ale.",
+     "Süffiges Session Ale.","İçimi kolay session ale.")},
+{blk:"beer",sec:"loc",id:"perler",n:"Lervig Perler for svin · 6,3 %",p:169,th:"y",alg:["barl","wheat"],tg:["loc"],
+ d:d("Juicy IPA, mango and lychee, low bitterness.","Saftig IPA med mango og litchi, lav bitterhet.",
+     "Saftiges IPA mit Mango und Litschi, wenig Bitterkeit.","Meyve suyu kıvamında IPA; mango ve liçi, düşük acılık.")},
+{blk:"beer",sec:"loc",id:"jattapils",n:"Jåttå Jåttåpils · 4,7 %",p:109,th:"y",alg:["barl"],tg:["loc"],
+ d:d("Czech-style pilsner from the farm brewery.","Tsjekkisk-inspirert pils fra gårdsbryggeriet.",
+     "Pils nach tschechischer Art aus der Bauernhof-Brauerei.","Çiftlikteki bira üreticisinden Çek usulü pilsner.")},
+{blk:"beer",sec:"loc",id:"vestland",n:"Jåttå Vestlandspils · 4,7 %",p:109,th:"y",alg:["barl"],tg:["loc"],
+ d:d("Saaz-heavy, aromatic and properly bitter.","Mye Saaz, aromatisk og tydelig bitter.",
+     "Viel Saazer Hopfen, aromatisch und deutlich bitter.","Bol Saaz şerbetçiotu; aromatik ve belirgin acılıkta.")},
+{blk:"beer",sec:"loc",id:"mocca",n:"Berentsen Mocca Stout · 4,7 %",p:119,th:"y",alg:["barl"],tg:["loc"],
+ d:d("Coffee stout from Egersund.","Kaffestout fra Egersund.","Kaffee-Stout aus Egersund.","Egersund'dan kahveli stout.")},
+{blk:"beer",sec:"loc",id:"pilegrim",n:"Kinn Pilegrim · 4,5 %",p:135,th:"y",alg:[],tg:["loc","glf"],
+ d:d("Yorkshire-style bitter, gluten free.","Bitter i Yorkshire-stil, glutenfri.",
+     "Bitter nach Yorkshire-Art, glutenfrei.","Yorkshire usulü bitter, glutensiz.")},
+
+{blk:"beer",sec:"tap",id:"tou",n:"Tou Pilsner · 0,4 l",p:125,th:"y",alg:["barl"],tg:[],
+ d:d("Crisp and light, straw and hay.","Frisk og lett, preg av strå og halm.",
+     "Frisch und leicht, Stroh und Heu.","Ferah ve hafif; saman notaları.")},
+{blk:"beer",sec:"tap",id:"schous",n:"Schous Pils · 0,4 l",p:139,th:"y",alg:["barl"],tg:[],
+ d:d("Nordic pilsner, floral and balanced.","Nordisk pils, floral og balansert.",
+     "Nordisches Pils, blumig und ausgewogen.","İskandinav pilsner; çiçeksi ve dengeli.")},
+{blk:"beer",sec:"tap",id:"frydenlund",n:"Frydenlund Juicy IPA · 0,4 l",p:139,th:"y",alg:["barl","wheat"],tg:[],
+ d:d("Passion fruit and mango, gently bitter.","Pasjonsfrukt og mango, mild bitterhet.",
+     "Maracuja und Mango, milde Bitterkeit.","Çarkıfelek meyvesi ve mango; hafif acılık.")},
+{blk:"beer",sec:"tap",id:"guinness",n:"Guinness · 0,5 l",p:169,th:"y",alg:["barl"],tg:[],
+ d:d("Roasted malt, coffee and caramel. Low carbonation.","Røstet malt, kaffe og karamell. Lav kullsyre.",
+     "Geröstetes Malz, Kaffee und Karamell. Wenig Kohlensäure.","Kavrulmuş malt, kahve ve karamel. Düşük gazlı.")},
+{blk:"beer",sec:"tap",id:"crowmoor",n:{en:"CrowMoor Dry Apple Cider · 0,4 l",no:"CrowMoor tørr eplesider · 0,4 l",de:"CrowMoor trockener Apfelcider · 0,4 l",tr:"CrowMoor sek elma şarabı · 0,4 l"},p:149,th:"g",alg:["sulf"],tg:["glf"],
+ d:d("Dry English-style cider with solid apple.","Tørr sider i engelsk stil med tydelig eplesmak.",
+     "Trockener Cider nach englischer Art mit deutlicher Apfelnote.","Sek, İngiliz usulü elma şarabı; belirgin elma karakteri.")},
+
+{blk:"beer",sec:"int",id:"staropramen",n:"Staropramen · 0,33 l",p:109,th:"y",alg:["barl"],tg:[],
+ d:d("Czech premium pilsner.","Tsjekkisk premium pilsner.","Tschechisches Premium-Pils.","Çek premium pilsner.")},
+{blk:"beer",sec:"int",id:"sol",n:"Sol · 0,33 l",p:125,th:"y",alg:["barl"],tg:[],
+ d:d("Mexican lager, light and citrusy.","Meksikansk lager, lett og sitrusaktig.",
+     "Mexikanisches Lager, leicht und zitrusfrisch.","Meksika birası; hafif ve narenciyeli.")},
+{blk:"beer",sec:"int",id:"paulaner",n:"Paulaner Weissbier · 0,5 l",p:165,th:"y",alg:["barl","wheat"],tg:[],
+ d:d("Banana, mango and pineapple. Cloudy and soft.","Banan, mango og ananas. Naturlig uklar og myk.",
+     "Banane, Mango und Ananas. Naturtrüb und weich.","Muz, mango ve ananas. Bulanık ve yumuşak.")},
+{blk:"beer",sec:"int",id:"chimay",n:"Chimay Blanche Tripel · 0,33 l",p:169,th:"y",alg:["barl"],tg:[],
+ d:d("Trappist tripel, muscat and raisin.","Trappist tripel med muskat og rosin.",
+     "Trappisten-Tripel mit Muskateller und Rosinen.","Trappist tripel; misket üzümü ve kuru üzüm.")},
+
+{blk:"beer",sec:"gfn",id:"lite",n:{en:"Lervig Lite Pilsner · 0,5 l",no:"Lervig Lite Pilsner · 0,5 l",de:"Lervig Lite Pils · 0,5 l",tr:"Lervig Lite Pilsner · 0,5 l"},p:169,th:"y",alg:[],tg:["glf","loc"],
+ d:d("Gluten-free lager, crisp and clean.","Glutenfri lager, frisk og ren.",
+     "Glutenfreies Lager, frisch und sauber.","Glutensiz lager; ferah ve temiz.")},
+{blk:"beer",sec:"gfn",id:"noworries",n:"Lervig No Worries · 0,5 %",p:85,th:"y",alg:["barl"],tg:["loc"],
+ d:d("Alcohol-free pilsner from Stavanger.","Alkoholfri pils fra Stavanger.",
+     "Alkoholfreies Pils aus Stavanger.","Stavanger'den alkolsüz pilsner.")},
+{blk:"beer",sec:"gfn",id:"paulaner_af",n:"Paulaner Alkoholfrei · 0,0 %",p:99,th:"y",alg:["barl","wheat"],tg:[],
+ d:d("Wheat beer, no alcohol at all.","Hveteøl helt uten alkohol.",
+     "Weißbier ganz ohne Alkohol.","Buğday birası; tamamen alkolsüz.")},
+{blk:"beer",sec:"loc",id:"flight",n:{en:"Stavanger Beer Flight · 4 × 15 cl",no:"Stavanger Beer Flight · 4 × 15 cl",de:"Stavanger Beer Flight · 4 × 15 cl",tr:"Stavanger Bira Tadımı · 4 × 15 cl"},p:199,th:"y",alg:["barl"],tg:["new","loc"],
+ d:d("Four local beers, chosen by the bar. The easiest way into a list of a hundred.",
+     "Fire lokale øl, valgt av baren. Den enkleste veien inn i en liste på hundre.",
+     "Vier regionale Biere, ausgewählt von der Bar. Der einfachste Einstieg in hundert Sorten.",
+     "Barın seçtiği dört yerel bira. Yüz kalemlik listeye en kolay giriş.")},
+
+/* ---------------- WINE & BAR ---------------- */
+{blk:"wine",sec:"gla",id:"bianco",n:"Cosa Vuoi Bianco 2025",p:149,th:"w",alg:["sulf"],tg:["vgn"],
+ d:d("Chardonnay and Pinot Grigio, Veneto, Italy.","Chardonnay og Pinot Grigio, Veneto, Italia.",
+     "Chardonnay und Pinot Grigio, Venetien, Italien.","Chardonnay ve Pinot Grigio; Veneto, İtalya.")},
+{blk:"wine",sec:"gla",id:"horgelus",n:"Dom. Horgelus 2025",p:149,th:"w",alg:["sulf"],tg:["vgn"],
+ d:d("Colombard and Sauvignon Blanc, Gascogne, France.","Colombard og Sauvignon Blanc, Gascogne, Frankrike.",
+     "Colombard und Sauvignon Blanc, Gascogne, Frankreich.","Colombard ve Sauvignon Blanc; Gascogne, Fransa.")},
+{blk:"wine",sec:"gla",id:"rosso",n:"Cosa Vuoi Rosso 2023",p:145,th:"r",alg:["sulf"],tg:["vgn"],
+ d:d("Raboso and Cabernet Sauvignon, Veneto, Italy.","Raboso og Cabernet Sauvignon, Veneto, Italia.",
+     "Raboso und Cabernet Sauvignon, Venetien, Italien.","Raboso ve Cabernet Sauvignon; Veneto, İtalya.")},
+{blk:"wine",sec:"gla",id:"rose",n:"Horgelus La Vie En Rose 2024",p:149,th:"r",alg:["sulf"],tg:["vgn"],
+ d:d("Rosé of Tannat, Cabernet Franc and Merlot.","Rosé av Tannat, Cabernet Franc og Merlot.",
+     "Rosé aus Tannat, Cabernet Franc und Merlot.","Tannat, Cabernet Franc ve Merlot rozesi.")},
+{blk:"wine",sec:"gla",id:"prosecco",n:"Da Luca Prosecco",p:145,th:"w",alg:["sulf"],tg:["vgn"],
+ d:d("Sparkling, Veneto, Italy.","Musserende, Veneto, Italia.","Schaumwein, Venetien, Italien.","Köpüklü şarap; Veneto, İtalya.")},
+
+{blk:"wine",sec:"coc",id:"aperol",n:"Aperol Spritz",p:155,th:"o",alg:["sulf"],tg:["vgn"],
+ d:d("Aperol, prosecco and soda over ice.","Aperol, prosecco og soda over is.",
+     "Aperol, Prosecco und Soda auf Eis.","Aperol, prosecco ve soda; buz üzerine.")},
+{blk:"wine",sec:"coc",id:"hugo",n:"Hugo Spritz",p:155,th:"g",alg:["sulf"],tg:["vgn"],
+ d:d("Elderflower, prosecco, soda and mint.","Hyllblomst, prosecco, soda og mynte.",
+     "Holunderblüte, Prosecco, Soda und Minze.","Mürver çiçeği, prosecco, soda ve nane.")},
+{blk:"wine",sec:"coc",id:"negroni",n:"Negroni",p:165,th:"r",alg:["sulf"],tg:["vgn"],
+ d:d("Campari, Beefeater gin and sweet vermouth.","Campari, Beefeater gin og søt vermut.",
+     "Campari, Beefeater Gin und roter Wermut.","Campari, Beefeater cini ve tatlı vermut.")},
+{blk:"wine",sec:"coc",id:"mule",n:"Moscow Mule",p:155,th:"o",alg:[],tg:["vgn"],
+ d:d("Absolut vodka, ginger beer, angostura and lime.","Absolut vodka, ingefærøl, angostura og lime.",
+     "Absolut Wodka, Ginger Beer, Angostura und Limette.","Absolut votka, zencefilli gazoz, angostura ve misket limonu.")},
+{blk:"wine",sec:"coc",id:"margarita",n:"Frozen Passionfruit Margarita",p:175,th:"o",alg:[],tg:["vgn"],
+ d:d("Tequila, Cointreau, passion fruit, vanilla and lime.","Tequila, Cointreau, pasjonsfrukt, vanilje og lime.",
+     "Tequila, Cointreau, Maracuja, Vanille und Limette.","Tekila, Cointreau, çarkıfelek meyvesi, vanilya ve misket limonu.")},
+{blk:"wine",sec:"coc",id:"hendricks",n:"Hendrick’s & Tonic",p:189,th:"g",alg:[],tg:["vgn"],
+ d:d("Premium tonic, black pepper and cucumber.","Premium tonic, svart pepper og agurk.",
+     "Premium-Tonic, schwarzer Pfeffer und Gurke.","Premium tonik, karabiber ve salatalık.")},
+{blk:"wine",sec:"coc",id:"byogt",n:{en:"Build your own Gin & Tonic",no:"Sett sammen din egen Gin & Tonic",de:"Gin & Tonic nach Wahl",tr:"Kendi Gin Tonic’ini yap"},p:175,th:"g",alg:[],tg:["vgn"],
+ d:d("Choose your gin, your tonic and your garnish. From 175 kr.",
+     "Velg gin, tonic og garnityr selv. Fra 175 kr.",
+     "Wählen Sie Gin, Tonic und Garnitur selbst. Ab 175 kr.",
+     "Cininizi, toniğinizi ve garnitürünüzü kendiniz seçin. Fiyatlar 175 kr'den başlar.")},
+
+{blk:"wine",sec:"spi",id:"glenfiddich",n:"Glenfiddich 12",p:120,th:"o",alg:[],tg:[],
+ d:d("Single malt scotch, 40 %.","Single malt scotch, 40 %.","Single Malt Scotch, 40 %.","Single malt İskoç viskisi, %40.")},
+{blk:"wine",sec:"spi",id:"nikka",n:"Nikka Coffey Grain",p:170,th:"o",alg:[],tg:[],
+ d:d("Japanese grain whisky, 45 %.","Japansk kornwhisky, 45 %.","Japanischer Grain Whisky, 45 %.","Japon tahıl viskisi, %45.")},
+{blk:"wine",sec:"spi",id:"aquavit",n:{en:"Gammel Opland aquavit",no:"Gammel Opland akevitt",de:"Gammel Opland Aquavit",tr:"Gammel Opland akvavit"},p:120,th:"o",alg:[],tg:["loc"],
+ d:d("Norwegian aquavit, 41,5 %. Served ice cold.","Norsk akevitt, 41,5 %. Serveres iskaldt.",
+     "Norwegischer Aquavit, 41,5 %. Eiskalt serviert.","Norveç akvaviti, %41,5. Buz gibi servis edilir.")},
+
+/* ---------------- NO ALCOHOL ---------------- */
+{blk:"noalc",sec:"moc",id:"grapefruit",n:"Grapefruit Cooler",p:69,th:"r",alg:[],tg:["vgn","nop","glf"],
+ d:d("Pink grapefruit, lime and mint over crushed ice. Bitter, sharp and not sweet.",
+     "Rosa grapefrukt, lime og mynte over knust is. Bitter og frisk, ikke søt.",
+     "Rosa Grapefruit, Limette und Minze auf Crushed Ice. Herb und frisch, nicht süß.",
+     "Pembe greyfurt, misket limonu ve nane; kırılmış buz üzerine. Acımsı ve ferah, tatlı değil.")},
+{blk:"noalc",sec:"moc",id:"peach",n:"Peach Fizz",p:69,th:"o",alg:[],tg:["vgn","nop","glf"],
+ d:d("White peach, lemon and soda with orange peel. Long and sparkling.",
+     "Hvit fersken, sitron og soda med appelsinskall. Frisk og sprudlende.",
+     "Weißer Pfirsich, Zitrone und Soda mit Orangenschale. Ein langer, spritziger Drink.",
+     "Beyaz şeftali, limon ve soda; portakal kabuğuyla. Uzun içimli ve gazlı.")},
+
+{blk:"noalc",sec:"sof",id:"cola",n:"Coca-Cola / Zero · 0,33 l",p:69,th:"o",alg:[],tg:["vgn","nop","glf"],
+ d:d("From the glass contour bottle.","Fra den originale glassflasken.","Aus der Glasflasche.","Cam şişeden.")},
+{blk:"noalc",sec:"sof",id:"fanta",n:"Fanta Orange / Sprite Zero · 0,33 l",p:69,th:"o",alg:[],tg:["vgn","nop","glf"],
+ d:d("Chilled, from the bottle.","Kald, fra flaske.","Gekühlt, aus der Flasche.","Soğuk, şişeden.")},
+{blk:"noalc",sec:"sof",id:"toujuice",n:{en:"Tou apple juice · 0,33 l",no:"Tou eplemost · 0,33 l",de:"Tou Apfelsaft · 0,33 l",tr:"Tou elma suyu · 0,33 l"},p:69,th:"o",alg:[],tg:["vgn","nop","glf","loc"],
+ d:d("Norwegian apple juice.","Norsk eplemost.","Norwegischer Apfelsaft.","Norveç elma suyu.")},
+{blk:"noalc",sec:"sof",id:"safteriet",n:{en:"Safteriet apple / raspberry / cherry · 0,25 l",no:"Safteriet eple / bringebær / kirsebær · 0,25 l",de:"Safteriet Apfel / Himbeere / Kirsche · 0,25 l",tr:"Safteriet elma / ahududu / vişne · 0,25 l"},p:79,th:"r",alg:[],tg:["vgn","nop","glf","loc"],
+ d:d("Norwegian cordials, served with cold water.","Norsk saft, servert med kaldt vann.",
+     "Norwegischer Sirup mit kaltem Wasser.","Norveç şurupları; soğuk suyla servis edilir.")},
+{blk:"noalc",sec:"sof",id:"mack",n:{en:"Mack Arctic sparkling water · 0,33 l",no:"Mack Arctic kullsyret vann · 0,33 l",de:"Mack Arctic Sprudelwasser · 0,33 l",tr:"Mack Arctic gazlı su · 0,33 l"},p:55,th:"w",alg:[],tg:["vgn","nop","glf"],
+ d:d("Sparkling water from the far north.","Kullsyret vann fra Nord-Norge.",
+     "Sprudelwasser aus dem hohen Norden.","Uzak kuzeyden gazlı su.")},
+{blk:"noalc",sec:"sof",id:"coffee",n:{en:"Coffee · Espresso · Earl Grey",no:"Kaffe · Espresso · Earl Grey",de:"Kaffee · Espresso · Earl Grey",tr:"Kahve · Espresso · Earl Grey"},p:45,th:"o",alg:[],tg:["vgn","nop","glf"],
+ d:d("Espresso from 47 kr. Tea and filter coffee 45 kr.","Espresso fra 47 kr. Te og filterkaffe 45 kr.",
+     "Espresso ab 47 kr. Tee und Filterkaffee 45 kr.","Espresso 47 kr'den. Çay ve filtre kahve 45 kr.")}
+];
+
+const THUMBS = {
+  a:"radial-gradient(circle at 32% 26%,#F0C98A,#D9964A 46%,#A9682C)",
+  b:"radial-gradient(circle at 30% 26%,#E8B07A,#C97B44 48%,#8E4E24)",
+  g:"radial-gradient(circle at 30% 26%,#C6DCA8,#8FB863 48%,#5A7F3A)",
+  k:"radial-gradient(circle at 30% 26%,#F2D79A,#DCAA55 48%,#A8762C)",
+  y:"radial-gradient(circle at 30% 26%,#F5DE9C,#D9A93C 48%,#8F6A16)",
+  w:"radial-gradient(circle at 30% 26%,#F1EBD2,#D9CE9A 48%,#A2955C)",
+  r:"radial-gradient(circle at 30% 26%,#E8A0A0,#B85252 48%,#7A2E2E)",
+  o:"radial-gradient(circle at 30% 26%,#F3C08A,#D97F3C 48%,#9A4E14)"
+};
+
+
+/* Real product photos, taken straight from this venue's own Favrit menu.
+   Only the drinks have photos there today - the food has none. That gap is
+   visible below: every coloured square is a dish still waiting for a picture. */
+const CDN = "https://res.cloudinary.com/dkjgwja0c/w_240,h_240,c_fit,dpr_2/product-images/";
+const IMG = {
+  jatta_h:"bc5d0b28-9a99-4e22-8fc4-94b5ff4283b2",
+  perler:"46e8c3e7-546d-4048-9e9a-bb263a6dafed",
+  jattapils:"f21e50c0-cf8b-404f-8358-80f1b17a663b",
+  mocca:"8f4fdd65-2f8b-4fc2-8899-2344f9ca408c",
+  schous:"1fd5e426-8a04-478e-b3ce-6e4b24426fb8",
+  staropramen:"67ff1ac3-fc41-4a58-ac63-4140f231792c",
+  paulaner:"53a3b3e4-4a53-4877-9138-536b1c11d82c",
+  paulaner_af:"72e4989b-5424-4b9e-84c6-354acdd95205",
+  lite:"235bc2e8-cfb0-4487-a1ed-9771cca77d2d",
+  noworries:"c683d106-1a4f-4801-8965-43ed450c7de9",
+  cola:"dc5ee945-180d-4389-a8a2-29dd25ea23f2",
+  mack:"1894f901-78e8-403b-a2e2-4c87fb0dfb60",
+  aperol:"c927d36b-cb26-4e78-b4c7-5b197edf13c5",
+  negroni:"174552ac-aca4-4818-9089-d3cac40750a7",
+  hendricks:"6dc7c5b2-83bc-49ee-99d7-1a9583d737d1",
+  byogt:"d718cd60-f078-411b-9267-2239d8e5340a",
+  nikka:"85a076b3-b0f6-49a0-b6fe-82b20cb77d26",
+  bianco:"72519a3b-e5f1-42c2-b47b-edff08cdfb14",
+  prosecco:"8c6d4c91-6f7c-4269-9f5a-934d61e1afc9"
+};
+
+const SECORDER = {
+  food:["sig","grn","gri","kid","set"],
+  beer:["hus","loc","tap","int","gfn"],
+  wine:["gla","coc","spi"],
+  noalc:["moc","sof"]
+};
+const BLOCKKEYS = ["food","beer","wine","noalc"];
+const FILTERKEYS = ["veg","vgn","nop","glf","spy","loc"];
+
+/* =====================================================================
+   STATE + RENDER
+   ===================================================================== */
+let lang = "en", block = "food", filters = new Set(), query = "", cart = {}, showAlt = false;
+let view = "guest", table = 11, orders = [], orderNo = 0, nTables = 12,
+    baseUrl = "https://burgerandbeers.no/meny";
+const $ = s => document.querySelector(s);
+const t = () => UI[lang];
+
+function money(n){ return n.toLocaleString("nb-NO") + " kr"; }
+function nameOf(it){ return typeof it.n === "string" ? it.n : (it.n[lang] || it.n.en); }
+
+function renderLangs(){
+  const other = lang !== "no" ? "NO" : "EN";
+  $("#langs").innerHTML =
+    LANGS.map(l=>`<button class="lg ${l.c===lang?"on":""}" data-lg="${l.c}">${l.name.toUpperCase()}</button>`).join("")
+    + `<button class="lg alt ${showAlt?"on":""}" data-more="1">+ ${t().lang.toUpperCase()}</button>`;
+  [...document.querySelectorAll("[data-lg]")].forEach(el=>el.onclick=()=>{ lang=el.dataset.lg; render(); });
+  $("[data-more]").onclick = openSheet;
+}
+
+function renderBlocks(){
+  $("#blocks").innerHTML = BLOCKKEYS.map((k,i)=>
+    `<div class="blk ${k===block?"on":""}" data-b="${k}">${t().blocks[i]}</div>`).join("");
+  [...document.querySelectorAll(".blk")].forEach(el=>el.onclick=()=>{
+    block = el.dataset.b; window.scrollTo({top:0}); render();
+  });
+}
+
+function renderFilters(){
+  $("#filters").innerHTML =
+    `<button class="flt ${filters.size===0?"on":""}" data-f="__all">${t().all}</button>` +
+    FILTERKEYS.map(f=>`<button class="flt ${filters.has(f)?"on":""}" data-f="${f}">${t()[f]}</button>`).join("");
+  [...document.querySelectorAll(".flt")].forEach(el=>el.onclick=()=>{
+    const f = el.dataset.f;
+    if(f==="__all") filters.clear();
+    else filters.has(f) ? filters.delete(f) : filters.add(f);
+    render();
+  });
+}
+
+function tagHTML(tg){
+  const NAME = {veg:t().veg,vgn:t().vgn,nop:t().nop,glf:t().glf,spy:t().spy,loc:t().loc,
+                new:{en:"NEW",no:"NYHET",de:"NEU",tr:"YENİ"}[lang],
+                fsh:{en:"FISH",no:"FISK",de:"FISCH",tr:"BALIK"}[lang],
+                hus:{en:"HOUSE BEER",no:"HUSETS ØL",de:"HAUSBIER",tr:"EV BİRASI"}[lang]};
+  return tg.map(x=>`<span class="tag t-${x}">${(NAME[x]||x).toUpperCase()}</span>`).join("");
+}
+
+function matches(it){
+  if(it.blk !== block) return false;
+  for(const f of filters){ if(!it.tg.includes(f)) return false; }
+  if(query){
+    const hay = (nameOf(it) + " " + Object.values(it.d).join(" ")).toLowerCase();
+    if(!hay.includes(query.toLowerCase())) return false;
+  }
+  return true;
+}
+
+function renderHero(){
+  const h = HERO[block][lang];
+  $("#hero").innerHTML = `<div class="acts">
+      <button class="act" id="callW">${t().callw}</button>
+      <button class="act" id="askB">${t().bill}</button>
+    </div>
+    <div class="hero"><b>${h[0]}</b><p>${h[1]}</p></div>`;
+  $("#callW").onclick = ()=>toast(t().called);
+  $("#askB").onclick  = ()=>toast(t().billed);
+}
+
+function renderList(){
+  const shown = MENU.filter(matches);
+  let html = "";
+  for(const s of SECORDER[block]){
+    const items = shown.filter(i=>i.sec===s);
+    if(!items.length) continue;
+    const [ttl,sub] = SEC[s][lang];
+    html += `<div class="sec"><h2>${ttl}</h2>${sub?`<div class="sh2">${sub}</div>`:""}</div><div class="hairline"></div>`;
+    for(const it of items){
+      const q = cart[it.id]||0;
+      const other = lang !== "no" ? "no" : "en";
+      const alt = showAlt ? `<div class="ialt"><b>${other.toUpperCase()}</b> ${it.d[other]}</div>` : "";
+      const alg = it.alg.length ? `<div class="ialg">${t().allerg}: ${it.alg.map(a=>ALG[a][lang]).join(", ")}</div>` : "";
+      html += `<div class="item">
+        ${IMG[it.id]
+          ? `<div class="thumb photo" style="--fb:${THUMBS[it.th]}"><img src="${CDN}${IMG[it.id]}.jpeg" alt="" loading="lazy" onerror="this.parentElement.classList.remove('photo');this.parentElement.style.background=this.parentElement.style.getPropertyValue('--fb');this.parentElement.dataset.ph='FOTO';this.remove()"></div>`
+          : `<div class="thumb" style="background:${THUMBS[it.th]}" data-ph="FOTO"></div>`}
+        <div class="ib">
+          <div class="iname">${nameOf(it)}</div>
+          <div class="idesc">${it.d[lang]}</div>
+          ${alt}
+          <div class="tags">${tagHTML(it.tg)}</div>
+          ${alg}
+        </div>
+        <div class="iright">
+          <div class="price">${money(it.p)}</div>
+          ${q ? `<div class="qty"><button data-m="${it.id}">−</button><b>${q}</b><button data-a="${it.id}">+</button></div>`
+              : `<button class="add" data-a="${it.id}">+</button>`}
+        </div>
+      </div>`;
+    }
+  }
+  if(!html) html = `<div class="empty" style="padding:50px 20px">—</div>`;
+  $("#list").innerHTML = html;
+  [...document.querySelectorAll("[data-a]")].forEach(b=>b.onclick=()=>addItem(b.dataset.a));
+  [...document.querySelectorAll("[data-m]")].forEach(b=>b.onclick=()=>removeItem(b.dataset.m));
+}
+
+function renderFoot(){
+  const txt = {
+    en:"Prices in Norwegian kroner. "+t().gfbun+". Allergens are shown on every item and translate with the language. The drink photos are the house's own, pulled from its live Favrit menu. The coloured squares are dishes with no photo yet - on Favrit today, not a single food item has one.",
+    no:"Priser i norske kroner. "+t().gfbun+". Allergener vises på hver vare og følger språket. Bildene av drikke er stedets egne, hentet fra den nåværende Favrit-menyen. De fargede firkantene er retter uten bilde - i dag har ingen matrett bilde på Favrit.",
+    de:"Preise in norwegischen Kronen. "+t().gfbun+". Allergene sind bei jedem Artikel angegeben und wechseln mit der Sprache. Die Getränkefotos stammen aus der aktuellen Favrit-Karte des Hauses. Die farbigen Flächen sind Gerichte ohne Foto - heute hat auf Favrit kein einziges Gericht eines.",
+    tr:"Fiyatlar Norveç kronu cinsindendir. "+t().gfbun+". Alerjenler her üründe görünür ve dille birlikte değişir. İçecek fotoğrafları mekânın kendi Favrit menüsünden geliyor. Renkli kareler ise fotoğrafı olmayan ürünler - bugün Favrit menüsünde hiçbir yemeğin fotoğrafı yok."
+  }[lang];
+  $("#fnote").innerHTML = `<b>DEMO</b> · ${txt}`;
+}
+
+function renderDemoBar(){
+  const tabs = [["guest",t().guest],["waiter",t().waiter],["qr",t().qrv]];
+  const opts = Array.from({length:nTables},(_,i)=>i+1)
+    .map(i=>`<option value="${i}" ${i===table?"selected":""}>${t().table} ${i}</option>`).join("");
+  $("#demobar").innerHTML =
+    `<span class="dbtn" style="flex:none;color:var(--red);border:1px solid var(--red);padding:5px 7px">DEMO</span>`
+    + tabs.map(([k,l])=>`<button class="dbtn ${view===k?"on":""}" data-v="${k}">${l}</button>`).join("")
+    + `<select class="dsel" id="tblSel">${opts}</select>`;
+  [...document.querySelectorAll("[data-v]")].forEach(b=>b.onclick=()=>{
+    view=b.dataset.v; window.scrollTo({top:0}); render();
+  });
+  $("#tblSel").onchange = e => { table = +e.target.value; render(); };
+}
+
+function renderService(){
+  const list = orders.length ? orders.slice().reverse().map(o=>`
+    <div class="ord ${o.served?"done":""}">
+      <div class="ordh"><b>${t().table} ${o.table}</b><span>#${String(o.id).padStart(3,"0")} · ${o.at}</span></div>
+      <div class="ordl">${o.lines.map(l=>`${l.q} × ${l.name}`).join("<br>")}</div>
+      <div class="ordf"><span class="op">${money(o.total)}</span>
+        ${o.served ? `<button disabled>${t().srvDone}</button>`
+                   : `<button data-srv="${o.id}">${t().served}</button>`}</div>
+    </div>`).join("") : `<div class="empty">${t().svcEmpty}</div>`;
+  $("#list").innerHTML = `<div class="pane"><h2>${t().svcTitle}</h2>
+    <p class="ps">${t().svcSub}</p><div style="margin-top:14px">${list}</div></div>`;
+  [...document.querySelectorAll("[data-srv]")].forEach(b=>b.onclick=()=>{
+    const o = orders.find(x=>x.id===+b.dataset.srv); if(o) o.served=true; renderService();
+  });
+}
+
+function renderQR(){
+  $("#list").innerHTML = `<div class="pane">
+      <h2>${t().qrTitle} · ${nTables} ${t().tblWord}</h2>
+      <p class="ps">${t().qrSub}</p>
+      <div class="fld"><label>${t().baseUrl}</label><input id="qUrl" value="${baseUrl}"></div>
+      <div class="hint">${t().table} 1 &rarr; <b>${qrLink(1)}</b></div>
+      <div class="fld"><label>${t().tables}</label><input id="qN" type="number" min="1" max="60" value="${nTables}"></div>
+      <button class="btn" id="qGen">${t().gen}</button>
+      <button class="btn ghost noprint" id="qPrint">${t().printS}</button>
+      <div class="qrgrid" id="qrgrid"></div>
+    </div>`;
+  $("#qUrl").onchange = e => { baseUrl = e.target.value.trim(); renderQR(); };
+  $("#qN").onchange   = e => { nTables = Math.max(1,Math.min(60,+e.target.value||12)); render(); };
+  $("#qGen").onclick  = drawQR;
+  $("#qPrint").onclick = () => window.print();
+  drawQR();
+}
+
+function qrLink(i){ return baseUrl + "?bord=" + i; }
+
+function drawQR(){
+  const grid = $("#qrgrid"); if(!grid) return;
+  grid.innerHTML = "";
+  if(typeof QRCode === "undefined"){
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">${t().offline}</div>`; return;
+  }
+  for(let i=1;i<=nTables;i++){
+    const card = document.createElement("div");
+    card.className = "qrcard";
+    const holder = document.createElement("div");
+    holder.className = "qc";
+    card.appendChild(holder);
+    const num = document.createElement("div");
+    num.className = "qn"; num.textContent = String(i).padStart(2,"0");
+    const sub = document.createElement("div");
+    sub.className = "qs"; sub.innerHTML = t().scan + "<br>" + UI.no.scan;
+    card.appendChild(num); card.appendChild(sub);
+    grid.appendChild(card);
+    new QRCode(holder,{text:qrLink(i),width:110,height:110,
+      colorDark:"#0E0C0A",colorLight:"#FFFFFF",correctLevel:QRCode.CorrectLevel.M});
+  }
+}
+
+function render(){
+  document.documentElement.lang = lang;
+  $("#search").placeholder = t().search;
+  $("#tablePill").textContent = t().table + " " + table;
+  renderLangs(); renderDemoBar();
+  const guest = view === "guest";
+  $(".blocks").style.display  = guest ? "" : "none";
+  $(".tools").style.display   = guest ? "" : "none";
+  $("#hero").style.display    = guest ? "" : "none";
+  $("#fnote").style.display   = guest ? "" : "none";
+  if(guest){ renderBlocks(); renderFilters(); renderHero(); renderList(); renderFoot(); }
+  else if(view === "waiter") renderService();
+  else renderQR();
+  renderCart();
+}
+
+/* ---------------- cart ---------------- */
+function addItem(id){
+  cart[id] = (cart[id]||0)+1;
+  const it = MENU.find(x=>x.id===id);
+  toast(nameOf(it) + " " + t().added);
+  renderList(); renderCart();
+}
+function removeItem(id){
+  cart[id] = (cart[id]||0)-1;
+  if(cart[id]<=0) delete cart[id];
+  renderList(); renderCart();
+}
+function cartCount(){ return Object.values(cart).reduce((a,b)=>a+b,0) }
+function cartTotal(){ return Object.entries(cart).reduce((a,[id,q])=>a+MENU.find(x=>x.id===id).p*q,0) }
+
+function renderCart(){
+  const c = cartCount();
+  const bar = $("#cartbar");
+  bar.classList.toggle("show", c>0 && view==="guest");
+  $("#cartL").textContent = c + " " + (c===1?t().item:t().items);
+  $("#cartR").textContent = money(cartTotal());
+}
+
+function openDrawer(){
+  const entries = Object.entries(cart);
+  let rows = entries.length ? entries.map(([id,q])=>{
+    const it = MENU.find(x=>x.id===id);
+    return `<div class="crow">
+      <div><div class="cn">${nameOf(it)}</div>
+        <div class="qty" style="margin-top:6px"><button data-dm="${id}">−</button><b>${q}</b><button data-da="${id}">+</button></div>
+      </div>
+      <div class="cp">${money(it.p*q)}</div></div>`;
+  }).join("") : `<div class="empty">${t().empty}</div>`;
+
+  $("#drawer").innerHTML = `<h3>${t().cart}</h3>${rows}
+    <div class="total"><span>${t().total}</span><span>${money(cartTotal())}</span></div>
+    <button class="btn" id="sendBtn">${t().send}</button>
+    <button class="btn ghost" id="closeBtn">${t().close}</button>`;
+  $("#drawer").classList.add("open"); $("#sheetBg").classList.add("open");
+  [...document.querySelectorAll("[data-da]")].forEach(b=>b.onclick=()=>{addItem(b.dataset.da);openDrawer()});
+  [...document.querySelectorAll("[data-dm]")].forEach(b=>b.onclick=()=>{removeItem(b.dataset.dm);openDrawer()});
+  $("#closeBtn").onclick = closeAll;
+  $("#sendBtn").onclick = ()=>{
+    if(!cartCount()) return;
+    const lines = Object.entries(cart).map(([id,q])=>{
+      const it = MENU.find(x=>x.id===id); return {name:nameOf(it), q, price:it.p};
+    });
+    orderNo++;
+    const now = new Date();
+    orders.push({id:orderNo, table, at:String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0"),
+                 lines, total:cartTotal(), served:false});
+    cart = {}; closeAll(); renderList(); renderCart(); toast(t().sent);
+  };
+}
+
+/* ---------------- language sheet ---------------- */
+function openSheet(){
+  const rows = LANGS.map(l=>`<div class="langrow ${l.c===lang?"on":""}" data-l="${l.c}">
+      <div><b>${l.name}</b><span>${l.nat}</span></div>
+      ${l.c===lang?'<span class="ck">✓</span>':""}
+    </div>`).join("");
+  const soon = {
+    en:["Any language can be added","Français, Español, Italiano, Nederlands, Polski — a new language is one text field per item. Prices, photos, labels and allergens are reused automatically."],
+    no:["Hvilket som helst språk kan legges til","Français, Español, Italiano, Nederlands, Polski — et nytt språk er ett tekstfelt per vare. Priser, bilder, merkelapper og allergener gjenbrukes automatisk."],
+    de:["Jede weitere Sprache lässt sich hinzufügen","Français, Español, Italiano, Nederlands, Polski — eine neue Sprache ist ein Textfeld pro Artikel. Preise, Fotos, Labels und Allergene werden automatisch übernommen."],
+    tr:["İstenen her dil eklenebilir","Français, Español, Italiano, Nederlands, Polski — yeni bir dil, ürün başına tek bir metin alanı demek. Fiyatlar, fotoğraflar, etiketler ve alerjenler otomatik olarak korunur."]
+  }[lang];
+  const other = lang !== "no" ? "NO" : "EN";
+  $("#sheet").innerHTML = `<h3>${t().lang}</h3><p class="sh">${t().langsub}</p>${rows}
+    <div class="langrow ${showAlt?"on":""}" data-alt="1">
+      <div><b>${t().altTitle} (${other})</b><span>${t().altSub}</span></div>
+      ${showAlt?'<span class="ck">✓</span>':""}
+    </div>
+    <div class="soon"><b>${soon[0]}</b><p>${soon[1]}</p></div>`;
+  $("[data-alt]").onclick = ()=>{ showAlt = !showAlt; closeAll(); render(); };
+  $("#sheet").classList.add("open"); $("#sheetBg").classList.add("open");
+  [...document.querySelectorAll("[data-l]")].forEach(el=>el.onclick=()=>{
+    lang = el.dataset.l; closeAll(); render();
+  });
+}
+
+function closeAll(){
+  $("#sheet").classList.remove("open");
+  $("#drawer").classList.remove("open");
+  $("#sheetBg").classList.remove("open");
+}
+
+let toastTimer;
+function toast(msg){
+  const el = $("#toast"); el.textContent = msg; el.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.classList.remove("show"), 1600);
+}
+
+/* ---------------- wire up ---------------- */
+
+$("#sheetBg").onclick = closeAll;
+$("#cartbar").onclick = openDrawer;
+$("#search").oninput = e => { query = e.target.value; renderList(); };
+
+// A real QR link carries no language code: let the phone suggest one.
+// ?lang=tr also works, so you can send someone straight into a language.
+const SP = new URLSearchParams(location.search);
+const qp = SP.get("lang");
+const qb = SP.get("blk");
+if(BLOCKKEYS.includes(qb)) block = qb;
+const qt = parseInt(SP.get("bord") || SP.get("table") || "", 10);
+if(qt >= 1 && qt <= 60) table = qt;
+const qv = SP.get("view");
+if(["guest","waiter","qr"].includes(qv)) view = qv;
+const nav = (qp || navigator.language || "en").slice(0,2).toLowerCase();
+if(LANGS.some(l=>l.c===nav)) lang = nav;
+
+render();
+</script>
+
+<script>
+/* =====================================================================
+   BURGER & BEERS — samme motor som Solsiden
+   Bestillinger og tilkallinger går gjennom én åpen kanal, så gjestens
+   telefon og kassa ser det samme. Ingen konto, ingen server å drifte.
+   Bytt TOPIC til noe eget før dette settes i drift.
+   ===================================================================== */
+(function(){
+  var TOPIC = "burgerandbeers-stavanger-demo";
+  var HUB   = "https://ntfy.sh/" + TOPIC;
+  var RETENTION_H = 48;
+  var LSKEY = "bb.orders.v1", CKEY = "bb.calls.v1";
+
+  /* ---------- ordbok ---------- */
+  var WORDS = {
+   en:{calls:"Calls",callsSub:"Tables waiting for someone. Acknowledge once you have been there.",
+       callsEmpty:"No calls right now.",ackBtn:"Acknowledge",wantsWaiter:"asks for a waiter",
+       wantsBill:"asks for the bill",kasse:"TILL",kTitle:"Till",kSub:"Everything sent from the tables today.",
+       kToday:"Revenue today",kOrders:"orders",kAvg:"Average per order",kTables:"By table",
+       kEmpty:"Nothing registered today.",hist:"History",histSub:"Served in the last {h} hours.",
+       histEmpty:"Nothing served yet.",retain:"Orders stay in the list for {h} hours.",
+       openOrders:"not served",today:"Today",yday:"Yesterday",mine:"Your order",
+       statSent:"sent to the kitchen",statServed:"served",
+       roleW:"Waiter",roleA:"Manager",items:"items",item:"item"},
+   no:{calls:"Tilkalling",callsSub:"Bord som venter på noen. Kvitter når du har vært der.",
+       callsEmpty:"Ingen tilkalling nå.",ackBtn:"Kvitter",wantsWaiter:"ber om servitør",
+       wantsBill:"ber om regningen",kasse:"KASSE",kTitle:"Kasse",kSub:"Alt som er sendt fra bordene i dag.",
+       kToday:"Omsetning i dag",kOrders:"bestillinger",kAvg:"Snitt per bestilling",kTables:"Per bord",
+       kEmpty:"Ingenting registrert i dag.",hist:"Historikk",histSub:"Servert de siste {h} timene.",
+       histEmpty:"Ingenting servert ennå.",retain:"Bestillingene blir liggende i {h} timer.",
+       openOrders:"ikke servert",today:"I dag",yday:"I går",mine:"Din bestilling",
+       statSent:"sendt til kjøkkenet",statServed:"servert",
+       roleW:"Servitør",roleA:"Sjef",items:"varer",item:"vare"},
+   de:{calls:"Rufe",callsSub:"Tische, die warten. Quittieren Sie, sobald Sie dort waren.",
+       callsEmpty:"Gerade keine Rufe.",ackBtn:"Quittieren",wantsWaiter:"ruft den Service",
+       wantsBill:"bittet um die Rechnung",kasse:"KASSE",kTitle:"Kasse",kSub:"Alles, was heute von den Tischen kam.",
+       kToday:"Umsatz heute",kOrders:"Bestellungen",kAvg:"Durchschnitt pro Bestellung",kTables:"Pro Tisch",
+       kEmpty:"Heute noch nichts erfasst.",hist:"Verlauf",histSub:"Serviert in den letzten {h} Stunden.",
+       histEmpty:"Noch nichts serviert.",retain:"Bestellungen bleiben {h} Stunden in der Liste.",
+       openOrders:"nicht serviert",today:"Heute",yday:"Gestern",mine:"Ihre Bestellung",
+       statSent:"an die Küche gesendet",statServed:"serviert",
+       roleW:"Service",roleA:"Leitung",items:"Artikel",item:"Artikel"},
+   tr:{calls:"Çağrılar",callsSub:"Sizi bekleyen masalar. Gidince İlgilendim'e basın.",
+       callsEmpty:"Şu an çağrı yok.",ackBtn:"İlgilendim",wantsWaiter:"garson istiyor",
+       wantsBill:"hesap istiyor",kasse:"KASA",kTitle:"Kasa",kSub:"Bugün masalardan gelen her şey.",
+       kToday:"Bugünkü ciro",kOrders:"sipariş",kAvg:"Sipariş başına ortalama",kTables:"Masa bazında",
+       kEmpty:"Bugün kayıt yok.",hist:"Geçmiş",histSub:"Son {h} saatte servis edilenler.",
+       histEmpty:"Henüz servis edilen yok.",retain:"Siparişler listede {h} saat kalır.",
+       openOrders:"servis edilmedi",today:"Bugün",yday:"Dün",mine:"Siparişiniz",
+       statSent:"mutfağa gönderildi",statServed:"servis edildi",
+       roleW:"Garson",roleA:"Yönetici",items:"ürün",item:"ürün"}
+  };
+  for(var lg in WORDS){ if(UI[lg]) for(var k in WORDS[lg]) UI[lg][k] = WORDS[lg][k]; }
+
+  /* ---------- lagring ---------- */
+  function prune(list){
+    var cut = Date.now() - RETENTION_H*3600*1000;
+    return list.filter(function(o){ return (o.ts||0) > cut; });
+  }
+  function load(key){ try{ return prune(JSON.parse(localStorage.getItem(key)||"[]")); }catch(e){ return []; } }
+  function save(key,val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+  function saveAll(){ save(LSKEY, orders); save(CKEY, calls); }
+
+  function stamp(ts){
+    var d=new Date(ts), n=new Date();
+    var hm=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+    var day=function(x){ return x.getFullYear()+"-"+x.getMonth()+"-"+x.getDate(); };
+    var y=new Date(n.getTime()-86400000);
+    if(day(d)===day(n)) return t().today+" "+hm;
+    if(day(d)===day(y)) return t().yday+" "+hm;
+    return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+". "+hm;
+  }
+
+  /* ---------- synk ---------- */
+  var online=false, seen={}, seq=1, es=null;
+  window.calls = [];
+  function uid(){ return Math.floor(performance.now()*1000).toString(36)+"-"+(seq++).toString(36); }
+  function setOnline(v){
+    if(online===v) return; online=v;
+    var d=document.querySelector("#syncdot"); if(d) d.className="syncdot"+(v?" on":"");
+  }
+  function publish(e){
+    try{ fetch(HUB,{method:"POST",body:JSON.stringify(e)})
+      .then(function(){setOnline(true);}).catch(function(){setOnline(false);});
+    }catch(err){ setOnline(false); }
+  }
+  function apply(e){
+    if(!e||!e.u||seen[e.u]) return false;
+    seen[e.u]=1;
+    if(e.k==="order"){
+      if(orders.some(function(o){return o.uid===e.u;})) return false;
+      orders.push({uid:e.u,id:e.id,table:e.table,ts:e.ts,at:e.at,lines:e.lines,total:e.total,served:false});
+      return true;
+    }
+    if(e.k==="serve"){ var o=orders.find(function(x){return x.uid===e.ref;});
+      if(o&&!o.served){o.served=true;return true;} return false; }
+    if(e.k==="call"){
+      if(calls.some(function(c){return c.uid===e.u;})) return false;
+      calls.push({uid:e.u,table:e.table,ts:e.ts,kind:e.kind,done:false}); return true;
+    }
+    if(e.k==="ack"){ var c=calls.find(function(x){return x.uid===e.ref;});
+      if(c&&!c.done){c.done=true;return true;} return false; }
+    return false;
+  }
+  function pull(){
+    fetch(HUB+"/json?poll=1&since=12h").then(function(r){ return r.text(); }).then(function(txt){
+      var touched=false;
+      txt.trim().split(String.fromCharCode(10)).forEach(function(line){
+        if(!line) return;
+        try{ var m=JSON.parse(line);
+          if(m.event!=="message"||!m.message) return;
+          if(apply(JSON.parse(m.message))) touched=true;
+        }catch(e){}
+      });
+      setOnline(true);
+      if(touched){ saveAll(); render(); }
+    }).catch(function(){ setOnline(false); });
+  }
+  function listen(){
+    try{
+      if(es) es.close();
+      es=new EventSource(HUB+"/sse");
+      es.onopen=function(){setOnline(true);};
+      es.onerror=function(){setOnline(false);};
+      es.onmessage=function(ev){
+        try{ var m=JSON.parse(ev.data);
+          if(m.event!=="message"||!m.message) return;
+          if(apply(JSON.parse(m.message))){ saveAll();
+            if(view==="waiter"||view==="kasse") render(); else renderMine(); }
+        }catch(e){}
+      };
+    }catch(e){ setOnline(false); }
+  }
+
+  /* ---------- roller ---------- */
+  var VIEWS={gjest:["guest"],servit:["waiter"],sjef:["guest","waiter","kasse","qr"]};
+  var role="gjest";
+  var SP=new URLSearchParams(location.search);
+  var pn=(SP.get("panel")||"").toLowerCase();
+  if(pn==="garson"||pn==="waiter"||pn==="servitor") role="servit";
+  else if(pn==="sef"||pn==="sjef"||pn==="admin"||SP.get("demo")==="1") role="sjef";
+
+  /* ---------- gjestens statuslinje ---------- */
+  var mineBox=document.createElement("div");
+  mineBox.className="mine"; mineBox.id="mine";
+  document.body.appendChild(mineBox);
+  window.renderMine=function(){
+    var list=prune(orders).filter(function(o){return o.table===table;})
+                          .sort(function(a,b){return b.ts-a.ts;});
+    var show = view==="guest" && list.length>0;
+    mineBox.classList.toggle("show",show);
+    document.body.classList.toggle("hasmine",show);
+    if(!show){ mineBox.innerHTML=""; return; }
+    var open=list.filter(function(o){return !o.served;});
+    var o=open[0]||list[0], served=!open.length;
+    mineBox.classList.toggle("done",served);
+    var n=list.reduce(function(a,x){return a+x.lines.reduce(function(b,l){return b+l.q;},0);},0);
+    var sum=list.reduce(function(a,x){return a+x.total;},0);
+    mineBox.innerHTML='<div><div class="mt"><span class="dot"></span>'+t().mine+" · "+
+      (served?t().statServed:t().statSent)+'</div><div class="ms">'+n+" "+
+      (n===1?t().item:t().items)+" · "+stamp(o.ts)+'</div></div><div class="mr">'+money(sum)+"</div>";
+  };
+
+  /* ---------- tilkalling ---------- */
+  function ring(kind){
+    var e={k:"call",u:uid(),table:table,ts:Date.now(),kind:kind};
+    apply(e); saveAll(); publish(e);
+  }
+  var _hero=renderHero;
+  window.renderHero=function(){
+    _hero();
+    var acts=document.querySelector("#hero .acts");
+    if(!acts) return;
+    var ringtxt=(t().callw+" · ").toUpperCase().repeat(3);
+    acts.innerHTML='<button class="bell" id="callW" aria-label="'+t().callw+'">'+
+      '<svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><defs>'+
+      '<path id="bellpath" fill="none" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0"></path></defs>'+
+      '<text><textPath href="#bellpath" startOffset="0">'+ringtxt+'</textPath></text></svg>'+
+      '<span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true">'+
+      '<path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"></path>'+
+      '<path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg></span></button>'+
+      '<button class="act" id="askB" style="flex:1">'+t().bill+"</button>";
+    document.querySelector("#callW").onclick=function(){
+      this.classList.remove("rang"); void this.offsetWidth; this.classList.add("rang");
+      ring("waiter"); toast(t().called);
+    };
+    document.querySelector("#askB").onclick=function(){ ring("bill"); toast(t().billed); };
+  };
+
+  /* ---------- bestillingen sendes ut ---------- */
+  var _open=openDrawer;
+  window.openDrawer=function(){
+    _open();
+    var b=document.querySelector("#sendBtn"); if(!b) return;
+    b.onclick=function(){
+      if(!cartCount()) return;
+      var lines=Object.entries(cart).map(function(p){
+        var it=MENU.find(function(x){return x.id===p[0];});
+        return {name:nameOf(it),q:p[1],price:it.p};
+      });
+      orderNo++;
+      var now=new Date();
+      var e={k:"order",u:uid(),id:orderNo,table:table,ts:Date.now(),
+             at:String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0"),
+             lines:lines,total:cartTotal()};
+      apply(e); saveAll(); publish(e);
+      cart={}; closeAll(); renderList(); renderCart(); renderMine(); toast(t().sent);
+    };
+  };
+
+  /* ---------- servitørpanel ---------- */
+  window.renderService=function(){
+    orders=prune(orders); calls=prune(calls); saveAll();
+    var newest=function(a,b){return b.ts-a.ts;};
+    var card=function(o){ return '<div class="ord '+(o.served?"done":"")+'">'+
+      '<div class="ordh"><b>'+t().table+" "+o.table+"</b><span>#"+String(o.id).padStart(3,"0")+
+      " · "+stamp(o.ts)+"</span></div>"+
+      '<div class="ordl">'+o.lines.map(function(l){return l.q+" × "+l.name;}).join("<br>")+"</div>"+
+      '<div class="ordf"><span class="op">'+money(o.total)+"</span>"+
+      (o.served?"<button disabled>"+t().srvDone+"</button>"
+               :'<button data-srv="'+o.uid+'">'+t().served+"</button>")+"</div></div>"; };
+    var active=orders.filter(function(o){return !o.served;}).sort(newest);
+    var done  =orders.filter(function(o){return  o.served;}).sort(newest);
+    var open  =calls.filter(function(c){return !c.done;}).sort(newest);
+    var callCard=function(c){ return '<div class="call"><div><b>'+t().table+" "+c.table+"</b><span>"+
+      (c.kind==="bill"?t().wantsBill:t().wantsWaiter)+" · "+stamp(c.ts)+
+      '</span></div><button data-ack="'+c.uid+'">'+t().ackBtn+"</button></div>"; };
+    document.querySelector("#list").innerHTML='<div class="pane">'+
+      '<div class="callhead"><h2>'+t().calls+'</h2><span class="histn '+(open.length?"hot":"")+'">'+
+      open.length+"</span></div><p class=\"ps\">"+t().callsSub+"</p>"+
+      '<div style="margin-top:12px">'+(open.length?open.map(callCard).join("")
+        :'<div class="empty">'+t().callsEmpty+"</div>")+"</div>"+
+      '<h2 style="margin-top:26px">'+t().svcTitle+'</h2><p class="ps">'+t().svcSub+"</p>"+
+      '<div class="retain">'+t().retain.replace("{h}",RETENTION_H)+
+        (active.length?" · "+active.length+" "+t().openOrders:"")+"</div>"+
+      '<div style="margin-top:14px">'+(active.length?active.map(card).join("")
+        :'<div class="empty">'+t().svcEmpty+"</div>")+"</div>"+
+      '<div class="callhead" style="margin-top:26px"><h2>'+t().hist+
+        '</h2><span class="histn">'+done.length+"</span></div>"+
+      '<p class="ps">'+t().histSub.replace("{h}",RETENTION_H)+"</p>"+
+      '<div style="margin-top:12px">'+(done.length?done.map(card).join("")
+        :'<div class="empty">'+t().histEmpty+"</div>")+"</div></div>";
+    [].forEach.call(document.querySelectorAll("[data-srv]"),function(b){
+      b.onclick=function(){
+        var o=orders.find(function(x){return x.uid===b.dataset.srv;});
+        if(o&&!o.served){ var e={k:"serve",u:uid(),ref:o.uid}; apply(e); saveAll(); publish(e); }
+        renderService(); renderMine();
+      };
+    });
+    [].forEach.call(document.querySelectorAll("[data-ack]"),function(b){
+      b.onclick=function(){ var e={k:"ack",u:uid(),ref:b.dataset.ack}; apply(e); saveAll(); publish(e); renderService(); };
+    });
+  };
+
+  /* ---------- kasse ---------- */
+  window.renderKasse=function(){
+    orders=prune(orders);
+    var d0=new Date(); d0.setHours(0,0,0,0);
+    var today=orders.filter(function(o){return o.ts>=d0.getTime();}).sort(function(a,b){return b.ts-a.ts;});
+    var sum=today.reduce(function(a,o){return a+o.total;},0);
+    var avg=today.length?Math.round(sum/today.length):0;
+    var byT={}; today.forEach(function(o){ byT[o.table]=(byT[o.table]||0)+o.total; });
+    var rows=Object.keys(byT).sort(function(a,b){return byT[b]-byT[a];})
+      .map(function(k){return '<div class="krow"><span>'+t().table+" "+k+"</span><b>"+money(byT[k])+"</b></div>";}).join("");
+    var lines=today.length?today.map(function(o){
+      return '<div class="krow"><span>#'+String(o.id).padStart(3,"0")+" · "+t().table+" "+o.table+
+        " · "+stamp(o.ts)+(o.served?"":" · "+t().openOrders)+"</span><b>"+money(o.total)+"</b></div>";}).join("")
+      :'<div class="empty">'+t().kEmpty+"</div>";
+    document.querySelector("#list").innerHTML='<div class="pane"><h2>'+t().kTitle+
+      '</h2><p class="ps">'+t().kSub+"</p>"+
+      '<div class="kbig"><span>'+t().kToday+"</span><b>"+money(sum)+"</b></div>"+
+      '<div class="ktri"><div><b>'+today.length+"</b><span>"+t().kOrders+"</span></div>"+
+      "<div><b>"+money(avg)+"</b><span>"+t().kAvg+"</span></div>"+
+      "<div><b>"+Object.keys(byT).length+"</b><span>"+t().tblWord+"</span></div></div>"+
+      '<h2 style="margin-top:24px">'+t().kTables+'</h2><div style="margin-top:10px">'+
+      (rows||'<div class="empty">'+t().kEmpty+"</div>")+"</div>"+
+      '<h2 style="margin-top:24px">'+t().svcTitle+'</h2><div style="margin-top:10px">'+lines+"</div></div>";
+  };
+
+  /* ---------- rollelinje ---------- */
+  window.renderDemoBar=function(){
+    var bar=document.querySelector("#demobar");
+    if(role==="gjest"){ bar.style.display="none"; document.body.classList.add("nobar"); return; }
+    bar.style.display=""; document.body.classList.remove("nobar");
+    var label={guest:t().guest,waiter:t().waiter,kasse:t().kasse,qr:t().qrv};
+    var allowed=VIEWS[role];
+    var tabs=allowed.map(function(k){
+      return '<button class="dbtn '+(view===k?"on":"")+'" data-v="'+k+'">'+label[k]+"</button>";}).join("");
+    var opts=Array.from({length:nTables},function(_,i){return i+1;}).map(function(i){
+      return '<option value="'+i+'" '+(i===table?"selected":"")+">"+t().table+" "+i+"</option>";}).join("");
+    bar.innerHTML='<span class="rolepill"><span class="syncdot'+(online?" on":"")+'" id="syncdot"></span>'+
+      (role==="sjef"?t().roleA:t().roleW)+"</span>"+tabs+
+      (allowed.indexOf("guest")>=0?'<select class="dsel" id="tblSel">'+opts+"</select>":"");
+    [].forEach.call(document.querySelectorAll("[data-v]"),function(b){
+      b.onclick=function(){ view=b.dataset.v; window.scrollTo({top:0}); render(); };});
+    var sel=document.querySelector("#tblSel");
+    if(sel) sel.onchange=function(e){ table=+e.target.value; render(); };
+  };
+
+  /* ---------- render-innpakning ---------- */
+  var _render=render;
+  window.render=function(){
+    if(VIEWS[role].indexOf(view)<0) view=VIEWS[role][0];
+    if(view==="kasse"){
+      document.querySelector("#blocks").style.display="none";
+      var tl=document.querySelector(".tools"); if(tl) tl.style.display="none";
+      document.querySelector("#hero").style.display="none";
+      var fn=document.querySelector("#fnote"); if(fn) fn.style.display="none";
+      renderLangs(); renderDemoBar(); renderKasse(); renderCart(); renderMine();
+      return;
+    }
+    _render();
+    renderMine();
+  };
+
+  /* ---------- oppstart ---------- */
+  orders=load(LSKEY); calls=load(CKEY);
+  orders.forEach(function(o){ if(o.uid) seen[o.uid]=1; });
+  calls .forEach(function(c){ if(c.uid) seen[c.uid]=1; });
+  orderNo=orders.reduce(function(m,o){return Math.max(m,o.id||0);},0);
+  if(VIEWS[role].indexOf(view)<0) view=VIEWS[role][0];
+  render();
+  pull(); listen();
+  setInterval(function(){ if(!online) pull(); },20000);
+})();
+</script>
+</body>
+</html>
