@@ -215,6 +215,19 @@ body.nobar .cartbar{bottom:0}
 body.nobar .mine{bottom:0}
 body.nobar.hasmine .cartbar{bottom:64px}
 .callhead{display:flex;align-items:baseline;gap:9px}
+.minebtn{position:relative}
+.minebtn .mn{display:inline-block;min-width:17px;margin-left:5px;background:#E8A33D;
+ color:#16130F;border-radius:20px;font-size:10px;font-weight:800;padding:1px 6px;vertical-align:1px}
+.klive{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:14px}
+.klive div{border-radius:10px;padding:11px 9px;text-align:center;background:#1C1813;border:1px solid #2E2921}
+.klive b{display:block;font-family:Georgia,serif;font-size:20px;font-weight:400;color:#F4EFE6}
+.klive span{display:block;font-size:9.5px;color:#7E7466;margin-top:3px;line-height:1.25}
+.klive .warn b{color:#C64B3C}
+.bar{display:flex;align-items:center;gap:8px;padding:5px 2px;font-size:11.5px;color:#9A8F80}
+.bar .bt{width:44px;flex:none;color:#7E7466}
+.bar .bb{flex:1;height:7px;border-radius:4px;background:#241E17;overflow:hidden}
+.bar .bf{height:100%;background:#E8A33D;border-radius:4px}
+.bar .bv{width:74px;text-align:right;flex:none;color:#F4EFE6;font-family:Georgia,serif;font-size:12.5px}
 .histn{display:inline-block;min-width:20px;text-align:center;background:#2A2118;color:#E8A33D;
  border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700}
 .histn.hot{background:#C64B3C;color:#fff}
@@ -340,7 +353,7 @@ const UI = {
       lang:"Sprache",langsub:"Die ganze Karte wechselt die Sprache — nicht nur die Buttons.",
       allerg:"Allergene",added:"hinzugefügt",gfbun:"Glutenfreies Burger-Brötchen +25 kr",table:"Tisch"},
   tr:{altTitle:"Orijinali göster",altSub:"Her yemeğin altına Norveççe metni koyar. Menüyü göstererek sipariş verirken işe yarar.",
-      tblWord:"masa",guest:"MİSAFİR",waiter:"GARSON",qrv:"QR KODLAR",qrTitle:"QR kodlar",qrSub:"Her kod menüyü kendi masa numarasıyla açar. Yazdırın, laminasyon yapın, masaya koyun.",baseUrl:"Menü adresi",tables:"Masa sayısı",gen:"QR kodları oluştur",printS:"Sayfayı yazdır",scan:"Menü ve sipariş için okutun",svcTitle:"Gelen siparişler",svcSub:"Masalardan gönderilen her sipariş buraya düşer.",svcEmpty:"Henüz sipariş yok. Misafir görünümünden bir tane gönderin.",served:"Servis edildi olarak işaretle",srvDone:"Servis edildi",callw:"Garson çağır",bill:"Hesap iste",called:"Garsona haber verildi",billed:"Hesap hazırlanıyor",offline:"QR kodlar için internet bağlantısı gerekir.",
+      tblWord:"masa",guest:"MİSAFİR",waiter:"GARSON",qrv:"QR KODLAR",qrTitle:"QR kodlar",qrSub:"Her kod menüyü kendi masa numarasıyla açar. Yazdırın, laminasyon yapın, masaya koyun.",baseUrl:"Menü adresi",tables:"Masa sayısı",gen:"QR kodları oluştur",printS:"Sayfayı yazdır",scan:"Menü ve sipariş için okutun",svcTitle:"Gelen siparişler",svcSub:"Masalardan gönderilen her sipariş buraya düşer.",svcEmpty:"Henüz sipariş yok. Misafir görünümünden bir tane gönderin.",served:"Servis edildi olarak işaretle",srvDone:"Servis edildi",callw:"Garson çağır",bill:"Hesap iste",called:"Garsona haber verildi",billed:"Hesap geliyor",offline:"QR kodlar için internet bağlantısı gerekir.",
       search:"Ara...",all:"Hepsi",veg:"Vejetaryen",vgn:"Vegan",nop:"Domuz etsiz",glf:"Glutensiz",
       spy:"Acı",loc:"Yerel",blocks:["YEMEK","BİRA","ŞARAP & BAR","ALKOLSÜZ"],
       cart:"Siparişiniz",items:"ürün",item:"ürün",total:"Toplam",send:"Siparişi mutfağa gönder",
@@ -566,7 +579,7 @@ const MENU = [
 
 {blk:"beer",sec:"tap",id:"tou",n:"Tou Pilsner · 0,4 l",p:125,th:"y",alg:["barl"],tg:[],
  d:d("Crisp and light, straw and hay.","Frisk og lett, preg av strå og halm.",
-     "Frisch und leicht, Stroh und Heu.","Ferah ve hafif; saman notaları.")},
+     "Frisch und leicht, Stroh und Heu.","Ferah ve hafif; saman ve kuru ot notaları.")},
 {blk:"beer",sec:"tap",id:"schous",n:"Schous Pils · 0,4 l",p:139,th:"y",alg:["barl"],tg:[],
  d:d("Nordic pilsner, floral and balanced.","Nordisk pils, floral og balansert.",
      "Nordisches Pils, blumig und ausgewogen.","İskandinav pilsner; çiçeksi ve dengeli.")},
@@ -576,9 +589,9 @@ const MENU = [
 {blk:"beer",sec:"tap",id:"guinness",n:"Guinness · 0,5 l",p:169,th:"y",alg:["barl"],tg:[],
  d:d("Roasted malt, coffee and caramel. Low carbonation.","Røstet malt, kaffe og karamell. Lav kullsyre.",
      "Geröstetes Malz, Kaffee und Karamell. Wenig Kohlensäure.","Kavrulmuş malt, kahve ve karamel. Düşük gazlı.")},
-{blk:"beer",sec:"tap",id:"crowmoor",n:{en:"CrowMoor Dry Apple Cider · 0,4 l",no:"CrowMoor tørr eplesider · 0,4 l",de:"CrowMoor trockener Apfelcider · 0,4 l",tr:"CrowMoor sek elma şarabı · 0,4 l"},p:149,th:"g",alg:["sulf"],tg:["glf"],
+{blk:"beer",sec:"tap",id:"crowmoor",n:{en:"CrowMoor Dry Apple Cider · 0,4 l",no:"CrowMoor tørr eplesider · 0,4 l",de:"CrowMoor trockener Apfelcider · 0,4 l",tr:"CrowMoor sek elma sidri · 0,4 l"},p:149,th:"g",alg:["sulf"],tg:["glf"],
  d:d("Dry English-style cider with solid apple.","Tørr sider i engelsk stil med tydelig eplesmak.",
-     "Trockener Cider nach englischer Art mit deutlicher Apfelnote.","Sek, İngiliz usulü elma şarabı; belirgin elma karakteri.")},
+     "Trockener Cider nach englischer Art mit deutlicher Apfelnote.","Sek, İngiliz usulü elma sidri; belirgin elma karakteri.")},
 
 {blk:"beer",sec:"int",id:"staropramen",n:"Staropramen · 0,33 l",p:109,th:"y",alg:["barl"],tg:[],
  d:d("Czech premium pilsner.","Tsjekkisk premium pilsner.","Tschechisches Premium-Pils.","Çek premium pilsner.")},
@@ -657,13 +670,13 @@ const MENU = [
 
 /* ---------------- NO ALCOHOL ---------------- */
 {blk:"noalc",sec:"moc",id:"grapefruit",n:"Grapefruit Cooler",p:69,th:"r",alg:[],tg:["vgn","nop","glf"],
- d:d("Pink grapefruit, lime and mint over crushed ice. Bitter, sharp and not sweet.",
+ d:d("Pink grapefruit, lime and mint over crushed ice. Bitter, fresh and not sweet.",
      "Rosa grapefrukt, lime og mynte over knust is. Bitter og frisk, ikke søt.",
      "Rosa Grapefruit, Limette und Minze auf Crushed Ice. Herb und frisch, nicht süß.",
      "Pembe greyfurt, misket limonu ve nane; kırılmış buz üzerine. Acımsı ve ferah, tatlı değil.")},
 {blk:"noalc",sec:"moc",id:"peach",n:"Peach Fizz",p:69,th:"o",alg:[],tg:["vgn","nop","glf"],
  d:d("White peach, lemon and soda with orange peel. Long and sparkling.",
-     "Hvit fersken, sitron og soda med appelsinskall. Frisk og sprudlende.",
+     "Hvit fersken, sitron og soda med appelsinskall. Lang og sprudlende.",
      "Weißer Pfirsich, Zitrone und Soda mit Orangenschale. Ein langer, spritziger Drink.",
      "Beyaz şeftali, limon ve soda; portakal kabuğuyla. Uzun içimli ve gazlı.")},
 
@@ -761,9 +774,14 @@ function renderBlocks(){
 }
 
 function renderFilters(){
+  /* Vis bare de filtrene som faktisk treffer noe i fanen man står i.
+     «Sterk» og «uten svin» hører ikke hjemme over ølkartet. */
+  const here = FILTERKEYS.filter(f => MENU.some(it => it.blk===block && it.tg && it.tg.indexOf(f)>=0));
+  if(!here.length){ $("#filters").innerHTML=""; $("#filters").style.display="none"; return; }
+  $("#filters").style.display="";
   $("#filters").innerHTML =
     `<button class="flt ${filters.size===0?"on":""}" data-f="__all">${t().all}</button>` +
-    FILTERKEYS.map(f=>`<button class="flt ${filters.has(f)?"on":""}" data-f="${f}">${t()[f]}</button>`).join("");
+    here.map(f=>`<button class="flt ${filters.has(f)?"on":""}" data-f="${f}">${t()[f]}</button>`).join("");
   [...document.querySelectorAll(".flt")].forEach(el=>el.onclick=()=>{
     const f = el.dataset.f;
     if(f==="__all") filters.clear();
@@ -1076,7 +1094,7 @@ render();
        histEmpty:"Nothing served yet.",retain:"Orders stay in the list for {h} hours.",
        openOrders:"not served",today:"Today",yday:"Yesterday",mine:"Your order",
        statSent:"sent to the kitchen",statServed:"served",
-       roleW:"Waiter",roleA:"Manager",items:"items",item:"item"},
+       roleW:"Waiter",roleA:"Manager",items:"items",item:"item",myOrders:"My order",openNow:"open orders",callsNow:"calls",busy:"tables in use",topItems:"Best sellers",perHour:"By hour",printDay:"Print the day",mineNone:"No order at this table yet."},
    no:{calls:"Tilkalling",callsSub:"Bord som venter på noen. Kvitter når du har vært der.",
        callsEmpty:"Ingen tilkalling nå.",ackBtn:"Kvitter",wantsWaiter:"ber om servitør",
        wantsBill:"ber om regningen",kasse:"KASSE",kTitle:"Kasse",kSub:"Alt som er sendt fra bordene i dag.",
@@ -1085,7 +1103,7 @@ render();
        histEmpty:"Ingenting servert ennå.",retain:"Bestillingene blir liggende i {h} timer.",
        openOrders:"ikke servert",today:"I dag",yday:"I går",mine:"Din bestilling",
        statSent:"sendt til kjøkkenet",statServed:"servert",
-       roleW:"Servitør",roleA:"Sjef",items:"varer",item:"vare"},
+       roleW:"Servitør",roleA:"Sjef",items:"varer",item:"vare",myOrders:"Min bestilling",openNow:"åpne bestillinger",callsNow:"tilkallinger",busy:"bord i bruk",topItems:"Mest solgt",perHour:"Per time",printDay:"Skriv ut dagen",mineNone:"Ingen bestilling ved dette bordet ennå."},
    de:{calls:"Rufe",callsSub:"Tische, die warten. Quittieren Sie, sobald Sie dort waren.",
        callsEmpty:"Gerade keine Rufe.",ackBtn:"Quittieren",wantsWaiter:"ruft den Service",
        wantsBill:"bittet um die Rechnung",kasse:"KASSE",kTitle:"Kasse",kSub:"Alles, was heute von den Tischen kam.",
@@ -1094,7 +1112,7 @@ render();
        histEmpty:"Noch nichts serviert.",retain:"Bestellungen bleiben {h} Stunden in der Liste.",
        openOrders:"nicht serviert",today:"Heute",yday:"Gestern",mine:"Ihre Bestellung",
        statSent:"an die Küche gesendet",statServed:"serviert",
-       roleW:"Service",roleA:"Leitung",items:"Artikel",item:"Artikel"},
+       roleW:"Service",roleA:"Leitung",items:"Artikel",item:"Artikel",myOrders:"Meine Bestellung",openNow:"offene Bestellungen",callsNow:"Rufe",busy:"Tische in Benutzung",topItems:"Meistverkauft",perHour:"Pro Stunde",printDay:"Tag drucken",mineNone:"Noch keine Bestellung an diesem Tisch."},
    tr:{calls:"Çağrılar",callsSub:"Sizi bekleyen masalar. Gidince İlgilendim'e basın.",
        callsEmpty:"Şu an çağrı yok.",ackBtn:"İlgilendim",wantsWaiter:"garson istiyor",
        wantsBill:"hesap istiyor",kasse:"KASA",kTitle:"Kasa",kSub:"Bugün masalardan gelen her şey.",
@@ -1103,7 +1121,7 @@ render();
        histEmpty:"Henüz servis edilen yok.",retain:"Siparişler listede {h} saat kalır.",
        openOrders:"servis edilmedi",today:"Bugün",yday:"Dün",mine:"Siparişiniz",
        statSent:"mutfağa gönderildi",statServed:"servis edildi",
-       roleW:"Garson",roleA:"Yönetici",items:"ürün",item:"ürün"}
+       roleW:"Garson",roleA:"Yönetici",items:"ürün",item:"ürün",myOrders:"Siparişim",openNow:"açık sipariş",callsNow:"çağrı",busy:"dolu masa",topItems:"En çok satan",perHour:"Saat bazında",printDay:"Günü yazdır",mineNone:"Bu masada henüz sipariş yok."}
   };
   for(var lg in WORDS){ if(UI[lg]) for(var k in WORDS[lg]) UI[lg][k] = WORDS[lg][k]; }
 
@@ -1192,8 +1210,11 @@ render();
   var role="gjest";
   var SP=new URLSearchParams(location.search);
   var pn=(SP.get("panel")||"").toLowerCase();
+  var qtab=parseInt(SP.get("bord")||SP.get("table")||"",10);
   if(pn==="garson"||pn==="waiter"||pn==="servitor") role="servit";
   else if(pn==="sef"||pn==="sjef"||pn==="admin"||SP.get("demo")==="1") role="sjef";
+  else if(pn==="misafir"||pn==="gjest"||pn==="guest") role="gjest";
+  else if(!(qtab>=1&&qtab<=60)) role="sjef";   /* naken lenke = demolenke */
 
   /* ---------- gjestens statuslinje ---------- */
   var mineBox=document.createElement("div");
@@ -1215,6 +1236,32 @@ render();
       (served?t().statServed:t().statSent)+'</div><div class="ms">'+n+" "+
       (n===1?t().item:t().items)+" · "+stamp(o.ts)+'</div></div><div class="mr">'+money(sum)+"</div>";
   };
+
+  /* ---------- gjestens egen bestillingsliste, alltid tilgjengelig ---------- */
+  function myOrders(){
+    return prune(orders).filter(function(o){return o.table===table;})
+                        .sort(function(a,b){return b.ts-a.ts;});
+  }
+  window.openMine=function(){
+    var list=myOrders();
+    var rows=list.map(function(o){
+      return '<div class="crow"><div><div class="cn">#'+String(o.id).padStart(3,"0")+" · "+stamp(o.ts)+
+        '</div><div class="cq" style="opacity:.75">'+
+        o.lines.map(function(l){return l.q+" × "+l.name;}).join("<br>")+"</div>"+
+        '<div style="color:'+(o.served?"#2E6B4F":"#E8A33D")+
+        ';font-size:11px;font-weight:700;margin-top:5px">'+
+        (o.served?t().statServed:t().statSent)+"</div></div>"+
+        '<div class="cp">'+money(o.total)+"</div></div>";
+    }).join("") || '<div class="empty">'+t().mineNone+"</div>";
+    var sum=list.reduce(function(a,o){return a+o.total;},0);
+    document.querySelector("#drawer").innerHTML="<h3>"+t().myOrders+"</h3>"+rows+
+      '<div class="total"><span>'+t().total+"</span><span>"+money(sum)+"</span></div>"+
+      '<button class="btn ghost" id="mineClose">'+t().close+"</button>";
+    document.querySelector("#drawer").classList.add("open");
+    document.querySelector("#sheetBg").classList.add("open");
+    document.querySelector("#mineClose").onclick=closeAll;
+  };
+  mineBox.onclick=function(){ openMine(); };
 
   /* ---------- tilkalling ---------- */
   function ring(kind){
@@ -1240,6 +1287,13 @@ render();
       ring("waiter"); toast(t().called);
     };
     document.querySelector("#askB").onclick=function(){ ring("bill"); toast(t().billed); };
+    if(myOrders().length){
+      var mb=document.createElement("button");
+      mb.className="act minebtn"; mb.id="mineBtn";
+      mb.innerHTML=t().myOrders+' <span class="mn">'+myOrders().length+"</span>";
+      acts.appendChild(mb);
+      mb.onclick=openMine;
+    }
   };
 
   /* ---------- bestillingen sendes ut ---------- */
@@ -1308,28 +1362,53 @@ render();
   };
 
   /* ---------- kasse ---------- */
+  function barRow(label,value,max,txt){
+    var w=max?Math.round(value/max*100):0;
+    return '<div class="bar"><span class="bt">'+label+'</span>'+
+      '<span class="bb"><span class="bf" style="width:'+w+'%"></span></span>'+
+      '<span class="bv">'+txt+"</span></div>";
+  }
   window.renderKasse=function(){
-    orders=prune(orders);
+    orders=prune(orders); calls=prune(calls);
     var d0=new Date(); d0.setHours(0,0,0,0);
     var today=orders.filter(function(o){return o.ts>=d0.getTime();}).sort(function(a,b){return b.ts-a.ts;});
     var sum=today.reduce(function(a,o){return a+o.total;},0);
     var avg=today.length?Math.round(sum/today.length):0;
     var byT={}; today.forEach(function(o){ byT[o.table]=(byT[o.table]||0)+o.total; });
-    var rows=Object.keys(byT).sort(function(a,b){return byT[b]-byT[a];})
-      .map(function(k){return '<div class="krow"><span>'+t().table+" "+k+"</span><b>"+money(byT[k])+"</b></div>";}).join("");
+    var tKeys=Object.keys(byT).sort(function(a,b){return byT[b]-byT[a];});
+    var tMax=tKeys.length?byT[tKeys[0]]:0;
+    var rows=tKeys.map(function(k){return barRow(t().table+" "+k,byT[k],tMax,money(byT[k]));}).join("");
+    var openO=orders.filter(function(o){return !o.served;}).length;
+    var openC=calls.filter(function(c){return !c.done;}).length;
+    var byN={}; today.forEach(function(o){o.lines.forEach(function(l){byN[l.name]=(byN[l.name]||0)+l.q;});});
+    var nKeys=Object.keys(byN).sort(function(a,b){return byN[b]-byN[a];}).slice(0,6);
+    var tops=nKeys.map(function(k){return '<div class="krow"><span>'+k+"</span><b>"+byN[k]+" ×</b></div>";}).join("");
+    var byH={}; today.forEach(function(o){var h=new Date(o.ts).getHours(); byH[h]=(byH[h]||0)+o.total;});
+    var hKeys=Object.keys(byH).map(Number).sort(function(a,b){return a-b;});
+    var hMax=hKeys.reduce(function(m,h){return Math.max(m,byH[h]);},0);
+    var hours=hKeys.map(function(h){return barRow(String(h).padStart(2,"0")+":00",byH[h],hMax,money(byH[h]));}).join("");
     var lines=today.length?today.map(function(o){
       return '<div class="krow"><span>#'+String(o.id).padStart(3,"0")+" · "+t().table+" "+o.table+
         " · "+stamp(o.ts)+(o.served?"":" · "+t().openOrders)+"</span><b>"+money(o.total)+"</b></div>";}).join("")
       :'<div class="empty">'+t().kEmpty+"</div>";
     document.querySelector("#list").innerHTML='<div class="pane"><h2>'+t().kTitle+
       '</h2><p class="ps">'+t().kSub+"</p>"+
+      '<div class="klive"><div class="'+(openO?"warn":"")+'"><b>'+openO+"</b><span>"+t().openNow+"</span></div>"+
+      '<div class="'+(openC?"warn":"")+'"><b>'+openC+"</b><span>"+t().callsNow+"</span></div>"+
+      "<div><b>"+tKeys.length+"</b><span>"+t().busy+"</span></div></div>"+
       '<div class="kbig"><span>'+t().kToday+"</span><b>"+money(sum)+"</b></div>"+
       '<div class="ktri"><div><b>'+today.length+"</b><span>"+t().kOrders+"</span></div>"+
       "<div><b>"+money(avg)+"</b><span>"+t().kAvg+"</span></div>"+
-      "<div><b>"+Object.keys(byT).length+"</b><span>"+t().tblWord+"</span></div></div>"+
+      "<div><b>"+tKeys.length+"</b><span>"+t().tblWord+"</span></div></div>"+
       '<h2 style="margin-top:24px">'+t().kTables+'</h2><div style="margin-top:10px">'+
       (rows||'<div class="empty">'+t().kEmpty+"</div>")+"</div>"+
-      '<h2 style="margin-top:24px">'+t().svcTitle+'</h2><div style="margin-top:10px">'+lines+"</div></div>";
+      '<h2 style="margin-top:24px">'+t().topItems+'</h2><div style="margin-top:10px">'+
+      (tops||'<div class="empty">'+t().kEmpty+"</div>")+"</div>"+
+      '<h2 style="margin-top:24px">'+t().perHour+'</h2><div style="margin-top:10px">'+
+      (hours||'<div class="empty">'+t().kEmpty+"</div>")+"</div>"+
+      '<h2 style="margin-top:24px">'+t().svcTitle+'</h2><div style="margin-top:10px">'+lines+"</div>"+
+      '<button class="btn ghost noprint" id="kPrint" style="margin-top:18px">'+t().printDay+"</button></div>";
+    var pb=document.querySelector("#kPrint"); if(pb) pb.onclick=function(){window.print();};
   };
 
   /* ---------- rollelinje ---------- */
