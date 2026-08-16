@@ -1368,6 +1368,15 @@ render();
     renderMine();
   };
 
+  /* ---------- QR-adressen er siden selv ---------- */
+  try{
+    if(location.protocol==="http:"||location.protocol==="https:")
+      baseUrl = location.origin + location.pathname;
+  }catch(e){}
+  window.qrLink=function(i){
+    return baseUrl+(baseUrl.indexOf("?")>=0?"&":"?")+"bord="+i+"&lang="+lang;
+  };
+
   /* ---------- oppstart ---------- */
   orders=load(LSKEY); calls=load(CKEY);
   orders.forEach(function(o){ if(o.uid) seen[o.uid]=1; });
