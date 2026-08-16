@@ -117,6 +117,12 @@ body.nobar .mine{bottom:0}
 body.nobar.hasmine .cartbar{bottom:64px}
 body.nobar #app{padding-bottom:20px}
 .callhead{display:flex;align-items:baseline;gap:9px}
+.dbtn{position:relative}
+.dbadge{display:inline-block;min-width:16px;margin-left:6px;background:var(--red);color:#fff;
+ border-radius:20px;font-size:9.5px;font-weight:800;padding:1px 5px;vertical-align:1px;
+ animation:bpulse 1.8s ease-in-out infinite}
+@keyframes bpulse{0%,100%{opacity:1}50%{opacity:.45}}
+@media(prefers-reduced-motion:reduce){.dbadge{animation:none}}
 .minebtn{position:relative}
 .minebtn .mn{display:inline-block;min-width:17px;margin-left:5px;background:var(--brass);
  color:#07141A;border-radius:20px;font-size:10px;font-weight:800;padding:1px 6px;vertical-align:1px}
@@ -450,6 +456,7 @@ async function pullHistory(){
     }
     setOnline(true);
     if(touched){ saveOrders(); saveCalls(); render(); }
+    else renderDemoBar();
   }catch(e){ setOnline(false); }
 }
 function listen(){
@@ -464,7 +471,8 @@ function listen(){
         if(m.event !== "message" || !m.message) return;
         if(applyEvent(JSON.parse(m.message))){
           saveOrders(); saveCalls();
-          if(view === "waiter" || view === "kasse") render(); else renderMine();
+          if(view === "waiter" || view === "kasse") render();
+          else { renderDemoBar(); renderMine(); }
         }
       }catch(e){}
     };
@@ -670,7 +678,14 @@ function renderDemoBar(){
   if(role === "gjest"){ bar.style.display = "none"; document.body.classList.add("nobar"); return; }
   bar.style.display = ""; document.body.classList.remove("nobar");
   const label = {guest:t().guest, waiter:t().waiter, kasse:t().kasse, qr:t().qrv};
-  const tabs = allowed.map(k=>`<button class="dbtn ${view===k?"on":""}" data-v="${k}">${label[k]}</button>`).join("");
+  /* Uleste krav: bestillinger som ikke er servert, pluss tilkallinger som ikke er kvittert.
+     Tallet står på servitørfanen og oppdateres når som helst noe kommer inn. */
+  const pending = prune(orders).filter(o=>!o.served).length
+                + prune(calls ).filter(c=>!c.done  ).length;
+  const tabs = allowed.map(k=>{
+    const badge = (k==="waiter" && pending) ? `<span class="dbadge">${pending}</span>` : "";
+    return `<button class="dbtn ${view===k?"on":""}" data-v="${k}">${label[k]}${badge}</button>`;
+  }).join("");
   const opts = Array.from({length:nTables},(_,i)=>i+1)
     .map(i=>`<option value="${i}" ${i===table?"selected":""}>${t().table} ${i}</option>`).join("");
   const rname = role==="sjef" ? t().roleA : t().roleW;

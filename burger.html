@@ -215,6 +215,12 @@ body.nobar .cartbar{bottom:0}
 body.nobar .mine{bottom:0}
 body.nobar.hasmine .cartbar{bottom:64px}
 .callhead{display:flex;align-items:baseline;gap:9px}
+.dbtn{position:relative}
+.dbadge{display:inline-block;min-width:16px;margin-left:6px;background:#C64B3C;color:#fff;
+ border-radius:20px;font-size:9.5px;font-weight:800;padding:1px 5px;vertical-align:1px;
+ animation:bpulse 1.8s ease-in-out infinite}
+@keyframes bpulse{0%,100%{opacity:1}50%{opacity:.45}}
+@media(prefers-reduced-motion:reduce){.dbadge{animation:none}}
 .minebtn{position:relative}
 .minebtn .mn{display:inline-block;min-width:17px;margin-left:5px;background:#E8A33D;
  color:#16130F;border-radius:20px;font-size:10px;font-weight:800;padding:1px 6px;vertical-align:1px}
@@ -1186,7 +1192,7 @@ render();
         }catch(e){}
       });
       setOnline(true);
-      if(touched){ saveAll(); render(); }
+      if(touched){ saveAll(); render(); } else renderDemoBar();
     }).catch(function(){ setOnline(false); });
   }
   function listen(){
@@ -1199,7 +1205,8 @@ render();
         try{ var m=JSON.parse(ev.data);
           if(m.event!=="message"||!m.message) return;
           if(apply(JSON.parse(m.message))){ saveAll();
-            if(view==="waiter"||view==="kasse") render(); else renderMine(); }
+            if(view==="waiter"||view==="kasse") render();
+            else { renderDemoBar(); renderMine(); } }
         }catch(e){}
       };
     }catch(e){ setOnline(false); }
@@ -1418,8 +1425,11 @@ render();
     bar.style.display=""; document.body.classList.remove("nobar");
     var label={guest:t().guest,waiter:t().waiter,kasse:t().kasse,qr:t().qrv};
     var allowed=VIEWS[role];
+    var pending=prune(orders).filter(function(o){return !o.served;}).length
+              + prune(calls ).filter(function(c){return !c.done;  }).length;
     var tabs=allowed.map(function(k){
-      return '<button class="dbtn '+(view===k?"on":"")+'" data-v="'+k+'">'+label[k]+"</button>";}).join("");
+      var badge=(k==="waiter"&&pending)?'<span class="dbadge">'+pending+"</span>":"";
+      return '<button class="dbtn '+(view===k?"on":"")+'" data-v="'+k+'">'+label[k]+badge+"</button>";}).join("");
     var opts=Array.from({length:nTables},function(_,i){return i+1;}).map(function(i){
       return '<option value="'+i+'" '+(i===table?"selected":"")+">"+t().table+" "+i+"</option>";}).join("");
     bar.innerHTML='<span class="rolepill"><span class="syncdot'+(online?" on":"")+'" id="syncdot"></span>'+
