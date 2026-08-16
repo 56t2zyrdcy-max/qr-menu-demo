@@ -559,13 +559,13 @@ function matches(it){
 }
 function renderHero(){
   const h = HERO[HEROKEY[block]][L.indexOf(lang)];
-  const ring = (t().callw + " · ").toUpperCase().repeat(3);
+  const ringTxt = (t().callw + " · ").toUpperCase().repeat(3);
   $("#hero").innerHTML = `<div class="acts">
       <button class="bell" id="callW" aria-label="${t().callw}">
         <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
           <defs><path id="bellpath" fill="none"
             d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0"></path></defs>
-          <text><textPath href="#bellpath" startOffset="0">${ring}</textPath></text>
+          <text><textPath href="#bellpath" startOffset="0">${ringTxt}</textPath></text>
         </svg>
         <span class="disc">
           <svg viewBox="0 0 24 24" aria-hidden="true">
