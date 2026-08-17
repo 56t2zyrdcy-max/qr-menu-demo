@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SOLSIDEN · QR-meny</title>
+<meta name="description" content="En gjennomgang av menyen — og et forslag.">
+<style>
+:root{
+  --bg:#07141A; --deep:#0E2029; --card:#112832; --line:#1B333C;
+  --brass:#D8B45A; --green:#2F6B57; --red:#B4472F;
+  --tx:#E7F0F2; --dim:#9DB4BA; --dim2:#6E858C;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+
+/* ---------- språkvelger ---------- */
+.top{position:sticky;top:0;z-index:40;background:rgba(7,20,26,.94);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topin{max-width:760px;margin:0 auto;padding:11px 22px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mark{font-family:Georgia,serif;font-size:15px;letter-spacing:4px;color:var(--tx);white-space:nowrap}
+.langs{display:flex;gap:6px}
+.lg{background:transparent;border:1px solid var(--line);color:var(--dim);
+  border-radius:20px;padding:7px 13px;font:700 11px/1 inherit;letter-spacing:.06em;
+  cursor:pointer;white-space:nowrap;transition:.15s}
+.lg:hover{color:var(--tx);border-color:#2B4A55}
+.lg.on{background:var(--brass);border-color:var(--brass);color:#07141A}
+
+/* ---------- hero ---------- */
+.hero{padding:64px 0 44px;border-bottom:1px solid var(--line)}
+h1{font-family:Georgia,serif;font-weight:400;font-size:44px;line-height:1.1;
+  margin:0 0 8px;letter-spacing:5px}
+.tag{font-family:Georgia,serif;font-size:23px;color:var(--brass);margin:0 0 20px;line-height:1.3}
+.lede{font-size:18px;line-height:1.7;color:var(--dim);margin:0 0 22px}
+.meta{font-size:13px;color:var(--dim2)}
+
+/* ---------- seksjoner ---------- */
+section{padding:46px 0;border-bottom:1px solid var(--line)}
+h2{font-family:Georgia,serif;font-weight:400;font-size:29px;line-height:1.25;margin:0 0 6px}
+.kicker{font:700 11px/1 inherit;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--dim2);margin:0 0 14px}
+p{margin:0 0 16px;color:var(--dim)}
+p.big{font-size:17.5px;color:#C6D8DC}
+strong{color:var(--tx);font-weight:600}
+
+/* ---------- tall ---------- */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:24px 0 0}
+.stats.four{grid-template-columns:repeat(4,1fr)}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 14px}
+.stat b{display:block;font-family:Georgia,serif;font-size:34px;font-weight:400;color:var(--brass);line-height:1}
+.stat.red b{color:var(--red)}
+.stat span{display:block;font-size:12px;color:var(--dim2);margin-top:8px;line-height:1.4}
+
+/* ---------- funnliste ---------- */
+.finds{margin:22px 0 0;padding:0;list-style:none}
+.finds li{display:flex;gap:14px;padding:15px 0;border-bottom:1px solid #14262E}
+.finds li:last-child{border-bottom:0}
+.n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;
+  font:700 12px/28px inherit;text-align:center}
+.n.a{background:#C08A1E}
+.fh{font-weight:600;color:var(--tx);display:block;margin-bottom:3px}
+.fd{font-size:14.5px;color:var(--dim2);display:block;line-height:1.55}
+
+/* ---------- sitatboks ---------- */
+.quote{background:var(--deep);border:1px solid var(--line);border-radius:14px;
+  padding:30px 24px;text-align:center;margin:26px 0}
+.quote .code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:30px;
+  color:var(--brass);letter-spacing:3px;display:block}
+.quote .cap{font-size:13px;color:var(--dim2);margin-top:12px;display:block}
+.alarm{background:#2A1310;border:1px solid #6B3226;border-radius:12px;
+  padding:18px 20px;color:#F0BCAE;font-size:16.5px;line-height:1.6}
+
+/* ---------- tabell ---------- */
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:20px 0 0}
+th{background:var(--deep);color:var(--tx);text-align:left;padding:12px 14px;
+  font-size:12.5px;font-weight:700;letter-spacing:.04em}
+td{padding:12px 14px;border-bottom:1px solid #14262E;color:var(--dim)}
+td.no{color:var(--red);font-weight:700}
+
+/* ---------- kort ---------- */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+.card b{display:block;color:var(--tx);font-size:15.5px;margin-bottom:5px}
+.card span{font-size:14px;color:var(--dim2);line-height:1.55}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--green);
+  display:block;margin-bottom:11px}
+.dot.br{background:var(--brass)}
+
+/* ---------- steg ---------- */
+.steps{margin:22px 0 0;padding:0;list-style:none;counter-reset:s}
+.steps li{display:flex;gap:15px;padding:14px 0;border-bottom:1px solid #14262E}
+.steps li:last-child{border-bottom:0}
+.sn{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--brass);
+  color:var(--brass);font:400 14px/28px Georgia,serif;text-align:center}
+
+/* ---------- plan ---------- */
+.plan{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
+.pcol{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+.ph{display:inline-block;font:700 10px/1 inherit;letter-spacing:.12em;color:#07141A;
+  border-radius:20px;padding:7px 12px;margin-bottom:14px}
+.pcol ul{margin:0;padding-left:17px;color:var(--dim);font-size:14px;line-height:1.6}
+.pcol li{margin-bottom:7px}
+
+/* ---------- lenker ---------- */
+.links{display:grid;gap:10px;margin-top:22px}
+.lk{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:17px 20px;text-decoration:none;transition:.15s}
+.lk:hover{border-color:var(--brass);background:#153039}
+.lk b{color:var(--brass);font-size:16px;font-weight:600}
+.lk span{color:var(--dim2);font-size:13px}
+.lk .arw{color:var(--brass);font-size:19px;flex:none}
+
+/* ---------- avslutning ---------- */
+.end{padding:66px 0 30px;text-align:left}
+.end h2{font-size:38px;line-height:1.25;margin-bottom:18px}
+.sig{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);
+  font-size:13.5px;color:var(--dim2)}
+.sig b{color:var(--brass);font-weight:600}
+.src{font-size:12px;color:#54696F;line-height:1.6;margin-top:24px}
+
+@media (max-width:620px){
+  h1{font-size:32px;letter-spacing:3px}
+  .tag{font-size:19px}
+  .lede{font-size:16.5px}
+  h2{font-size:24px}
+  .end h2{font-size:28px}
+  .stats,.stats.four{grid-template-columns:1fr 1fr}
+  .cards,.plan{grid-template-columns:1fr}
+  .quote .code{font-size:22px;letter-spacing:2px}
+  .mark{font-size:12px;letter-spacing:2px}
+  .lg{padding:7px 10px;font-size:10.5px}
+  section{padding:38px 0}
+}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="topin">
+  <div class="mark">SOLSIDEN</div>
+  <div class="langs" id="langs"></div>
+</div></div>
+
+<main id="doc"></main>
+
+<script>
+const BASE = "https://56t2zyrdcy-max.github.io/qr-menu-demo/solsiden.html";
+
+const T = {
+
+/* ===================================================== NORSK */
+no: {
+name:"Norsk", htmlLang:"nb",
+h1:"SOLSIDEN",
+tag:"Menyen deres på fem språk",
+lede:"Jeg har lest hele menyen deres — hver rett, hver pris, hver allergenkode — og bygget den om til en QR-meny som virker. Denne siden forteller hva jeg fant, og hva jeg foreslår. Det tar fem minutter å lese.",
+meta:"Özkan Özmen · august 2026 · Akershusstranda 13, Oslo",
+
+k1:"Utgangspunktet", h1s:"Gjesten som kommer opp fra kaia",
+p1:"Hun går de hundre meterne opp fra cruisekaia. Hun leser ikke norsk. Hun har halvannen time før skipet går, og hun er allergisk mot skalldyr. Alt hun trenger å vite står allerede på menyen deres — men ikke på et språk hun forstår.",
+st1:[["90","minutter fra kai til bord",""],["2","språk på menyen i dag",""],["0","matretter med bilde","red"]],
+
+k2:"Gjennomgangen", h2s:"Ti ting jeg fant",
+p2:"Jeg gikk gjennom matkartet, vinkartet på 250 flasker, selskapsmenyen og bildearkivet deres. Dette er det jeg stoppet ved, i den rekkefølgen jeg ville tatt tak i det.",
+finds:[
+ ["Allergennøkkelen finnes bare på norsk","Kodene står på hver eneste rett. Forklaringen står nederst på siden — kun på norsk.","r"],
+ ["Østersen har to navn","Utemenyen sier Chebooktook, Canada. À la carte sier Sanchez, Frankrike. Samme pris, 75/435/865.","r"],
+ ["En allergenkode uten forklaring","Nøtter er merket *n, p, ha, ma. Bokstaven «p» står ikke i noen nøkkel på hele menyen.","r"],
+ ["Øl, vann, brus og kaffe står ingen steder","Ikke på menyen, ikke i vinkartet, ikke på selskapsmenyen.","r"],
+ ["Bare norsk og engelsk","Tyskerne er blant de største gruppene på kaia. Ingen tysk, ingen kinesisk, ingen fransk.","r"],
+ ["Nøkkelen er ulik fra seksjon til seksjon","Én seksjon lister Nøtter = n. En annen lister Laktose = l. Ingen lister begge.","a"],
+ ["«Norwegian crayfish»","Sjøkreps er langustin, ikke ferskvannskreps. Det står slik på to sider.","a"],
+ ["«ferskrevet pepperrot»","Skrivefeil under hovedrettene. Skal være nyrevet.","a"],
+ ["Vinkartet er en PDF på 250 flasker","Umulig å lese på telefon. De femten vinene på glass ligger begravd i den.","a"],
+ ["Ikke ett bilde av en rett","Samtidig ligger det over tretti profesjonelle bilder på deres egen nettside.","a"]],
+
+k3:"Det viktigste", h3s:"Den ene som ikke tåler å bli misforstått",
+code:"*sk, b, se, e, s",
+cap:"står under Plateau de Fruits de Mer",
+p3:"Forklaringen — Bløtdyr = b, Skalldyr = sk, Selleri = se, Egg = e, Sennep = s — finnes bare på norsk, nederst på siden. En engelsk, tysk eller kinesisk gjest ser fem bokstaver uten nøkkel, på en meny der nesten hver rett inneholder skalldyr eller bløtdyr.",
+alarm:"Dette er den ene opplysningen på hele menyen som ikke tåler å bli misforstått.",
+
+k4:"Drikke", h4s:"Det står ingenting noe sted",
+p4:"Jeg lette tre steder. Svaret er det samme alle tre.",
+tbl:[["Kilde","Øl","Vann og brus","Kaffe og te"],
+     ["Menykartet","nei","nei","nei"],
+     ["VINKART 2026 · 250 flasker","nei","nei","nei"],
+     ["Selskapsmenyen","nei","nei","nei"]],
+p4b:"En gjest som vil ha et glass vann eller en øl til skalldyrene må spørre. Hver gang, på hvert bord. Og servitøren må svare på det i stedet for å selge.",
+
+k5:"For ordens skyld", h5s:"Det som allerede sitter",
+cards1:[
+ ["Allergenmerking på hver rett","De fleste steder i Oslo har ikke dette i det hele tatt."],
+ ["Tospråklig meny","Grunnlaget for flere språk er alt gjort — teksten finnes på to språk fra før."],
+ ["Østers i tre antall","1, 6 og 12 stykker. Som skapt for en digital meny med antallsvalg."],
+ ["Plateau de Fruits de Mer","Husets signatur, og den retten gjesten fotograferer."],
+ ["Et vinkart på 250 flasker","Blant de sterkeste i byen. Problemet er formatet, ikke innholdet."],
+ ["Over tretti pressebilder","Deres egne, profesjonelt tatt — og ubrukt på menyen."]],
+
+k6:"Forslaget", h6s:"Hele menyen på én skjerm",
+p6:"Ingenting er diktet opp. Hver rett, hver årgang og hver pris er hentet fra deres eget materiale. Øl, alkoholfritt og kaffe står som forslag uten pris, fordi de ikke finnes i noe kart hos dere.",
+st2:[["69","retter og drikkevarer"],["5","språk fra dag én"],["14","allergenkoder oversatt"],["48","timers bestillingslogg"]],
+
+k7:"Ved bordet", h7s:"Slik ser det ut for gjesten",
+steps:[
+ ["Hun skanner koden på bordet","Menyen åpner med sitt eget bordnummer. Ingen app, ingen nedlasting, ingen konto."],
+ ["Hun velger språk","Hele menyen bytter — retter, kategorier og allergener. Ikke bare knappene."],
+ ["Hun tar bort det hun ikke tåler","Ett trykk på «uten skalldyr» skjuler hver rett som inneholder det."],
+ ["Hun bestiller, eller bare leser","Begge deler går. Bestillingen havner hos servitøren, merket med bordnummer."],
+ ["Hun tilkaller servitøren","Klokka på skjermen. Servitøren ser hvilket bord det gjelder, og hva de vil ha."]],
+
+k8:"I salen", h8s:"Det servitøren ser",
+cards2:[
+ ["Tilkallinger øverst","Hvilket bord, om de vil ha servitør eller regning, og klokkeslettet. Kvitteres med ett trykk."],
+ ["Bestillinger under","Bordnummer, hva som er bestilt, klokkeslett og sum."],
+ ["Rødt tall på fanen","Hvor mange bord som venter. Synlig også når skjermen står på gjestevisning."],
+ ["Historikk i 48 timer","Servert flytter seg ned i egen liste og faller ut av seg selv."]],
+
+k9:"På kontoret", h9s:"Det sjefen ser",
+cards3:[
+ ["Omsetning i dag","Sum, antall bestillinger og snitt per bestilling."],
+ ["Per bord","Hvilke bord som har lagt igjen mest, sortert."],
+ ["Mest solgt","De seks rettene som går mest, med antall."],
+ ["Per time","Når på kvelden pengene faktisk kommer inn."],
+ ["Åpne bestillinger og tilkallinger","Levende tall, rødt når noen venter."],
+ ["Skriv ut dagen","Hele dagslista på ett ark."]],
+
+k10:"På bordet", h10s:"QR-kodene lager seg selv",
+p10:"Panelet lager ferdige koder — én per bord, med bordnummeret bakt inn. Skriv ut arket, laminer, sett på bordet. Skanner gjesten koden på bord 7, åpner menyen med bord 7 allerede valgt, og bestillingen kommer inn merket bord 7. Antall bord bestemmer dere selv.",
+
+k11:"Språk", h11s:"Flere når dere vil",
+p11:"Norsk, engelsk, tysk, tyrkisk og kinesisk ligger inne nå. Fransk, spansk, italiensk, japansk — et nytt språk er ett tekstfelt per rett. Priser, allergener og merking gjenbrukes automatisk. Ingenting av strukturen må bygges på nytt.",
+
+k12:"Rekkefølge", h12s:"Hadde jeg måttet velge",
+plan:[["FØRSTE UKE","C08A1E",["Oversett allergennøkkelen til engelsk","Sett nøkkelen ved siden av kodene, ikke nederst","Rydd opp i de to østersnavnene","Forklar eller fjern koden «p»"]],
+      ["INNEN 30 DAGER","B4472F",["QR-meny med bordnummer","Tysk som tredje språk","Filter for skalldyr, fisk og gluten","Vin på glass ut av PDF-en","Øl, vann og kaffe inn i kartet"]],
+      ["INNEN 90 DAGER","2F6B57",["Kinesisk og fransk","Bilder på signaturrettene","Cuvée Solsiden fremhevet","Bestilling fra bordet i sesong"]]],
+
+k13:"Prøv den", h13s:"Demoen er åpen nå",
+p13:"Alt dere har lest om ligger ute og virker. Åpne den på telefonen — helst mens dere sitter i restauranten.",
+links:[["Slik ser gjesten det","Bord 7, hele menyen, fem språk","?bord=7"],
+       ["Servitørens skjerm","Bestillinger og tilkallinger","?panel=garson"],
+       ["Sjefens skjerm","Kasse, QR-koder og alt annet","?panel=sef"]],
+
+endh:"Dere forestiller dere det.\nVi bygger det.",
+endp:"Menyen er bare begynnelsen. Si hva dere vil at gjesten skal oppleve — så setter vi det opp.",
+sig:"Özkan Özmen",
+src:"Gjennomgangen er gjort på solsiden.no 16. august 2026: menykartet og VINKART 2026 (12.08.26). Priser og retter kan ha endret seg siden. Ingenting i demoen er diktet opp."
+},
+
+/* ===================================================== ENGELSK */
+en: {
+name:"English", htmlLang:"en",
+h1:"SOLSIDEN",
+tag:"Your menu in five languages",
+lede:"I have read your entire menu — every dish, every price, every allergen code — and rebuilt it as a QR menu that works. This page sets out what I found and what I propose. It takes five minutes to read.",
+meta:"Özkan Özmen · August 2026 · Akershusstranda 13, Oslo",
+
+k1:"The starting point", h1s:"The guest walking up from the quay",
+p1:"She walks the hundred metres up from the cruise quay. She does not read Norwegian. She has ninety minutes before the ship leaves, and she is allergic to shellfish. Everything she needs to know is already on your menu — but not in a language she understands.",
+st1:[["90","minutes from quay to table",""],["2","languages on the menu today",""],["0","dishes with a photograph","red"]],
+
+k2:"The review", h2s:"Ten things I found",
+p2:"I went through the food menu, the 250-bottle wine list, the party menu and your photo archive. These are the things I stopped at, in the order I would deal with them.",
+finds:[
+ ["The allergen key exists only in Norwegian","The codes are on every single dish. The explanation sits at the foot of the page — in Norwegian only.","r"],
+ ["The oyster has two names","The terrace menu says Chebooktook, Canada. The à la carte says Sanchez, France. Same price, 75/435/865.","r"],
+ ["An allergen code with no explanation","Nuts are marked *n, p, ha, ma. The letter «p» appears in no key anywhere on the menu.","r"],
+ ["Beer, water, soft drinks and coffee appear nowhere","Not on the menu, not in the wine list, not on the party menu.","r"],
+ ["Norwegian and English only","Germans are among the largest groups on the quay. No German, no Chinese, no French.","r"],
+ ["The key changes from section to section","One section lists Nuts = n. Another lists Lactose = l. Neither lists both.","a"],
+ ["«Norwegian crayfish»","Sjøkreps is langoustine, not freshwater crayfish. It reads this way on two pages.","a"],
+ ["«ferskrevet pepperrot»","A spelling error under the main courses. It should read nyrevet.","a"],
+ ["The wine list is a 250-bottle PDF","Unreadable on a phone. The fifteen wines by the glass are buried in it.","a"],
+ ["Not one photograph of a dish","Meanwhile more than thirty professional photographs sit on your own website.","a"]],
+
+k3:"The important one", h3s:"The one that cannot be misread",
+code:"*sk, b, se, e, s",
+cap:"printed under Plateau de Fruits de Mer",
+p3:"The explanation — Molluscs = b, Crustaceans = sk, Celery = se, Egg = e, Mustard = s — exists only in Norwegian, at the foot of the page. An English, German or Chinese guest sees five letters with no key, on a menu where nearly every dish contains shellfish or molluscs.",
+alarm:"This is the one piece of information on the whole menu that cannot afford to be misunderstood.",
+
+k4:"Drinks", h4s:"Nothing is written down anywhere",
+p4:"I looked in three places. The answer is the same in all three.",
+tbl:[["Source","Beer","Water & soft drinks","Coffee & tea"],
+     ["The food menu","no","no","no"],
+     ["VINKART 2026 · 250 bottles","no","no","no"],
+     ["The party menu","no","no","no"]],
+p4b:"A guest who wants a glass of water or a beer with the shellfish has to ask. Every time, at every table. And the waiter has to answer that instead of selling.",
+
+k5:"For the record", h5s:"What already works",
+cards1:[
+ ["Allergens marked on every dish","Most places in Oslo do not do this at all."],
+ ["A bilingual menu","The groundwork for more languages is done — the text already exists twice."],
+ ["Oysters in three quantities","1, 6 and 12. As if made for a digital menu with quantity choices."],
+ ["Plateau de Fruits de Mer","The house signature, and the dish guests photograph."],
+ ["A 250-bottle wine list","Among the strongest in the city. The problem is the format, not the contents."],
+ ["Over thirty press photographs","Your own, professionally shot — and unused on the menu."]],
+
+k6:"The proposal", h6s:"The whole menu on one screen",
+p6:"Nothing is invented. Every dish, every vintage and every price comes from your own material. Beer, soft drinks and coffee are shown as a proposal without prices, because they do not exist on any list of yours.",
+st2:[["69","dishes and drinks"],["5","languages from day one"],["14","allergen codes translated"],["48","hours of order history"]],
+
+k7:"At the table", h7s:"What the guest does",
+steps:[
+ ["She scans the code on the table","The menu opens with her own table number. No app, no download, no account."],
+ ["She picks a language","The whole menu changes — dishes, categories and allergens. Not just the buttons."],
+ ["She rules out what she cannot eat","One tap on «no shellfish» hides every dish that contains it."],
+ ["She orders, or simply reads","Both work. The order reaches the waiter, marked with the table number."],
+ ["She calls the waiter","The bell on the screen. The waiter sees which table it is, and what they want."]],
+
+k8:"In the room", h8s:"What the waiter sees",
+cards2:[
+ ["Calls at the top","Which table, whether they want a waiter or the bill, and the time. Cleared with one tap."],
+ ["Orders below","Table number, what was ordered, the time and the total."],
+ ["A red count on the tab","How many tables are waiting. Visible even from the guest view."],
+ ["48 hours of history","Served orders move into their own list and drop out on their own."]],
+
+k9:"In the office", h9s:"What the manager sees",
+cards3:[
+ ["Revenue today","Total, number of orders and average per order."],
+ ["By table","Which tables have spent the most, in order."],
+ ["Best sellers","The six dishes that move most, with counts."],
+ ["By hour","When in the evening the money actually comes in."],
+ ["Open orders and calls","Live figures, red when someone is waiting."],
+ ["Print the day","The whole day's list on one sheet."]],
+
+k10:"On the table", h10s:"The QR codes make themselves",
+p10:"The panel generates the codes — one per table, with the table number built in. Print the sheet, laminate it, put it on the table. Scan the code on table 7 and the menu opens with table 7 already chosen, and the order arrives marked table 7. You decide how many tables.",
+
+k11:"Languages", h11s:"More whenever you want",
+p11:"Norwegian, English, German, Turkish and Chinese are in place now. French, Spanish, Italian, Japanese — a new language is one text field per dish. Prices, allergens and labels are reused automatically. None of the structure has to be rebuilt.",
+
+k12:"Order of work", h12s:"If I had to choose",
+plan:[["FIRST WEEK","C08A1E",["Translate the allergen key into English","Put the key beside the codes, not at the bottom","Settle the two oyster names","Explain or remove the code «p»"]],
+      ["WITHIN 30 DAYS","B4472F",["QR menu with table numbers","German as the third language","Filters for shellfish, fish and gluten","Wine by the glass out of the PDF","Beer, water and coffee into the list"]],
+      ["WITHIN 90 DAYS","2F6B57",["Chinese and French","Photographs on the signature dishes","Cuvée Solsiden given its own place","Ordering from the table in season"]]],
+
+k13:"Try it", h13s:"The demo is live now",
+p13:"Everything you have read about is online and working. Open it on your phone — preferably while you are sitting in the restaurant.",
+links:[["What the guest sees","Table 7, the whole menu, five languages","?bord=7&lang=en"],
+       ["The waiter's screen","Orders and calls","?panel=garson&lang=en"],
+       ["The manager's screen","Till, QR codes and everything else","?panel=sef&lang=en"]],
+
+endh:"You imagine it.\nWe build it.",
+endp:"The menu is only the beginning. Tell us what you want the guest to experience — and we will set it up.",
+sig:"Özkan Özmen",
+src:"The review was carried out on solsiden.no on 16 August 2026: the food menu and VINKART 2026 (12.08.26). Prices and dishes may have changed since. Nothing in the demo is invented."
+},
+
+/* ===================================================== TYRKISK */
+tr: {
+name:"Türkçe", htmlLang:"tr",
+h1:"SOLSIDEN",
+tag:"Menünüz beş dilde",
+lede:"Menünüzün tamamını okudum — her yemeği, her fiyatı, her alerjen kodunu — ve çalışan bir QR menüye dönüştürdüm. Bu sayfa ne bulduğumu ve ne önerdiğimi anlatıyor. Okuması beş dakika.",
+meta:"Özkan Özmen · Ağustos 2026 · Akershusstranda 13, Oslo",
+
+k1:"Başlangıç noktası", h1s:"İskeleden yukarı çıkan misafir",
+p1:"Cruise iskelesinden yüz metre yürüyor. Norveççe okumuyor. Gemi kalkana kadar bir buçuk saati var ve kabuklu deniz ürünlerine alerjisi var. Bilmesi gereken her şey zaten menünüzde yazıyor — ama anladığı bir dilde değil.",
+st1:[["90","dakika, iskeleden masaya",""],["2","menüdeki dil sayısı",""],["0","fotoğraflı yemek","red"]],
+
+k2:"İnceleme", h2s:"Bulduğum on şey",
+p2:"Yemek menüsünü, 250 şişelik şarap listesini, grup menüsünü ve fotoğraf arşivinizi inceledim. Takıldığım noktalar bunlar — ele almak isteyeceğim sırayla.",
+finds:[
+ ["Alerjen anahtarı yalnızca Norveççe","Kodlar her yemekte var. Açıklaması sayfanın en altında — sadece Norveççe.","r"],
+ ["İstiridyenin iki adı var","Teras menüsü Chebooktook, Kanada diyor. À la carte Sanchez, Fransa diyor. Fiyat aynı: 75/435/865.","r"],
+ ["Karşılığı olmayan bir alerjen kodu","Kuruyemiş *n, p, ha, ma diye işaretli. «p» harfi menünün hiçbir yerindeki anahtarda yok.","r"],
+ ["Bira, su, gazoz ve kahve hiçbir yerde yok","Menüde yok, şarap listesinde yok, grup menüsünde yok.","r"],
+ ["Sadece Norveççe ve İngilizce","İskeledeki en büyük gruplardan biri Almanlar. Almanca yok, Çince yok, Fransızca yok.","r"],
+ ["Anahtar bölümden bölüme değişiyor","Bir bölümde Kuruyemiş = n yazıyor. Başkasında Laktoz = l. Hiçbirinde ikisi birden yok.","a"],
+ ["«Norwegian crayfish»","Sjøkreps langustindir, tatlı su kerevidi değil. İki sayfada da böyle yazıyor.","a"],
+ ["«ferskrevet pepperrot»","Ana yemeklerin altında yazım hatası. Doğrusu nyrevet.","a"],
+ ["Şarap listesi 250 şişelik bir PDF","Telefonda okunmuyor. Kadehle satılan on beş şarap içinde kaybolmuş.","a"],
+ ["Tek bir yemek fotoğrafı yok","Oysa kendi sitenizde otuzdan fazla profesyonel fotoğraf duruyor.","a"]],
+
+k3:"En önemlisi", h3s:"Yanlış anlaşılmayı kaldıramayacak tek bilgi",
+code:"*sk, b, se, e, s",
+cap:"Plateau de Fruits de Mer'in altında yazıyor",
+p3:"Açıklaması — Yumuşakçalar = b, Kabuklular = sk, Kereviz = se, Yumurta = e, Hardal = s — yalnızca Norveççe, sayfanın en altında. İngiliz, Alman ya da Çinli bir misafir, neredeyse her yemeğinde kabuklu ya da yumuşakça bulunan bir menüde karşılığı olmayan beş harf görüyor.",
+alarm:"Menüdeki tüm bilgiler içinde yanlış anlaşılmayı kaldıramayacak olan tek bilgi budur.",
+
+k4:"İçecek", h4s:"Hiçbir yerde yazmıyor",
+p4:"Üç yere baktım. Üçünde de sonuç aynı.",
+tbl:[["Kaynak","Bira","Su ve gazoz","Kahve ve çay"],
+     ["Yemek menüsü","yok","yok","yok"],
+     ["VINKART 2026 · 250 şişe","yok","yok","yok"],
+     ["Grup menüsü","yok","yok","yok"]],
+p4b:"Deniz ürünlerinin yanına bir bardak su ya da bira isteyen misafir sormak zorunda. Her seferinde, her masada. Garson da satış yapmak yerine buna cevap vermek zorunda.",
+
+k5:"Hakkını vermek gerekirse", h5s:"Zaten iyi olan taraflar",
+cards1:[
+ ["Her yemekte alerjen işareti","Oslo'daki çoğu yerde bu hiç yok."],
+ ["İki dilli menü","Çok dilliliğin temeli atılmış — metin zaten iki dilde mevcut."],
+ ["Üç farklı adette istiridye","1, 6 ve 12 adet. Adet seçimli dijital menü için birebir."],
+ ["Plateau de Fruits de Mer","Evin imzası ve misafirin fotoğrafını çektiği tabak."],
+ ["250 şişelik şarap listesi","Şehrin en güçlülerinden. Sorun içerikte değil, formatta."],
+ ["Otuzdan fazla basın fotoğrafı","Kendinize ait, profesyonel çekilmiş — ve menüde hiç kullanılmamış."]],
+
+k6:"Öneri", h6s:"Menünün tamamı tek ekranda",
+p6:"Hiçbir şey uydurulmadı. Her yemek, her yıl ve her fiyat kendi materyalinizden alındı. Bira, alkolsüz ve kahve fiyatsız birer öneri olarak duruyor; çünkü hiçbir listenizde yer almıyorlar.",
+st2:[["69","yemek ve içecek"],["5","dil, ilk günden"],["14","alerjen kodu çevrildi"],["48","saatlik sipariş kaydı"]],
+
+k7:"Masada", h7s:"Misafir için nasıl görünüyor",
+steps:[
+ ["Masadaki kodu okutuyor","Menü kendi masa numarasıyla açılıyor. Uygulama yok, indirme yok, hesap yok."],
+ ["Dilini seçiyor","Menünün tamamı değişiyor — yemekler, kategoriler ve alerjenler. Sadece butonlar değil."],
+ ["Yiyemediğini eliyor","«Kabuklusuz» seçeneğine tek dokunuş, içinde geçen her yemeği gizliyor."],
+ ["Sipariş veriyor ya da sadece okuyor","İkisi de olur. Sipariş garsona masa numarasıyla ulaşıyor."],
+ ["Garsonu çağırıyor","Ekrandaki çan. Garson hangi masa olduğunu ve ne istendiğini görüyor."]],
+
+k8:"Salonda", h8s:"Garsonun gördüğü",
+cards2:[
+ ["Çağrılar en üstte","Hangi masa, garson mu hesap mı istiyor, saat kaçta. Tek dokunuşla kapanıyor."],
+ ["Siparişler altında","Masa numarası, sipariş içeriği, saat ve tutar."],
+ ["Sekmede kırmızı sayı","Kaç masanın beklediği. Misafir ekranındayken bile görünüyor."],
+ ["48 saatlik geçmiş","Servis edilenler kendi listesine iniyor ve kendiliğinden düşüyor."]],
+
+k9:"Ofiste", h9s:"Yöneticinin gördüğü",
+cards3:[
+ ["Bugünkü ciro","Toplam, sipariş adedi ve sipariş başına ortalama."],
+ ["Masa bazında","Hangi masa ne bıraktı, sıralı."],
+ ["En çok satan","En çok giden altı ürün, adetleriyle."],
+ ["Saat bazında","Akşamın hangi saatinde para giriyor."],
+ ["Açık sipariş ve çağrılar","Canlı rakam; bekleyen varsa kırmızı."],
+ ["Günü yazdır","Günün tamamı tek sayfada."]],
+
+k10:"Masanın üstünde", h10s:"QR kodlar kendini üretiyor",
+p10:"Panel kodları kendisi üretiyor — masa başına bir tane, masa numarası içine gömülü. Sayfayı yazdırın, lamine edin, masaya koyun. Misafir 7 numaralı masadaki kodu okutunca menü 7. masa seçili açılıyor ve sipariş 7. masa etiketiyle düşüyor. Kaç masa olacağına siz karar veriyorsunuz.",
+
+k11:"Diller", h11s:"İstediğiniz zaman yenisi",
+p11:"Norveççe, İngilizce, Almanca, Türkçe ve Çince şu an hazır. Fransızca, İspanyolca, İtalyanca, Japonca — yeni bir dil, yemek başına tek bir metin alanı demek. Fiyat, alerjen ve etiketler otomatik korunuyor. Yapının hiçbir yeri yeniden kurulmuyor.",
+
+k12:"Sıralama", h12s:"Ben seçseydim",
+plan:[["İLK HAFTA","C08A1E",["Alerjen anahtarını İngilizceye çevirin","Anahtarı kodların yanına koyun, en alta değil","İki istiridye adını netleştirin","«p» kodunu açıklayın ya da kaldırın"]],
+      ["30 GÜN İÇİNDE","B4472F",["Masa numaralı QR menü","Üçüncü dil olarak Almanca","Kabuklu, balık ve gluten filtreleri","Kadeh şarapları PDF'ten çıkarın","Bira, su ve kahveyi listeye ekleyin"]],
+      ["90 GÜN İÇİNDE","2F6B57",["Çince ve Fransızca","İmza yemeklerde fotoğraf","Cuvée Solsiden'e kendi yeri","Sezonda masadan sipariş"]]],
+
+k13:"Deneyin", h13s:"Demo şu anda açık",
+p13:"Okuduğunuz her şey yayında ve çalışıyor. Telefonunuzdan açın — tercihen restoranda otururken.",
+links:[["Misafir böyle görüyor","Masa 7, menünün tamamı, beş dil","?bord=7&lang=tr"],
+       ["Garsonun ekranı","Siparişler ve çağrılar","?panel=garson&lang=tr"],
+       ["Yöneticinin ekranı","Kasa, QR kodlar ve gerisi","?panel=sef&lang=tr"]],
+
+endh:"Siz hayal edin,\nbiz tasarlayalım.",
+endp:"Menü sadece başlangıç. Misafirin ne yaşamasını istediğinizi söyleyin — gerisini biz kuralım.",
+sig:"Özkan Özmen",
+src:"İnceleme 16 Ağustos 2026'da solsiden.no üzerinde yapıldı: yemek menüsü ve VINKART 2026 (12.08.26). Fiyatlar ve yemekler o tarihten sonra değişmiş olabilir. Demodaki hiçbir şey uydurma değildir."
+}
+};
+
+/* --------------------------------------------------------------- render */
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+let lang = (new URLSearchParams(location.search).get("lang") || "").toLowerCase();
+if(!T[lang]){
+  const nav = (navigator.language || "no").slice(0,2).toLowerCase();
+  lang = T[nav] ? nav : "no";
+}
+
+function renderLangs(){
+  document.getElementById("langs").innerHTML = Object.keys(T).map(c =>
+    `<button class="lg ${c===lang?"on":""}" data-l="${c}">${T[c].name}</button>`).join("");
+  document.querySelectorAll("[data-l]").forEach(b => b.onclick = () => {
+    lang = b.dataset.l;
+    const u = new URL(location); u.searchParams.set("lang", lang);
+    history.replaceState(null, "", u);
+    render(); window.scrollTo({top:0});
+  });
+}
+
+function render(){
+  const t = T[lang];
+  document.documentElement.lang = t.htmlLang;
+  document.title = t.h1 + " · QR";
+  renderLangs();
+
+  const stats = (arr, four) => `<div class="stats${four?" four":""}">` + arr.map(s =>
+    `<div class="stat${s[2]==="red"?" red":""}"><b>${esc(s[0])}</b><span>${esc(s[1])}</span></div>`
+  ).join("") + `</div>`;
+
+  const cards = (arr, brass) => `<div class="cards">` + arr.map(c =>
+    `<div class="card"><span class="dot${brass?" br":""}"></span>
+      <b>${esc(c[0])}</b><span>${esc(c[1])}</span></div>`).join("") + `</div>`;
+
+  document.getElementById("doc").innerHTML = `
+  <div class="wrap">
+
+    <div class="hero">
+      <h1>${esc(t.h1)}</h1>
+      <p class="tag">${esc(t.tag)}</p>
+      <p class="lede">${esc(t.lede)}</p>
+      <p class="meta">${esc(t.meta)}</p>
+    </div>
+
+    <section>
+      <p class="kicker">${esc(t.k1)}</p><h2>${esc(t.h1s)}</h2>
+      <p class="big">${esc(t.p1)}</p>
+      ${stats(t.st1)}
+    </section>
+
+    <section>
+      <p class="kicker">${esc(t.k2)}</p><h2>${esc(t.h2s)}</h2>
+      <p>${esc(t.p2)}</p>
+      <ul class="finds">${t.finds.map((f,i)=>
+        `<li><span class="n ${f[2]==="a"?"a":""}">${i+1}</span>
+          <span><span class="fh">${esc(f[0])}</span><span class="fd">${esc(f[1])}</span></span></li>`).join("")}
+      </ul>
+    </section>
+
+    <section>
+      <p class="kicker">${esc(t.k3)}</p><h2>${esc(t.h3s)}</h2>
+      <div class="quote"><span class="code">${esc(t.code)}</span>
+        <span class="cap">${esc(t.cap)}</span></div>
+      <p class="big">${esc(t.p3)}</p>
+      <div class="alarm">${esc(t.alarm)}</div>
+    </section>
+
+    <section>
+      <p class="kicker">${esc(t.k4)}</p><h2>${esc(t.h4s)}</h2>
+      <p>${esc(t.p4)}</p>
+      <table><tr>${t.tbl[0].map(h=>`<th>${esc(h)}</th>`).join("")}</tr>
+        ${t.tbl.slice(1).map(r=>`<tr>${r.map((c,i)=>
+          `<td${i?' class="no"':''}>${esc(c)}</td>`).join("")}</tr>`).join("")}
+      </table>
+      <p class="big" style="margin-top:22px">${esc(t.p4b)}</p>
+    </section>
+
+    <section>
+      <p class="kicker">${esc(t.k5)}</p><h2>${esc(t.h5s)}</h2>
+      ${cards(t.cards1)}
+    </section>
+
+    <section>
+      <p class="kicker">${esc(t.k6)}</p><h2>${esc(t.h6s)}</h2>
+      <p class="big">${esc(t.p6)}</p>
+      ${stats(t.st2, true)}
+    </section>
+
+    <section>
+      <p class="kicker">${esc(t.k7)}</p><h2>${esc(t.h7s)}</h2>
+      <ul class="steps">${t.steps.map((s,i)=>
+        `<li><span class="sn">${i+1}</span>
+          <span><span class="fh">${esc(s[0])}</span><span class="fd">${esc(s[1])}</span></span></li>`).join("")}
+      </ul>
+    </section>
+
+    <section>
+      <p class="kicker">${esc(t.k8)}</p><h2>${esc(t.h8s)}</h2>
+      ${cards(t.cards2, true)}
+    </section>
+
+    <section>
+      <p class="kicker">${esc(t.k9)}</p><h2>${esc(t.h9s)}</h2>
+      ${cards(t.cards3, true)}
+    </section>
+
+    <section>
+      <p class="kicker">${esc(t.k10)}</p><h2>${esc(t.h10s)}</h2>
+      <p class="big">${esc(t.p10)}</p>
+    </section>
+
+    <section>
+      <p class="kicker">${esc(t.k11)}</p><h2>${esc(t.h11s)}</h2>
+      <p class="big">${esc(t.p11)}</p>
+    </section>
+
+    <section>
+      <p class="kicker">${esc(t.k12)}</p><h2>${esc(t.h12s)}</h2>
+      <div class="plan">${t.plan.map(c=>
+        `<div class="pcol"><span class="ph" style="background:#${c[1]}">${esc(c[0])}</span>
+          <ul>${c[2].map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")}
+      </div>
+    </section>
+
+    <section>
+      <p class="kicker">${esc(t.k13)}</p><h2>${esc(t.h13s)}</h2>
+      <p>${esc(t.p13)}</p>
+      <div class="links">${t.links.map(l=>
+        `<a class="lk" href="${BASE}${l[2]}" target="_blank" rel="noopener">
+          <span><b>${esc(l[0])}</b><br><span>${esc(l[1])}</span></span>
+          <span class="arw">&rarr;</span></a>`).join("")}
+      </div>
+    </section>
+
+    <div class="end">
+      <h2>${esc(t.endh).replace("\\n","<br>")}</h2>
+      <p class="big">${esc(t.endp)}</p>
+      <div class="sig"><b>${esc(t.sig)}</b></div>
+      <p class="src">${esc(t.src)}</p>
+    </div>
+
+  </div>`;
+}
+
+render();
+</script>
+</body>
+</html>
