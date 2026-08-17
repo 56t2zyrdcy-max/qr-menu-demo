@@ -588,7 +588,7 @@ function render(){
     </section>
 
     <div class="end">
-      <h2>${esc(t.endh).replace("\\n","<br>")}</h2>
+      <h2>${esc(t.endh).split("\n").join("<br>")}</h2>
       <p class="big">${esc(t.endp)}</p>
       <div class="sig"><b>${esc(t.sig)}</b></div>
       <p class="src">${esc(t.src)}</p>
